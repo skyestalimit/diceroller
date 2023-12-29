@@ -1,29 +1,47 @@
 package roller
 
 import (
-	"fmt"
-	"strconv"
-	"strings"
+"fmt"
+"math/rand"
+"time"
 )
 
 // Dice Roll structure
 type DiceRoll struct {
-	diceSize    int
-	diceAmmount int
+	DiceAmmount int
+	DiceSize    int
+	Modifier 	int
 }
 
-func ParseSingleRollStr(rollStr string) DiceRoll {
-	// Parse the dice roll and return the ammount and size of dice
-	rollDef := strings.Split(rollStr, "d")
-	dice, diceErr := strconv.Atoi(rollDef[0])
-	if diceErr != nil {
-		fmt.Println(fmt.Sprintf("Error converting dice value of %s: %s", rollDef, diceErr.Error()))
-		dice = 0
+// func NewDiceRoll(diceAmmount, diceSize, modifier) *DiceRoll{
+// 	return &diceRoll := DiceRoll {diceAmmount, diceSize, modifier}
+// }
+
+// Basic single dice roll
+
+func PerformSingleRoll(diceRoll DiceRoll) int {
+
+	fmt.Println("Rolling DiceRoll: ", diceRoll)
+	rollSum := 0
+	for i := 0; i < diceRoll.DiceAmmount; i++ {
+		diceGen := getFreshRandomGenerator()
+		diceRollResult := diceGen.Intn(diceRoll.DiceSize) + 1
+		fmt.Println("Gen results: ", diceRollResult)
+		rollSum += diceRollResult
 	}
-	ammount, ammountErr := strconv.Atoi(rollDef[1])
-	if ammountErr != nil {
-		fmt.Println(fmt.Sprintf("Error converting ammount value of %s: %s", rollDef, ammountErr.Error()))
-		ammount = 0
-	}
-	return DiceRoll{dice, ammount}
+	fmt.Println("Roll sum: ", rollSum)
+	return rollSum
 }
+
+func PerformRolls(diceRolls []DiceRoll) int {
+	rollsSum := 0
+	for i := 0; i < len(diceRolls); i++ {
+		rollsSum += PerformSingleRoll(diceRolls[i])
+	}
+	fmt.Println("Rolls sum: ", rollsSum)
+	return rollsSum
+}
+
+ func getFreshRandomGenerator() *rand.Rand {
+ 	return rand.New(rand.NewSource(time.Now().UnixNano()))
+ }
