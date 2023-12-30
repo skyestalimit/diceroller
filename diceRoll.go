@@ -30,7 +30,8 @@ func PerformSingleRoll(diceRoll DiceRoll) int {
 		rollSum += diceRollResult
 	}
 	fmt.Println("Roll sum: ", rollSum)
-	return rollSum
+	fmt.Println("Roll sum with mod: ", rollSum + diceRoll.Modifier)
+	return rollSum + diceRoll.Modifier
 }
 
 func PerformRolls(diceRolls []DiceRoll) int {
@@ -38,7 +39,6 @@ func PerformRolls(diceRolls []DiceRoll) int {
 	for i := 0; i < len(diceRolls); i++ {
 		rollsSum += PerformSingleRoll(diceRolls[i])
 	}
-	fmt.Println("Rolls sum: ", rollsSum)
 	return rollsSum
 }
 
