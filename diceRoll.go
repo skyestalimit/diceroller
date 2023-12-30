@@ -14,7 +14,7 @@ type DiceRoll struct {
 }
 
 // Basic single DiceRoll
-func PerformSingleRoll(diceRoll DiceRoll) int {
+func (diceRoll DiceRoll) performSingleRoll() int {
 	fmt.Println("Rolling for", printoutDiceRoll(diceRoll))
 	rollSum := 0
 	rollStr := ""
@@ -33,7 +33,7 @@ func PerformSingleRoll(diceRoll DiceRoll) int {
 func PerformRolls(diceRolls []DiceRoll) int {
 	rollsSum := 0
 	for i := 0; i < len(diceRolls); i++ {
-		rollsSum += PerformSingleRoll(diceRolls[i])
+		rollsSum += diceRolls[i].performSingleRoll()
 	}
 	return rollsSum
 }
