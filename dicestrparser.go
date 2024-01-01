@@ -18,30 +18,30 @@ func ParseRollArgs(rollArgs []string) []DiceRoll {
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			diceRolls = append(diceRolls, diceRoll)
+			diceRolls = append(diceRolls, *diceRoll)
 		}
 	}
 	return diceRolls
 }
 
-func parseRollArg(rollArg string) (DiceRoll, error) {
+func parseRollArg(rollArg string) (*DiceRoll, error) {
 	diceRoll := new(DiceRoll)
 
 	// Validate arg format
 	rollArg = strings.ToLower(rollArg)
 	regExp := regexp.MustCompile("^[[:digit:]]+d[[:digit:]]+([+|-][[:digit:]]+)?$")
 	if !regExp.MatchString(rollArg) {
-		return *diceRoll, createInvalidRollArgError(rollArg)
+		return diceRoll, createInvalidRollArgError(rollArg)
 	}
 
 	// Parse a roll argument and return it as a DiceRoll if valid
 	var argErr error = nil
 	rollArg, diceRoll.Modifier, argErr = evaluateModifier(rollArg)
 	if argErr != nil {
-		return *diceRoll, argErr
+		return diceRoll, argErr
 	}
 	diceRoll.DiceAmmount, diceRoll.DiceSize, argErr = evaluateDiceSizeAndAmmount(rollArg)
-	return *diceRoll, argErr
+	return diceRoll, argErr
 }
 
 func evaluateModifier(rollArg string) (string, int, error) {
