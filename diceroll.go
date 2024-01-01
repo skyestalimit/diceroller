@@ -11,36 +11,35 @@ type DiceRoll struct {
 	DiceAmmount int
 	DiceSize    int
 	Modifier    int
-	result      diceRollResult
 }
 
 // Dice Roll Result structure
-type diceRollResult struct {
-	dice []int
-	sum  int
+type DiceRollResult struct {
+	Dice []int
+	Sum  int
 }
 
 // Basic single DiceRoll
-func (diceRoll DiceRoll) performRoll() int {
+func (diceRoll DiceRoll) performRoll() *DiceRollResult {
 	fmt.Println("Rolling for", diceRoll.asString())
 
+	diceRollResult := new(DiceRollResult)
 	// Generate rolls DiceAmmount times for DiceSize dices
-	diceRoll.result.dice = make([]int, 0)
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
 		diceGen := getFreshRandomGenerator()
-		diceRoll.result.dice = append(diceRoll.result.dice, diceGen.Intn(diceRoll.DiceSize)+1)
-		diceRoll.result.sum += diceRoll.result.dice[i]
+		diceRollResult.Dice = append(diceRollResult.Dice, diceGen.Intn(diceRoll.DiceSize)+1)
+		diceRollResult.Sum += diceRollResult.Dice[i]
 	}
 
 	// Apply modifier
-	diceRoll.result.sum += diceRoll.Modifier
+	diceRollResult.Sum += diceRoll.Modifier
 	// Minimum roll result if always 1
-	if diceRoll.result.sum <= 0 {
-		diceRoll.result.sum = 1
+	if diceRollResult.Sum <= 0 {
+		diceRollResult.Sum = 1
 	}
 
-	fmt.Println("Dice rolls:", diceRoll.result.dice, "Sum:", diceRoll.result.sum)
-	return diceRoll.result.sum
+	fmt.Println("Dice rolls:", diceRollResult.Dice, "Sum:", diceRollResult.Sum)
+	return diceRollResult
 }
 
 // Human readable DiceRoll String
@@ -56,12 +55,12 @@ func (diceRoll DiceRoll) asString() string {
 }
 
 // Perform an array of DiceRoll
-func PerformRolls(diceRolls []DiceRoll) int {
-	rollsSum := 0
+func PerformRolls(diceRolls []DiceRoll) map[*DiceRoll]*DiceRollResult {
+	rollMap := map[*DiceRoll]*DiceRollResult{}
 	for i := range diceRolls {
-		rollsSum += diceRolls[i].performRoll()
+		rollMap[&diceRolls[i]] = diceRolls[i].performRoll()
 	}
-	return rollsSum
+	return rollMap
 }
 
 // Seeds a fresh random generator
