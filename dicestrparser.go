@@ -10,34 +10,30 @@ import (
 const plus = "+"
 const minus = "-"
 
-func ParseRollArgs(rollArgs []string) []DiceRoll {
-	// Parse the roll args and return an array of DiceRoll
-	diceRolls := make([]DiceRoll, 0)
+// Parse command line Roll Arguments
+// Returns a map of DiceRoll and error
+func ParseRollArgs(rollArgs []string) map[*DiceRoll]error {
+	diceRollMap := map[*DiceRoll]error{}
 	for i := range rollArgs {
-		diceRoll, err := parseRollArg(rollArgs[i])
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			diceRolls = append(diceRolls, *diceRoll)
-		}
+		diceRoll, err := ParseRollArg(rollArgs[i])
+		diceRollMap[diceRoll] = err
 	}
-	return diceRolls
+	return diceRollMap
 }
 
-func parseRollArg(rollArg string) (*DiceRoll, error) {
-	diceRoll := new(DiceRoll)
-
+// Parse a single Roll Argument
+// Returns a DiceRoll
+func ParseRollArg(rollArg string) (diceRoll *DiceRoll, argErr error) {
 	// Validate arg format
 	rollArg = strings.ToLower(rollArg)
 	regExp := regexp.MustCompile("^[[:digit:]]+d[[:digit:]]+([+|-][[:digit:]]+)?$")
 	if !regExp.MatchString(rollArg) {
-		return diceRoll, createInvalidRollArgError(rollArg)
+		return nil, createInvalidRollArgError(rollArg)
 	}
 
 	// Parse a roll argument and return it as a DiceRoll if valid
-	var argErr error = nil
-	rollArg, diceRoll.Modifier, argErr = evaluateModifier(rollArg)
-	if argErr != nil {
+	diceRoll = new(DiceRoll)
+	if rollArg, diceRoll.Modifier, argErr = evaluateModifier(rollArg); argErr != nil {
 		return diceRoll, argErr
 	}
 	diceRoll.DiceAmmount, diceRoll.DiceSize, argErr = evaluateDiceSizeAndAmmount(rollArg)
@@ -58,43 +54,39 @@ func evaluateModifier(rollArg string) (string, int, error) {
 
 func parseModifier(rollArg string, symbol string) (string, int, error) {
 	modSlices := strings.Split(rollArg, symbol)
-	invalidErr := validateArgSize(modSlices[1])
-	if invalidErr != nil {
+	if invalidErr := validateArgSize(modSlices[1]); invalidErr != nil {
 		return rollArg, 0, invalidErr
 	}
 	mod, modErr := strconv.Atoi(modSlices[1])
-	if modErr != nil {
-		modErr = fmt.Errorf("error converting modifier %s: \n%s", modSlices[1], modErr.Error())
-		mod = 0
-	} else {
+	if modErr == nil {
 		// Modifier is valid and processed, remove that slice from the rollArg
 		rollArg = modSlices[0]
 		if strings.EqualFold(symbol, minus) {
 			mod = -mod
 		}
+	} else {
+		modErr = fmt.Errorf("error converting modifier %s: \n%s", modSlices[1], modErr.Error())
+		mod = 0
 	}
 	return rollArg, mod, modErr
 }
 
-func evaluateDiceSizeAndAmmount(rollArg string) (int, int, error) {
+func evaluateDiceSizeAndAmmount(rollArg string) (ammount int, size int, argErr error) {
 	argSlices := strings.Split(rollArg, "d")
-	ammount, diceErr := parseDiceSlice(argSlices[0])
-	if diceErr != nil {
-		return ammount, 0, diceErr
+	if ammount, argErr = parseDiceSlice(argSlices[0]); argErr != nil {
+		return ammount, 0, argErr
 	}
-	size, diceErr := parseDiceSlice(argSlices[1])
-	if diceErr != nil {
-		return ammount, size, diceErr
+	if size, argErr = parseDiceSlice(argSlices[1]); argErr != nil {
+		return ammount, size, argErr
 	}
 	if ammount <= 0 || size <= 1 {
-		diceErr = createInvalidRollArgError(rollArg)
+		argErr = createInvalidRollArgError(rollArg)
 	}
-	return ammount, size, diceErr
+	return ammount, size, argErr
 }
 
 func parseDiceSlice(diceSlice string) (int, error) {
-	invalidErr := validateArgSize(diceSlice)
-	if invalidErr != nil {
+	if invalidErr := validateArgSize(diceSlice); invalidErr != nil {
 		return 0, invalidErr
 	}
 	dice, diceErr := strconv.Atoi(diceSlice)
@@ -107,7 +99,7 @@ func parseDiceSlice(diceSlice string) (int, error) {
 
 func validateArgSize(arg string) error {
 	if len(arg) > 5 {
-		return fmt.Errorf("invalid value: %s. \nThis is a dice roller, not a Pi calculator", arg)
+		return fmt.Errorf("invalid value: %s. This is a dice roller, not a Pi calculator", arg)
 	}
 	return nil
 }

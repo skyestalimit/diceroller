@@ -19,12 +19,22 @@ type DiceRollResult struct {
 	Sum  int
 }
 
-// Basic single DiceRoll
-func (diceRoll DiceRoll) performRoll() *DiceRollResult {
-	fmt.Println("Rolling for", diceRoll.asString())
+// Perform an array of DiceRoll
+func PerformRolls(diceRolls []DiceRoll) map[*DiceRoll]*DiceRollResult {
+	diceRollMap := map[*DiceRoll]*DiceRollResult{}
+	for i := range diceRolls {
+		diceRollMap[&diceRolls[i]] = diceRolls[i].PerformRoll()
+	}
+	return diceRollMap
+}
 
+// Performs a DiceRoll
+// Returns DiceRollResult
+func (diceRoll DiceRoll) PerformRoll() *DiceRollResult {
 	diceRollResult := new(DiceRollResult)
+
 	// Generate rolls DiceAmmount times for DiceSize dices
+	fmt.Println("Rolling for " + diceRoll.String())
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
 		diceGen := getFreshRandomGenerator()
 		diceRollResult.Dice = append(diceRollResult.Dice, diceGen.Intn(diceRoll.DiceSize)+1)
@@ -38,12 +48,12 @@ func (diceRoll DiceRoll) performRoll() *DiceRollResult {
 		diceRollResult.Sum = 1
 	}
 
-	fmt.Println("Dice rolls:", diceRollResult.Dice, "Sum:", diceRollResult.Sum)
+	fmt.Println(diceRollResult.String())
 	return diceRollResult
 }
 
 // Human readable DiceRoll String
-func (diceRoll DiceRoll) asString() string {
+func (diceRoll DiceRoll) String() string {
 	strDiceRoll := fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
 	if diceRoll.Modifier != 0 {
 		if diceRoll.Modifier > 0 {
@@ -54,13 +64,9 @@ func (diceRoll DiceRoll) asString() string {
 	return strDiceRoll
 }
 
-// Perform an array of DiceRoll
-func PerformRolls(diceRolls []DiceRoll) map[*DiceRoll]*DiceRollResult {
-	rollMap := map[*DiceRoll]*DiceRollResult{}
-	for i := range diceRolls {
-		rollMap[&diceRolls[i]] = diceRolls[i].performRoll()
-	}
-	return rollMap
+// Human readable DiceRollResult String
+func (result DiceRollResult) String() string {
+	return fmt.Sprintf("Dice rolls: %s Sum: %d", fmt.Sprint(result.Dice), result.Sum)
 }
 
 // Seeds a fresh random generator
