@@ -2,6 +2,7 @@ package roller
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -15,22 +16,49 @@ type DiceRoll struct {
 
 // Dice Roll Result structure
 type DiceRollResult struct {
-	Dice []int
-	Sum  int
+	DiceRollStr string
+	Dice        []int
+	Sum         int
+}
+
+const MaxDiceRollValue int = 99999
+
+// DiceRoll constructor
+func NewDiceRoll(ammount int, size int, modifier int) (DiceRoll, error) {
+	diceRoll := DiceRoll{ammount, size, modifier}
+	if diceErr := validateDiceRoll(diceRoll); diceErr == nil {
+		return diceRoll, nil
+	} else {
+		return DiceRoll{}, fmt.Errorf("invalid DiceRoll: %s", diceErr.Error())
+	}
+}
+
+// DiceRollResult constructor
+func NewDiceRollResult(diceRollStr string) DiceRollResult {
+	return DiceRollResult{diceRollStr, []int{}, 0}
 }
 
 // Perform an array of DiceRoll
-func PerformRolls(diceRolls []DiceRoll) map[*DiceRoll]*DiceRollResult {
+func PerformRolls(diceRolls []DiceRoll) (map[*DiceRoll]*DiceRollResult, []error) {
 	diceRollMap := map[*DiceRoll]*DiceRollResult{}
+	diceErrs := make([]error, 0)
 	for i := range diceRolls {
-		diceRollMap[&diceRolls[i]] = diceRolls[i].PerformRoll()
+		if result, diceErr := diceRolls[i].PerformRoll(); diceErr == nil {
+			diceRollMap[&diceRolls[i]] = result
+		} else {
+			diceErrs = append(diceErrs, diceErr)
+		}
 	}
-	return diceRollMap
+	return diceRollMap, diceErrs
 }
 
 // Performs a DiceRoll
 // Returns DiceRollResult
-func (diceRoll DiceRoll) PerformRoll() *DiceRollResult {
+func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
+	// Validate DiceRoll values
+	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
+		return nil, diceErr
+	}
 	diceRollResult := new(DiceRollResult)
 
 	// Generate rolls DiceAmmount times for DiceSize dices
@@ -49,7 +77,7 @@ func (diceRoll DiceRoll) PerformRoll() *DiceRollResult {
 	}
 
 	fmt.Println(diceRollResult.String())
-	return diceRollResult
+	return diceRollResult, nil
 }
 
 // Human readable DiceRoll String
@@ -62,6 +90,40 @@ func (diceRoll DiceRoll) String() string {
 		strDiceRoll += fmt.Sprintf("%d", diceRoll.Modifier)
 	}
 	return strDiceRoll
+}
+
+func validateDiceRoll(diceRoll DiceRoll) error {
+	if diceErr := validateDiceAmmout(diceRoll.DiceAmmount); diceErr != nil {
+		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+	}
+	if diceErr := validateDiceSize(diceRoll.DiceSize); diceErr != nil {
+		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+	}
+	if diceErr := validateDiceModifier(diceRoll.Modifier); diceErr != nil {
+		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+	}
+	return nil
+}
+
+func validateDiceAmmout(ammount int) error {
+	if ammount > MaxDiceRollValue || ammount <= 0 {
+		return fmt.Errorf("invalid dice ammout: %d", ammount)
+	}
+	return nil
+}
+
+func validateDiceSize(size int) error {
+	if size > MaxDiceRollValue || size <= 1 {
+		return fmt.Errorf("invalid dice size: %d", size)
+	}
+	return nil
+}
+
+func validateDiceModifier(modifier int) error {
+	if int(math.Abs(float64(modifier))) > MaxDiceRollValue {
+		return fmt.Errorf("invalid dice modifier: %d", modifier)
+	}
+	return nil
 }
 
 // Human readable DiceRollResult String

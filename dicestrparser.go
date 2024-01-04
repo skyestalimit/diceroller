@@ -12,13 +12,16 @@ const minus = "-"
 
 // Parse command line Roll Arguments
 // Returns a map of DiceRoll and error
-func ParseRollArgs(rollArgs []string) map[*DiceRoll]error {
-	diceRollMap := map[*DiceRoll]error{}
+func ParseRollArgs(rollArgs []string) (diceRolls []DiceRoll, errors []error) {
 	for i := range rollArgs {
 		diceRoll, err := ParseRollArg(rollArgs[i])
-		diceRollMap[diceRoll] = err
+		if diceRoll != nil {
+			diceRolls = append(diceRolls, *diceRoll)
+		} else {
+			errors = append(errors, err)
+		}
 	}
-	return diceRollMap
+	return diceRolls, errors
 }
 
 // Parse a single Roll Argument
@@ -34,9 +37,11 @@ func ParseRollArg(rollArg string) (diceRoll *DiceRoll, argErr error) {
 	// Parse a roll argument and return it as a DiceRoll if valid
 	diceRoll = new(DiceRoll)
 	if rollArg, diceRoll.Modifier, argErr = evaluateModifier(rollArg); argErr != nil {
-		return diceRoll, argErr
+		return nil, argErr
 	}
-	diceRoll.DiceAmmount, diceRoll.DiceSize, argErr = evaluateDiceSizeAndAmmount(rollArg)
+	if diceRoll.DiceAmmount, diceRoll.DiceSize, argErr = evaluateDiceSizeAndAmmount(rollArg); argErr != nil {
+		return nil, argErr
+	}
 	return diceRoll, argErr
 }
 
@@ -75,12 +80,13 @@ func evaluateDiceSizeAndAmmount(rollArg string) (ammount int, size int, argErr e
 	argSlices := strings.Split(rollArg, "d")
 	if ammount, argErr = parseDiceSlice(argSlices[0]); argErr != nil {
 		return ammount, 0, argErr
+	} else if argErr = validateDiceAmmout(ammount); argErr != nil {
+		return ammount, 0, argErr
 	}
 	if size, argErr = parseDiceSlice(argSlices[1]); argErr != nil {
 		return ammount, size, argErr
-	}
-	if ammount <= 0 || size <= 1 {
-		argErr = createInvalidRollArgError(rollArg)
+	} else if argErr = validateDiceSize(size); argErr != nil {
+		return ammount, size, argErr
 	}
 	return ammount, size, argErr
 }
