@@ -9,8 +9,8 @@ import (
 
 // Max allow
 const maxRollArgSliceSize = 5
-const plus = "+"
-const minus = "-"
+const plusSymbol = "+"
+const minusSymbol = "-"
 
 // Parse command line Roll Arguments. Returns arrays of DiceRolls and errors.
 func ParseRollArgs(rollArgs []string) (diceRolls []DiceRoll, errors []error) {
@@ -26,13 +26,14 @@ func ParseRollArgs(rollArgs []string) (diceRolls []DiceRoll, errors []error) {
 }
 
 // Parse and validates a roll arg. Returns a DiceRoll if valid, an error if invalid.
+// Valid rollArg examples: 4d4+1, 10d10, 1d6-1, 1D8
 func ParseRollArg(rollArg string) (diceRoll *DiceRoll, argErr error) {
 	// Validate arg format
 	rollArg = strings.ToLower(rollArg)
 	regExp := regexp.MustCompile("^[[:digit:]]+d[[:digit:]]+([+|-][[:digit:]]+)?$")
 	if !regExp.MatchString(rollArg) {
 		// Invalid roll arg, return error
-		return nil, createInvalidRollArgError(rollArg)
+		return nil, fmt.Errorf("invalid roll arg: %s", rollArg)
 	}
 
 	// Parse a roll argument and return it as a DiceRoll if valid. Return error if invalid
@@ -47,24 +48,26 @@ func ParseRollArg(rollArg string) (diceRoll *DiceRoll, argErr error) {
 }
 
 // Evaluates if a roll arg modifier is present.
-//   - If present, returns parseAndValidateModifier function call results.
-//   - If not present, returns the original roll arg, a zero value and no error.
+//
+//	-If present, returns parseAndValidateModifier function call results.
+//	-If not present, returns the original roll arg, a zero value and no error.
 func evaluateModifier(rollArg string) (string, int, error) {
 	// Detect if a modifier is present in roll arg. If present, parse and validate
-	if strings.ContainsAny(rollArg, plus) {
-		return parseAndValidateModifier(rollArg, plus)
+	if strings.ContainsAny(rollArg, plusSymbol) {
+		return parseAndValidateModifier(rollArg, plusSymbol)
 
-	} else if strings.ContainsAny(rollArg, minus) {
-		return parseAndValidateModifier(rollArg, minus)
+	} else if strings.ContainsAny(rollArg, minusSymbol) {
+		return parseAndValidateModifier(rollArg, minusSymbol)
 	}
 	// Modifier not present in roll arg
 	return rollArg, 0, nil
 }
 
 // Parses and validate a roll arg modifier.
-//   - If valid, returns the roll arg string with the modifier part removed, the modifier value and nil value error.
-//   - If invalid, returns the original roll arg, a zero and an error.
-//   - For unexpected parsing errors, returns the original roll arg, a zero and an error.
+//
+//	-If valid, returns the roll arg string with the modifier part removed, the modifier value and nil value error.
+//	-If invalid, returns the original roll arg, a zero and an error.
+//	-For unexpected parsing errors, returns the original roll arg, a zero and an error.
 func parseAndValidateModifier(rollArg string, symbol string) (string, int, error) {
 	// Extract modifier value and validate its size
 	modSlices := strings.Split(rollArg, symbol)
@@ -75,7 +78,7 @@ func parseAndValidateModifier(rollArg string, symbol string) (string, int, error
 
 	// Parse a roll arg modifier and return its value if valid. Return zero and error if invalid
 	if modifier, modErr := strconv.Atoi(modSlices[1]); modErr == nil {
-		if strings.EqualFold(symbol, minus) {
+		if strings.EqualFold(symbol, minusSymbol) {
 			// Make the modifier value negative for minus modifier
 			modifier = -modifier
 		}
@@ -126,9 +129,4 @@ func validateRollArgSliceSize(rollArg string) error {
 		return fmt.Errorf("invalid value: %s. This is a dice roller, not a Pi calculator", rollArg)
 	}
 	return nil
-}
-
-// Returns a formatter error for invalid roll arg.
-func createInvalidRollArgError(rollArg string) error {
-	return fmt.Errorf("invalid roll arg: %s", rollArg)
 }

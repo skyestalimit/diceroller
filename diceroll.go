@@ -41,13 +41,13 @@ func PerformRolls(diceRolls []DiceRoll) (results []DiceRollResult, diceErrs []er
 
 // Validates and performs a DiceRoll. Returns DiceRollResult if valid, an error if invalid.
 func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
-	// Validate DiceRoll values
+	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		// Invalid DiceRoll, return error
 		return nil, diceErr
 	}
 
-	// Generate rolls DiceAmmount times of DiceSize dices
+	// Generate rolls
 	diceRollResult := NewDiceRollResult(diceRoll.String())
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
 		diceGen := getFreshRandomGenerator()
@@ -75,7 +75,7 @@ func (diceRoll DiceRoll) String() string {
 	// Add modifier when necessary
 	if diceRoll.Modifier != 0 {
 		if diceRoll.Modifier > 0 {
-			strDiceRoll += "+"
+			strDiceRoll += plusSymbol
 		}
 		strDiceRoll += fmt.Sprintf("%d", diceRoll.Modifier)
 	}
@@ -85,21 +85,26 @@ func (diceRoll DiceRoll) String() string {
 // Validates DiceRoll values. Returns nil if valid, error if invalid.
 func validateDiceRoll(diceRoll DiceRoll) error {
 	if diceErr := validateDiceAmmout(diceRoll.DiceAmmount); diceErr != nil {
-		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
 	}
 	if diceErr := validateDiceSize(diceRoll.DiceSize); diceErr != nil {
-		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
 	}
 	if diceErr := validateDiceModifier(diceRoll.Modifier); diceErr != nil {
-		return fmt.Errorf("dice roll %s, %s", diceRoll.String(), diceErr.Error())
+		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
 	}
 	return nil
+}
+
+// Returns a formatted invalid dice roll error.
+func formattedInvalidDiceRollError(diceRollStr string, diceErr error) error {
+	return fmt.Errorf("dice roll %s: %s", diceRollStr, diceErr.Error())
 }
 
 // Validates ammount value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceAmmout(ammount int) error {
 	if ammount > MaxDiceRollValue || ammount <= 0 {
-		return fmt.Errorf("invalid dice ammout: %d", ammount)
+		return fmt.Errorf("invalid dice ammout %d", ammount)
 	}
 	return nil
 }
@@ -107,7 +112,7 @@ func validateDiceAmmout(ammount int) error {
 // Validates size value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceSize(size int) error {
 	if size > MaxDiceRollValue || size <= 1 {
-		return fmt.Errorf("invalid dice size: %d", size)
+		return fmt.Errorf("invalid dice size %d", size)
 	}
 	return nil
 }
@@ -115,7 +120,7 @@ func validateDiceSize(size int) error {
 // Validates modifier value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceModifier(modifier int) error {
 	if int(math.Abs(float64(modifier))) > MaxDiceRollValue {
-		return fmt.Errorf("invalid dice modifier: %d", modifier)
+		return fmt.Errorf("invalid dice modifier %d", modifier)
 	}
 	return nil
 }
