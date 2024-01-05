@@ -50,8 +50,8 @@ func TestParseSingleValidRollArg(t *testing.T) {
 
 func TestParseSingleInvalidRollArg(t *testing.T) {
 	for i := range invalidRollArgs {
-		if diceRoll, argErr := ParseRollArg(invalidRollArgs[i]); argErr == nil {
-			invalidArgParsingError(diceRoll.String(), t)
+		if _, argErr := ParseRollArg(invalidRollArgs[i]); argErr == nil {
+			invalidArgParsingError(invalidRollArgs[i], t)
 		}
 	}
 }

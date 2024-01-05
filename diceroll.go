@@ -17,13 +17,13 @@ type DiceRoll struct {
 // Max allowed value for DiceRoll definition.
 const MaxDiceRollValue int = 99999
 
-// DiceRoll constructor. Validates DiceRoll values.
-func NewDiceRoll(ammount int, size int, modifier int) (DiceRoll, error) {
+// DiceRoll constructor. Validates values.
+func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error) {
 	diceRoll := DiceRoll{ammount, size, modifier}
 	if diceErr := validateDiceRoll(diceRoll); diceErr == nil {
-		return diceRoll, nil
+		return &diceRoll, nil
 	} else {
-		return DiceRoll{}, fmt.Errorf("invalid DiceRoll: %s", diceErr.Error())
+		return nil, fmt.Errorf("invalid DiceRoll: %s", diceErr.Error())
 	}
 }
 
@@ -96,11 +96,6 @@ func validateDiceRoll(diceRoll DiceRoll) error {
 	return nil
 }
 
-// Returns a formatted invalid dice roll error.
-func formattedInvalidDiceRollError(diceRollStr string, diceErr error) error {
-	return fmt.Errorf("dice roll %s: %s", diceRollStr, diceErr.Error())
-}
-
 // Validates ammount value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceAmmout(ammount int) error {
 	if ammount > MaxDiceRollValue || ammount <= 0 {
@@ -123,6 +118,11 @@ func validateDiceModifier(modifier int) error {
 		return fmt.Errorf("invalid dice modifier %d", modifier)
 	}
 	return nil
+}
+
+// Returns a formatted invalid dice roll error.
+func formattedInvalidDiceRollError(diceRollStr string, diceErr error) error {
+	return fmt.Errorf("dice roll %s: %s", diceRollStr, diceErr.Error())
 }
 
 // Seeds a fresh random generator.
