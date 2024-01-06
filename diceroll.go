@@ -1,3 +1,6 @@
+// Package diceroller generates dice roll results based on the values
+// defined within a DiceRole object. It returns the results in a
+// DiceRollResult struct.
 package diceroller
 
 import (
