@@ -93,3 +93,18 @@ You can sum results of a `DiceRollResult` array by passing it to:
 ```go
 func DiceRollResultsSum(results []DiceRollResult) (sum int)
 ``` 
+
+## Roadmap
+
+The following versions and features are currently planned:
+
+* 1.0.0
+** Code coverage support
+** Include fuzzing tests
+
+* 1.1.0
+** Commands support: `crit`, `spell`
+** Introducing Roll attributes to support special rolling features
+
+* 1.2.0
+** Command support: `charGen`
