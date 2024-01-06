@@ -1,4 +1,4 @@
-package roller
+package diceroller
 
 import "fmt"
 
@@ -20,7 +20,7 @@ func (result DiceRollResult) String() string {
 }
 
 // Returns the total sum of a DiceRollResult array.
-func RollsSum(results []DiceRollResult) (sum int) {
+func DiceRollResultsSum(results []DiceRollResult) (sum int) {
 	for i := range results {
 		sum += results[i].Sum
 	}
