@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-// DiceRoll structure
+// A DiceRoll represents a dice rolling expression
 type DiceRoll struct {
-	DiceAmmount int
-	DiceSize    int
-	Modifier    int
+	DiceAmmount int // Ammount of dice to be rolled
+	DiceSize    int // Size, or numer of faces, of the dice to be rolled
+	Modifier    int // Value to be applied to the sum of rolled dices
 }
 
 // Max allowed value for DiceRoll definition.
-const MaxDiceRollValue int = 99999
+const maxDiceRollValue int = 99999
 
 // DiceRoll constructor. Validates values.
 func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error) {
@@ -98,7 +98,7 @@ func validateDiceRoll(diceRoll DiceRoll) error {
 
 // Validates ammount value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceAmmout(ammount int) error {
-	if ammount > MaxDiceRollValue || ammount <= 0 {
+	if ammount > maxDiceRollValue || ammount <= 0 {
 		return fmt.Errorf("invalid dice ammout %d", ammount)
 	}
 	return nil
@@ -106,7 +106,7 @@ func validateDiceAmmout(ammount int) error {
 
 // Validates size value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceSize(size int) error {
-	if size > MaxDiceRollValue || size <= 1 {
+	if size > maxDiceRollValue || size <= 1 {
 		return fmt.Errorf("invalid dice size %d", size)
 	}
 	return nil
@@ -114,7 +114,7 @@ func validateDiceSize(size int) error {
 
 // Validates modifier value for DiceRoll. Returns nil if valid, error if invalid.
 func validateDiceModifier(modifier int) error {
-	if int(math.Abs(float64(modifier))) > MaxDiceRollValue {
+	if int(math.Abs(float64(modifier))) > maxDiceRollValue {
 		return fmt.Errorf("invalid dice modifier %d", modifier)
 	}
 	return nil

@@ -7,9 +7,13 @@ import (
 	"strings"
 )
 
-// Max allow
+// Max allowed arg slice length
 const maxRollArgSliceSize = 5
+
+// Plus symbol character
 const plusSymbol = "+"
+
+// Minus symbol character
 const minusSymbol = "-"
 
 // Parses string format roll args. Returns arrays of DiceRolls and errors.

@@ -2,11 +2,11 @@ package diceroller
 
 import "fmt"
 
-// Dice Roll Result structure
+// A DiceRollResult contains the results of performing a DiceRoll
 type DiceRollResult struct {
-	DiceRollStr string
-	Dice        []int
-	Sum         int
+	DiceRollStr string // String representation of the performed DiceRoll
+	Dice        []int  // Individual dice roll results
+	Sum         int    // Sum of Dice array
 }
 
 // DiceRollResult constructor with DiceRoll readable string.
