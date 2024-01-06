@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// A DiceRoll represents a dice rolling expression
+// A DiceRoll represents a dice rolling expression, such as 1d6 or 2d8+1.
 type DiceRoll struct {
 	DiceAmmount int // Ammount of dice to be rolled
 	DiceSize    int // Size, or numer of faces, of the dice to be rolled
