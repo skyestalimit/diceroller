@@ -10,7 +10,8 @@ var validRollArgs = []string{
 	"10d10",
 	"1d6-1",
 	"10000d10000-10000",
-	"1D8-00"}
+	"1D8-00",
+	"1d100+0"}
 
 // Invalid Roll Args
 var invalidRollArgs = []string{

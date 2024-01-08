@@ -24,5 +24,5 @@ func DiceRollResultsSum(results []DiceRollResult) (sum int) {
 	for i := range results {
 		sum += results[i].Sum
 	}
-	return sum
+	return
 }

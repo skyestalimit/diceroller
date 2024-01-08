@@ -52,13 +52,14 @@ var valuesZeroSize diceRollTestValues = diceRollTestValues{
 	nil,
 	DiceRoll{1, 0, 0}}
 
-// Test basic init and string representation
+// Test basic init and string representation for valid DiceRolls
 func TestValidDiceRollString(t *testing.T) {
 	for i := range validDiceRollsValues {
 		validateDiceRollString(validDiceRollsValues[i], t)
 	}
 }
 
+// Test basic init and string representation for invalid DiceRolls
 func TestInvalidDiceRollString(t *testing.T) {
 	for i := range invalidDiceRollsValues {
 		validateDiceRollString(invalidDiceRollsValues[i], t)
@@ -72,7 +73,7 @@ func TestValidDiceRollResult(t *testing.T) {
 	}
 }
 
-// Test invalid DiceRoll results
+// Test invalid DiceRolls
 func TestInvalidDiceRollResult(t *testing.T) {
 	for i := range invalidDiceRollsValues {
 		validateInvalidDiceRoll(invalidDiceRollsValues[i], t)
@@ -81,21 +82,15 @@ func TestInvalidDiceRollResult(t *testing.T) {
 
 // Test rolling an array of valid DiceRoll
 func TestPerformValidRolls(t *testing.T) {
-	// Build valid DiceRoll array
-	validDiceRolls := make([]DiceRoll, 0)
-	for i := range validDiceRollsValues {
-		validDiceRolls = append(validDiceRolls, validDiceRollsValues[i].diceRoll)
-	}
-
-	// Perform roll on DiceRoll array
-	if results, diceErrs := PerformRolls(validDiceRolls); len(diceErrs) == 0 {
-		if len(results) == len(validDiceRolls) {
+	// Perform rolls on DiceRoll array
+	if results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)); len(diceErrs) == 0 {
+		if len(results) == len(validDiceRollsValues) {
 			for i := range results {
 				validateDiceRollResult(results[i], validDiceRollsValues[i].resultFormat, t)
 			}
 		} else {
 			// Missing results, fail the test
-			t.Fatalf("Result list length = %d, want match for %d", len(results), len(validDiceRolls))
+			t.Fatalf("Result list length = %d, want match for %d", len(results), len(validDiceRollsValues))
 		}
 	} else {
 		// Received errors, fail the test
@@ -109,17 +104,11 @@ func TestPerformValidRolls(t *testing.T) {
 
 // Test rolling an array of invalid DiceRoll
 func TestPerformInvalidRolls(t *testing.T) {
-	// Build valid DiceRoll array
-	invalidDiceRolls := make([]DiceRoll, 0)
-	for i := range invalidDiceRollsValues {
-		invalidDiceRolls = append(invalidDiceRolls, invalidDiceRollsValues[i].diceRoll)
-	}
-
-	// Perform roll on DiceRoll array
-	if _, diceErrs := PerformRolls(invalidDiceRolls); len(diceErrs) > 0 {
-		if len(diceErrs) != len(invalidDiceRolls) {
-			// Missing results, fail the test
-			t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRolls))
+	// Perform rolls on DiceRoll array
+	if _, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)); len(diceErrs) > 0 {
+		if len(diceErrs) != len(invalidDiceRollsValues) {
+			// Missing errors, fail the test
+			t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
 		}
 	}
 }
@@ -147,8 +136,17 @@ func validateDiceRollResult(result DiceRollResult, format *regexp.Regexp, t *tes
 	}
 }
 
+// Validate invalid DiceRoll generates an error
 func validateInvalidDiceRoll(diceValues diceRollTestValues, t *testing.T) {
 	if _, diceErr := diceValues.diceRoll.PerformRoll(); diceErr == nil {
 		t.Fatalf("Invalid dice roll did not generate an error: %s", diceValues.wantedDiceStr)
 	}
+}
+
+// Extracts and returns a DiceRoll array from a diceRollTestValues array
+func diceRollsFromTestValues(testValues []diceRollTestValues) (diceRolls []DiceRoll) {
+	for i := range testValues {
+		diceRolls = append(diceRolls, testValues[i].diceRoll)
+	}
+	return
 }
