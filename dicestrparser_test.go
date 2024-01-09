@@ -28,14 +28,14 @@ var invalidRollArgs = []string{
 	"1+8d8+1"}
 
 func TestParseValidRollArgs(t *testing.T) {
-	_, errors := ParseRollArgs(validRollArgs)
+	_, errors := ParseRollArgs(validRollArgs...)
 	for i := range errors {
 		validArgParsingError(errors[i], t)
 	}
 }
 
 func TestParseInvalidRollArgs(t *testing.T) {
-	diceRolls, _ := ParseRollArgs(invalidRollArgs)
+	diceRolls, _ := ParseRollArgs(invalidRollArgs...)
 	for i := range diceRolls {
 		invalidArgParsingError(diceRolls[i].String(), t)
 	}

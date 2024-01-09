@@ -32,13 +32,13 @@ func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error) {
 	}
 }
 
-// Performs a DiceRoll, returns the sum. Sum is 0 if DiceRoll is invalid.
+// Performs the DiceRoll, returns the sum. Sum is 0 if DiceRoll is invalid.
 func (diceRoll DiceRoll) PerformRollAndSum() int {
 	result, _ := diceRoll.PerformRoll()
 	return result.Sum
 }
 
-// Validates and performs a DiceRoll. Returns a DiceRollResult if valid, an error if invalid.
+// Validates and performs the DiceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
@@ -48,8 +48,9 @@ func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 
 	// Generate rolls
 	diceRollResult := NewDiceRollResult(diceRoll.String())
+	diceGen := freshRandomGenerator()
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
-		diceRollResult.Dice = append(diceRollResult.Dice, freshRandomGenerator().Intn(diceRoll.DiceSize)+1)
+		diceRollResult.Dice = append(diceRollResult.Dice, diceGen.Intn(diceRoll.DiceSize)+1)
 		diceRollResult.Sum += diceRollResult.Dice[i]
 	}
 
@@ -81,13 +82,13 @@ func (diceRoll DiceRoll) String() string {
 }
 
 // Performs an array of DiceRoll, returns the sum. Invalid DiceRolls counts as 0.
-func PerformRollsAndSum(diceRolls []DiceRoll) int {
-	results, _ := PerformRolls(diceRolls)
+func PerformRollsAndSum(diceRolls ...DiceRoll) int {
+	results, _ := PerformRolls(diceRolls...)
 	return DiceRollResultsSum(results)
 }
 
 // Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(diceRolls []DiceRoll) (results []DiceRollResult, diceErrs []error) {
+func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
 	for i := range diceRolls {
 		if result, diceErr := diceRolls[i].PerformRoll(); diceErr == nil {
 			results = append(results, *result)

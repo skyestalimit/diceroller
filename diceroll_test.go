@@ -17,15 +17,15 @@ var validDiceRollsValues = []diceRollTestValues{values4d4Plus1, values10d10, val
 
 var values4d4Plus1 diceRollTestValues = diceRollTestValues{
 	`4d4+1`,
-	regexp.MustCompile(`\[[0-9] [0-9] [0-9] [0-9]\]`),
+	regexp.MustCompile(`\[[1-4] [1-4] [1-4] [1-4]\]`),
 	DiceRoll{4, 4, 1}}
 var values10d10 diceRollTestValues = diceRollTestValues{
 	`10d10`,
-	regexp.MustCompile(`\[[0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+ [0-9]+\]`),
+	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
 	DiceRoll{10, 10, 0}}
 var values1d6Minus1 diceRollTestValues = diceRollTestValues{
 	`1d6-1`,
-	regexp.MustCompile(`\[[0-9]\]`),
+	regexp.MustCompile(`\[[1-6]\]`),
 	DiceRoll{1, 6, -1}}
 
 // Invalid Dice Rolls
@@ -67,26 +67,26 @@ func TestInvalidDiceRollString(t *testing.T) {
 }
 
 // Test valid DiceRoll results
-func TestValidDiceRollResult(t *testing.T) {
+func TestPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
-		rollAndvalidateDiceRollResult(validDiceRollsValues[i], t)
+		rollAndvalidateResult(validDiceRollsValues[i], t)
 	}
 }
 
 // Test invalid DiceRolls
-func TestInvalidDiceRollResult(t *testing.T) {
+func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		validateInvalidDiceRoll(invalidDiceRollsValues[i], t)
+		rollAndFailInvalidDiceRoll(invalidDiceRollsValues[i], t)
 	}
 }
 
 // Test rolling an array of valid DiceRoll
-func TestPerformValidRolls(t *testing.T) {
+func TestPerformRollsWithValidRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	if results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)); len(diceErrs) == 0 {
+	if results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...); len(diceErrs) == 0 {
 		if len(results) == len(validDiceRollsValues) {
 			for i := range results {
-				validateDiceRollResult(results[i], validDiceRollsValues[i].resultFormat, t)
+				validateDiceRollResult(results[i], validDiceRollsValues[i], t)
 			}
 		} else {
 			// Missing results, fail the test
@@ -103,9 +103,9 @@ func TestPerformValidRolls(t *testing.T) {
 }
 
 // Test rolling an array of invalid DiceRoll
-func TestPerformInvalidRolls(t *testing.T) {
+func TestPerformRollsWithInvalidRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	if _, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)); len(diceErrs) > 0 {
+	if _, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...); len(diceErrs) > 0 {
 		if len(diceErrs) != len(invalidDiceRollsValues) {
 			// Missing errors, fail the test
 			t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
@@ -121,23 +121,37 @@ func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
 }
 
 // Validate DiceRollResult matches expected format
-func rollAndvalidateDiceRollResult(diceValues diceRollTestValues, t *testing.T) {
+func rollAndvalidateResult(diceValues diceRollTestValues, t *testing.T) {
 	if result, diceErr := diceValues.diceRoll.PerformRoll(); diceErr == nil {
-		validateDiceRollResult(*result, diceValues.resultFormat, t)
+		validateDiceRollResult(*result, diceValues, t)
 	} else {
 		t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
 	}
 }
 
 // Validate roll result matches expected format
-func validateDiceRollResult(result DiceRollResult, format *regexp.Regexp, t *testing.T) {
-	if resultStr := result.String(); !format.MatchString(result.String()) {
-		t.Fatalf("Roll result = %s, want match for %#q", resultStr, format)
+func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues, t *testing.T) {
+	// validate result format
+	if resultStr := result.String(); !diceValues.resultFormat.MatchString(result.String()) {
+		t.Fatalf("Roll result = %s, want match for %#q", resultStr, diceValues.resultFormat)
+	}
+
+	// Validate sum
+	sum := 0
+	for i := range result.Dice {
+		sum += result.Dice[i]
+	}
+	sum += diceValues.diceRoll.Modifier
+	if sum <= 0 {
+		sum = 1
+	}
+	if result.Sum != sum {
+		t.Fatalf("Result sum = %d, should be %d", result.Sum, sum)
 	}
 }
 
 // Validate invalid DiceRoll generates an error
-func validateInvalidDiceRoll(diceValues diceRollTestValues, t *testing.T) {
+func rollAndFailInvalidDiceRoll(diceValues diceRollTestValues, t *testing.T) {
 	if _, diceErr := diceValues.diceRoll.PerformRoll(); diceErr == nil {
 		t.Fatalf("Invalid dice roll did not generate an error: %s", diceValues.wantedDiceStr)
 	}

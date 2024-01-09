@@ -18,7 +18,7 @@ const minusSymbol = "-"
 
 // Parses a rollArg array. Returns a DiceRoll array for valid rollArgs
 // and an error array for invalid ones.
-func ParseRollArgs(rollArgs []string) (diceRolls []DiceRoll, errors []error) {
+func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
 	for i := range rollArgs {
 		if diceRoll, err := ParseRollArg(rollArgs[i]); diceRoll != nil {
 			diceRolls = append(diceRolls, *diceRoll)
