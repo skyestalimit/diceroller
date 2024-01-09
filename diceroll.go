@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"time"
 )
 
 // A DiceRoll represents a dice rolling expression, such as 1d6 or 2d8+1.
@@ -48,9 +47,8 @@ func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 
 	// Generate rolls
 	diceRollResult := NewDiceRollResult(diceRoll.String())
-	diceGen := freshRandomGenerator()
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
-		diceRollResult.Dice = append(diceRollResult.Dice, diceGen.Intn(diceRoll.DiceSize)+1)
+		diceRollResult.Dice = append(diceRollResult.Dice, rand.Intn(diceRoll.DiceSize)+1)
 		diceRollResult.Sum += diceRollResult.Dice[i]
 	}
 
@@ -142,9 +140,4 @@ func validateDiceModifier(modifier int) error {
 // Returns a formatted invalid DiceRoll error.
 func formattedInvalidDiceRollError(diceRollStr string, diceErr error) error {
 	return fmt.Errorf("%s: %s", diceRollStr, diceErr.Error())
-}
-
-// Seeds and returns a fresh random generator.
-func freshRandomGenerator() *rand.Rand {
-	return rand.New(rand.NewSource(time.Now().UnixNano()))
 }
