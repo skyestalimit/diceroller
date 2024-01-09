@@ -12,39 +12,9 @@ go get github.com/skyestalimit/diceroller
 
 ## Usage
 
-For simple dice rolling, such as `1d6`, `1d8-1`, `4d4+4` or `10d10`, see the **Single Dice Rolls** section.
+You will need DiceRolls to start rolling!
 
-For more complex dice rolling, such as `2d6+4 + 1d8`, see the **Multiple Dice Rolls** section.
-
-### Single rolls
-
-To perform a single dice roll, you simply call PerformRoll() on a DiceRoll and get the sum:
-
-```go
-func (diceRoll DiceRoll) PerformRollAndSum() int
-```
-
-Or you can get a DiceRollResult instead for a more detailed result:
-
-```go
-func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error)
-```
-
-### Multiple dice rolls
-
-You can perform multiple DiceRolls and get the sum by passing DiceRolls to:
-
-```go
-func PerformRollsAndSum(diceRolls ...DiceRoll) int
-```
-
-Or you can get a DiceRollResult array instead for more detailed results:
-
-```go
-func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error)
-```
-
-The results can then be summed, see the **Viewing Results** section.
+The methods to either build your own or get them from the parser are described below.
 
 ### DiceRoll definition
 
@@ -61,7 +31,7 @@ func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error)
 For example, to build a `DiceRoll` for the dice rolling expression `2d6+1`, you would pass these values to the constructor:
 
 ```go
-diceRoll, err := NewDiceRoll(2, 6, 1)
+NewDiceRoll(2, 6, 1)
 ```
 
 ### RollArg definition
@@ -76,7 +46,7 @@ Examples:
 "1d6", "4d4+4", "1D8-1", "10d10", "1d00"
 ```
 
-#### Building DiceRolss using the rollArg parser
+#### Building DiceRolls using the rollArg parser
 
 You can use the parser to build a `DiceRoll` from a rollArg:
 
@@ -84,7 +54,11 @@ You can use the parser to build a `DiceRoll` from a rollArg:
 func ParseRollArg(rollArg string) (*DiceRoll, error)
 ```
 
-For example, to build a `DiceRoll` for the dice rolling expression `2d6+1` you would pass this rollArg to the above function: `"2d6+1"`
+For example, to build a `DiceRoll` for the dice rolling expression `2d6+1` you would pass the `"2d6+1"` rollArg:
+
+```go
+ParseRollArg("2d6+1")
+```
 
 You can also use the parser to build a `DiceRoll` array from multiple rollArgs:
 
@@ -105,6 +79,40 @@ Or:
 ```go
 ParseRollArgs([]string{"2d6+4","1d8"})
 ```
+
+### Single rolls
+
+For simple dice rolling expressions, such as `1d6`, `1d8-1`, `4d4+4` or `10d10`, you only need a single DiceRoll.
+
+Call PerformRollAndSum() or PerformRoll() on a DiceRoll and get the result:
+
+```go
+func (diceRoll DiceRoll) PerformRollAndSum() int
+```
+
+Or you can get a DiceRollResult instead for a more detailed result:
+
+```go
+func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error)
+```
+
+### Multiple rolls
+
+For more complex dice rolling expressions, such as `2d6+4 + 1d8`, you need multiple DiceRolls.
+
+You can get the sum of the DiceRoll results by passing the DiceRolls to:
+
+```go
+func PerformRollsAndSum(diceRolls ...DiceRoll) int
+```
+
+Or you can get a DiceRollResult array instead for more detailed results:
+
+```go
+func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error)
+```
+
+The results can then be summed, see the **Viewing Results** section.
 
 ### Viewing Results
 
