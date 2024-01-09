@@ -64,7 +64,7 @@ func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 	return diceRollResult, nil
 }
 
-// Human readable DiceRoll string in XdY[+|-Z] format.
+// Human readable DiceRoll string in XdY([+|-]Z) format.
 // DiceRoll{2, 8, 1}.PerformRoll() would return "2d8+1"
 func (diceRoll DiceRoll) String() string {
 	strDiceRoll := fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
