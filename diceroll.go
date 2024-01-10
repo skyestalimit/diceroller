@@ -82,8 +82,11 @@ func (diceRoll DiceRoll) String() string {
 // Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.
 // Returns the sum if valid, zero if invalid.
 func PerformRollAndSum(diceAmmount int, diceSize int, modifier int) int {
-	result, _ := PerformRoll(diceAmmount, diceSize, modifier)
-	return result.Sum
+	if result, _ := PerformRoll(diceAmmount, diceSize, modifier); result != nil {
+		return result.Sum
+	} else {
+		return 0
+	}
 }
 
 // Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.

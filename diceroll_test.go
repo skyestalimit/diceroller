@@ -66,22 +66,57 @@ func TestInvalidDiceRollString(t *testing.T) {
 	}
 }
 
-// Test valid DiceRoll results
-func TestPerformRollWithValidDiceRolls(t *testing.T) {
+// Test simple rolling with valid values
+func TestPerformRollWithValidDiceValues(t *testing.T) {
 	for i := range validDiceRollsValues {
-		rollAndvalidateResult(validDiceRollsValues[i], t)
+		diceRoll := validDiceRollsValues[i].diceRoll
+		if sum := PerformRollAndSum(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); sum <= 0 {
+			t.Fatalf("Valid diceRoll %s returned invalid result %d", diceRoll.String(), sum)
+		}
+		if result, diceErr := PerformRoll(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); diceErr != nil {
+			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
+		} else {
+			validateDiceRollResult(*result, validDiceRollsValues[i], t)
+		}
 	}
 }
 
-// Test invalid DiceRolls
-func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
+// Test simple rolling with invalid values
+func TestPerformRollWithInvalidDiceValues(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		rollAndFailInvalidDiceRoll(invalidDiceRollsValues[i], t)
+		diceRoll := invalidDiceRollsValues[i].diceRoll
+		if sum := PerformRollAndSum(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); sum > 0 {
+			t.Fatalf("Invalid diceRoll %s returned valid result %d", diceRoll.String(), sum)
+		}
+		if _, diceErr := PerformRoll(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); diceErr == nil {
+			t.Fatalf("Invalid dice roll %s did not generate an error", diceRoll.String())
+
+		}
+	}
+}
+
+// Test valid DiceRoll results
+func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
+	for i := range validDiceRollsValues {
+		if result, diceErr := validDiceRollsValues[i].diceRoll.PerformRoll(); diceErr == nil {
+			validateDiceRollResult(*result, validDiceRollsValues[i], t)
+		} else {
+			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
+		}
+	}
+}
+
+// Test rolling invalid DiceRolls
+func TestDiceRollPerformRollWithInvalidDiceRolls(t *testing.T) {
+	for i := range invalidDiceRollsValues {
+		if _, diceErr := invalidDiceRollsValues[i].diceRoll.PerformRoll(); diceErr == nil {
+			t.Fatalf("Invalid dice roll %s did not generate an error", invalidDiceRollsValues[i].wantedDiceStr)
+		}
 	}
 }
 
 // Test rolling an array of valid DiceRoll
-func TestPerformRollsWithValidRolls(t *testing.T) {
+func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
 	if results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...); len(diceErrs) == 0 {
 		if len(results) == len(validDiceRollsValues) {
@@ -103,7 +138,7 @@ func TestPerformRollsWithValidRolls(t *testing.T) {
 }
 
 // Test rolling an array of invalid DiceRoll
-func TestPerformRollsWithInvalidRolls(t *testing.T) {
+func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
 	if _, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...); len(diceErrs) > 0 {
 		if len(diceErrs) != len(invalidDiceRollsValues) {
@@ -113,23 +148,14 @@ func TestPerformRollsWithInvalidRolls(t *testing.T) {
 	}
 }
 
-// Validate DiceRoll string format
+// Validates DiceRoll string format
 func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
 	if diceStr := diceValues.diceRoll.String(); !strings.EqualFold(diceValues.wantedDiceStr, diceStr) {
 		t.Fatalf("DiceRoll = %s, must equal %s", diceStr, diceValues.wantedDiceStr)
 	}
 }
 
-// Validate DiceRollResult matches expected format
-func rollAndvalidateResult(diceValues diceRollTestValues, t *testing.T) {
-	if result, diceErr := diceValues.diceRoll.PerformRoll(); diceErr == nil {
-		validateDiceRollResult(*result, diceValues, t)
-	} else {
-		t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
-	}
-}
-
-// Validate roll result matches expected format
+// Validates roll result matches expected format
 func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues, t *testing.T) {
 	// validate result format
 	if resultStr := result.String(); !diceValues.resultFormat.MatchString(result.String()) {
@@ -146,14 +172,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 		sum = 1
 	}
 	if result.Sum != sum {
-		t.Fatalf("Result sum = %d, should be %d", result.Sum, sum)
-	}
-}
-
-// Validate invalid DiceRoll generates an error
-func rollAndFailInvalidDiceRoll(diceValues diceRollTestValues, t *testing.T) {
-	if _, diceErr := diceValues.diceRoll.PerformRoll(); diceErr == nil {
-		t.Fatalf("Invalid dice roll did not generate an error: %s", diceValues.wantedDiceStr)
+		t.Fatalf("DiceRoll %s result is %d, wanted be %d", diceValues.diceRoll.String(), result.Sum, sum)
 	}
 }
 
