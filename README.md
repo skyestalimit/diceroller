@@ -12,15 +12,25 @@ go get github.com/skyestalimit/diceroller
 
 ## Usage
 
-You will need DiceRolls to start rolling!
+For simple dice rolling, use this function:
 
-The methods to either build your own or get them from the parser are described below.
+```go
+func PerformRollAndSum(diceAmmount int, diceSize int, modifier int) int
+```
 
-### DiceRoll definition
+For example, to roll the dice rolling expression `2d6`:
+
+```go
+PerformRollAndSum(2, 6, 0)
+```
+
+For more rolling, you will need DiceRolls!
+
+You can either build your own or get them from the parser. The options are described below.
+
+### Building a DiceRoll
 
 A `DiceRoll` is not necessarily a single dice roll, but a single dice rolling expression, such as `2d6`.
-
-#### Building a DiceRoll
 
 You can build your own `DiceRoll` by using the constructor:
 
@@ -34,19 +44,17 @@ For example, to build a `DiceRoll` for the dice rolling expression `2d6+1`, you 
 NewDiceRoll(2, 6, 1)
 ```
 
-### RollArg definition
+### Building DiceRolls using the rollArg parser
 
-A rollArg is simply a string representing a dice roll expression, such as `1d6`, `1d8-1`, `4d4+4` or `10d10`.
+A rollArg is simply a string representing a dice rolling expression, such as `1d6`, `1d8-1`, `4d4+4` or `10d10`.
 
 A valid rollArg matches either of these formats: `XdY`, `XdY+Z`, `XdY-Z`.
 
 Examples:
 
 ```go
-"1d6", "4d4+4", "1D8-1", "10d10", "1d00"
+"1d6", "4d4+4", "1D8-1", "10d10", "1d100"
 ```
-
-#### Building DiceRolls using the rollArg parser
 
 You can use the parser to build a `DiceRoll` from a rollArg:
 
@@ -100,7 +108,7 @@ func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error)
 
 For more complex dice rolling expressions, such as `2d6+4 + 1d8`, you need multiple DiceRolls.
 
-You can get the sum of the DiceRoll results by passing the DiceRolls to:
+You can get the sum of the DiceRolls results by passing the DiceRolls to:
 
 ```go
 func PerformRollsAndSum(diceRolls ...DiceRoll) int
@@ -116,10 +124,10 @@ The results can then be summed, see the **Viewing Results** section.
 
 ### Viewing Results
 
-For more details about the result of a `DiceRoll`, it can return its result in a `DiceRollResult`.
+For more details about the result of a `DiceRoll`, a `DiceRollResult` can be returned.
 
 * The result, or sum, is stored in the `Sum` field.
-* An array of the individual dice roll results are stored in the `Dice` field.
+* An array of each individual dice roll result is stored in the `Dice` field.
 * `String()` returns a formatted result string.
 
 You can sum results of a `DiceRollResult` array by passing it to:

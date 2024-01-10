@@ -44,12 +44,12 @@ func ParseRollArg(rollArg string) (*DiceRoll, error) {
 	if rollArg, modifier, argErr := evaluateModifier(rollArg); argErr != nil {
 		// Invalid modifier
 		return nil, argErr
-	} else if ammount, size, argErr := evaluateDiceSizeAndAmmount(rollArg); argErr != nil {
+	} else if diceAmmount, diceSize, argErr := evaluateDiceSizeAndAmmount(rollArg); argErr != nil {
 		// Invalid dice values
 		return nil, argErr
 	} else {
 		// Parsed rollArgs, their values gets validated in DiceRoll constructor
-		return NewDiceRoll(ammount, size, modifier)
+		return NewDiceRoll(diceAmmount, diceSize, modifier)
 	}
 }
 
@@ -96,15 +96,15 @@ func parseModifier(rollArg string, symbol string) (string, int, error) {
 func evaluateDiceSizeAndAmmount(rollArg string) (int, int, error) {
 	// rollArg is either xdy or xDy format by now. To lowercase and split on "d"
 	rollArgSlices := strings.Split(strings.ToLower(rollArg), "d")
-	if ammount, argErr := parseDiceRollArgSlice(rollArgSlices[0]); argErr != nil {
+	if diceAmmount, argErr := parseDiceRollArgSlice(rollArgSlices[0]); argErr != nil {
 		// Invalid ammount
 		return 0, 0, argErr
-	} else if size, argErr := parseDiceRollArgSlice(rollArgSlices[1]); argErr != nil {
+	} else if diceSize, argErr := parseDiceRollArgSlice(rollArgSlices[1]); argErr != nil {
 		// Invalide size
 		return 0, 0, argErr
 	} else {
 		// Valid rollArg
-		return ammount, size, nil
+		return diceAmmount, diceSize, nil
 	}
 }
 

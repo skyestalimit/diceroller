@@ -22,8 +22,8 @@ const maxDiceRollValue int = 99999
 const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
-func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error) {
-	diceRoll := DiceRoll{ammount, size, modifier}
+func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error) {
+	diceRoll := DiceRoll{diceAmmount, diceSize, modifier}
 	if diceErr := validateDiceRoll(diceRoll); diceErr == nil {
 		return &diceRoll, nil
 	} else {
@@ -31,13 +31,13 @@ func NewDiceRoll(ammount int, size int, modifier int) (*DiceRoll, error) {
 	}
 }
 
-// Performs the DiceRoll, returns the sum. Sum is 0 if DiceRoll is invalid.
+// Performs the DiceRoll. Returns the sum if diceRoll valid, zero if invalid.
 func (diceRoll DiceRoll) PerformRollAndSum() int {
 	result, _ := diceRoll.PerformRoll()
 	return result.Sum
 }
 
-// Validates and performs the DiceRoll. Returns a DiceRollResult if valid, an error if invalid.
+// Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
@@ -79,7 +79,24 @@ func (diceRoll DiceRoll) String() string {
 	return strDiceRoll
 }
 
-// Performs an array of DiceRoll, returns the sum. Invalid DiceRolls counts as 0.
+// Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.
+// Returns the sum if valid, zero if invalid.
+func PerformRollAndSum(diceAmmount int, diceSize int, modifier int) int {
+	result, _ := PerformRoll(diceAmmount, diceSize, modifier)
+	return result.Sum
+}
+
+// Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.
+// Returns a DiceRollResult if valid, an error if invalid.
+func PerformRoll(diceAmmount int, diceSize int, modifier int) (*DiceRollResult, error) {
+	if diceRoll, diceErr := NewDiceRoll(diceAmmount, diceSize, modifier); diceErr != nil {
+		return nil, diceErr
+	} else {
+		return diceRoll.PerformRoll()
+	}
+}
+
+// Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
 func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 	results, _ := PerformRolls(diceRolls...)
 	return DiceRollResultsSum(results)
@@ -97,7 +114,7 @@ func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []e
 	return results, diceErrs
 }
 
-// Validates DiceRoll values. Returns nil if valid, error if invalid.
+// Validates diceRoll values. Returns nil if valid, error if invalid.
 func validateDiceRoll(diceRoll DiceRoll) error {
 	if diceErr := validateDiceAmmout(diceRoll.DiceAmmount); diceErr != nil {
 		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
@@ -111,20 +128,20 @@ func validateDiceRoll(diceRoll DiceRoll) error {
 	return nil
 }
 
-// Validates ammount values for DiceRoll. Returns nil if valid, an error if invalid.
-func validateDiceAmmout(ammount int) error {
-	if ammount > maxDiceRollValue || ammount <= 0 {
-		return fmt.Errorf("invalid dice ammout %d. %s", ammount, bigNumberErrorMsg)
-	} else if ammount <= 0 {
-		return fmt.Errorf("invalid dice ammout %d", ammount)
+// Validates diceAmmount values for DiceRoll. Returns nil if valid, an error if invalid.
+func validateDiceAmmout(diceAmmount int) error {
+	if diceAmmount > maxDiceRollValue || diceAmmount <= 0 {
+		return fmt.Errorf("invalid dice ammout %d. %s", diceAmmount, bigNumberErrorMsg)
+	} else if diceAmmount <= 0 {
+		return fmt.Errorf("invalid dice ammout %d", diceAmmount)
 	}
 	return nil
 }
 
-// Validates size values for DiceRoll. Returns nil if valid, an error if invalid.
-func validateDiceSize(size int) error {
-	if size > maxDiceRollValue || size <= 1 {
-		return fmt.Errorf("invalid dice size %d. %s", size, bigNumberErrorMsg)
+// Validates diceSize values for DiceRoll. Returns nil if valid, an error if invalid.
+func validateDiceSize(diceSize int) error {
+	if diceSize > maxDiceRollValue || diceSize <= 1 {
+		return fmt.Errorf("invalid dice size %d. %s", diceSize, bigNumberErrorMsg)
 	}
 	return nil
 }
