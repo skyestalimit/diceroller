@@ -99,6 +99,20 @@ func PerformRoll(diceAmmount int, diceSize int, modifier int) (*DiceRollResult, 
 	}
 }
 
+// Straightforward rolling using rollArgs. Returns the sum, invalid rollArgs are worth 0.
+func PerformRollArgsAndSum(rollArgs ...string) int {
+	diceRolls, _ := ParseRollArgs(rollArgs...)
+	return PerformRollsAndSum(diceRolls...)
+}
+
+// Performs an array of rollArgs. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
+func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
+	diceRolls, argErrs := ParseRollArgs(rollArgs...)
+	results, diceErrs := PerformRolls(diceRolls...)
+	argErrs = append(argErrs, diceErrs...)
+	return results, argErrs
+}
+
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
 func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 	results, _ := PerformRolls(diceRolls...)
