@@ -7,15 +7,6 @@ import (
 	"strings"
 )
 
-// Max allowed arg slice length
-const maxRollArgSliceSize = 5
-
-// Plus symbol character
-const plusSymbol = "+"
-
-// Minus symbol character
-const minusSymbol = "-"
-
 // Parses a RollArg array. Returns a DiceRoll array for valid RollArgs
 // and an error array for invalid ones.
 func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
@@ -34,100 +25,53 @@ func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
 //
 // Valid RollArg examples: "4d4+1", "10d10", "1d6-1", "1D8".
 func parseRollArg(rollArg string) (*DiceRoll, error) {
-	// Validate RollArg format
-	if !regexp.MustCompile("^[[:digit:]]+[d|D][[:digit:]]+([+|-][[:digit:]]+)?$").MatchString(rollArg) {
-		// Invalid RollArg, return error
+	// Validate rollArg format
+	regex := regexp.MustCompile(`^(\d+)+[dD](\d+)([+-](\d+))?$`)
+	if !regex.MatchString(rollArg) {
 		return nil, fmt.Errorf("invalid RollArg: %s", rollArg)
 	}
 
-	// Parse the RollArg
-	if modifier, argErr := evaluateModifier(&rollArg); argErr != nil {
-		// Invalid modifier
-		return nil, argErr
-	} else if diceAmmount, diceSize, argErr := evaluateDiceSizeAndAmmount(rollArg); argErr != nil {
-		// Invalid dice values
-		return nil, argErr
+	// Parse rollArg into slices using the regex matches
+	matches := regex.FindStringSubmatch(rollArg)
+
+	var diceAmmount, diceSize, modifier = 0, 0, 0
+
+	// Parse dice ammount
+	if value, argErr := parseRollArgSlice(matches[1]); argErr == nil {
+		diceAmmount = value
 	} else {
-		// Parsed RollArgs, their values gets validated in DiceRoll constructor
-		return NewDiceRoll(diceAmmount, diceSize, modifier)
+		return nil, argErr
 	}
-}
-
-// Evaluates rollArg modifier if present.
-//
-//	-If present, returns the modifier values and no error.
-//	-If not present, returns zero and an error.
-func evaluateModifier(rollArg *string) (int, error) {
-	// Detect modifier
-	if strings.ContainsAny(*rollArg, plusSymbol) {
-		return parseModifier(rollArg, plusSymbol)
-
-	} else if strings.ContainsAny(*rollArg, minusSymbol) {
-		return parseModifier(rollArg, minusSymbol)
+	// Parse dice size
+	if value, argErr := parseRollArgSlice(matches[2]); argErr == nil {
+		diceSize = value
+	} else {
+		return nil, argErr
 	}
-
-	// Modifier not present in rollArg
-	return 0, nil
-}
-
-// Parses and validates the size of rollArg modifier.
-//
-//	-If valid, returns the modifier value and no error.
-//	-If invalid, returns zero and an error.
-func parseModifier(rollArg *string, symbol string) (int, error) {
-	// Extract the modifier from rollArg and validate its size
-	rollArgSlices := strings.Split(*rollArg, symbol)
-
-	// Parse the modifier
-	if modifier, argErr := parseRollArgSlice(rollArgSlices[1]); argErr == nil {
-		if strings.EqualFold(symbol, minusSymbol) {
-			// Make the modifier value negative for minus modifiers
-			modifier = -modifier
+	// Parse modifier
+	if len(matches[3]) > 0 {
+		if value, argErr := parseRollArgSlice(matches[3]); argErr == nil {
+			modifier = value
+		} else {
+			return nil, argErr
 		}
-		// Modifier is valid and processed, update rollArg to a slice without the modifier part
-		*rollArg = rollArgSlices[0]
-		return modifier, nil
-	} else {
-		// Invalid modifier
-		return 0, argErr
 	}
-}
 
-// Evaluates rollArg. Returns its values if a valid, zeroes and an error if invalid.
-func evaluateDiceSizeAndAmmount(rollArg string) (int, int, error) {
-	// rollArg is either xdy or xDy format by now. To lowercase and split on "d"
-	rollArgSlices := strings.Split(strings.ToLower(rollArg), "d")
-	if diceAmmount, argErr := parseRollArgSlice(rollArgSlices[0]); argErr != nil {
-		// Invalid ammount
-		return 0, 0, argErr
-	} else if diceSize, argErr := parseRollArgSlice(rollArgSlices[1]); argErr != nil {
-		// Invalide size
-		return 0, 0, argErr
-	} else {
-		// Valid rollArg
-		return diceAmmount, diceSize, nil
-	}
+	return NewDiceRoll(diceAmmount, diceSize, modifier)
 }
 
 // Parses a rollArg slice. Returns its value if valid, zero and an error if invalid.
 func parseRollArgSlice(rollArgSlice string) (int, error) {
-	// Validate rollArgSlice size
-	if argErr := validateRollArgSliceSize(rollArgSlice); argErr != nil {
-		return 0, argErr
+	// Validate rollArgSlice size, max allowed is 5 not including minus symbol
+	maxAllowedLength := 5
+	if strings.ContainsAny(rollArgSlice, "-") {
+		maxAllowedLength++
+	}
+
+	if len(rollArgSlice) > maxAllowedLength {
+		return 0, fmt.Errorf("invalid value: %s. %s", rollArgSlice, bigNumberErrorMsg)
 	}
 
 	// Parse rollArgSlice
-	if diceValue, diceErr := strconv.Atoi(rollArgSlice); diceErr == nil {
-		return diceValue, nil
-	} else {
-		return 0, fmt.Errorf("error parsing value of %s: \n%s", rollArgSlice, diceErr.Error())
-	}
-}
-
-// Validates that rollArgSlice is shorter than defined maxRollArgSliceSize.
-func validateRollArgSliceSize(rollArgSlice string) error {
-	if len(rollArgSlice) > maxRollArgSliceSize {
-		return fmt.Errorf("invalid value: %s. %s", rollArgSlice, bigNumberErrorMsg)
-	}
-	return nil
+	return strconv.Atoi(rollArgSlice)
 }

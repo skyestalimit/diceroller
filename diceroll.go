@@ -24,25 +24,25 @@ const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 // DiceRoll constructor, validates values.
 func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error) {
 	diceRoll := DiceRoll{diceAmmount, diceSize, modifier}
-	if diceErr := validateDiceRoll(diceRoll); diceErr == nil {
-		return &diceRoll, nil
-	} else {
+	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
 	}
+	return &diceRoll, nil
 }
 
-// Human readable DiceRoll string in XdY([+|-]Z) format.
-// DiceRoll{2, 8, 1}.PerformRoll() would return "2d8+1"
+// Human readable DiceRoll string, such as "2d8+1".
 func (diceRoll DiceRoll) String() string {
+	// XdY format
 	strDiceRoll := fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
 
 	// Add modifier when necessary
 	if diceRoll.Modifier != 0 {
 		if diceRoll.Modifier > 0 {
-			strDiceRoll += plusSymbol
+			strDiceRoll += "+"
 		}
 		strDiceRoll += fmt.Sprint(diceRoll.Modifier)
 	}
+
 	return strDiceRoll
 }
 
@@ -56,8 +56,7 @@ func PerformRollArgsAndSum(rollArgs ...string) int {
 func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
 	diceRolls, argErrs := ParseRollArgs(rollArgs...)
 	results, diceErrs := PerformRolls(diceRolls...)
-	argErrs = append(argErrs, diceErrs...)
-	return results, argErrs
+	return results, append(argErrs, diceErrs...)
 }
 
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
@@ -108,20 +107,20 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 // Validates diceRoll values. Returns nil if valid, error if invalid.
 func validateDiceRoll(diceRoll DiceRoll) error {
 	if diceErr := validateDiceAmmout(diceRoll.DiceAmmount); diceErr != nil {
-		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
+		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
 	if diceErr := validateDiceSize(diceRoll.DiceSize); diceErr != nil {
-		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
+		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
 	if diceErr := validateDiceModifier(diceRoll.Modifier); diceErr != nil {
-		return formattedInvalidDiceRollError(diceRoll.String(), diceErr)
+		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
 	return nil
 }
 
 // Validates diceAmmount values for DiceRoll. Returns nil if valid, an error if invalid.
 func validateDiceAmmout(diceAmmount int) error {
-	if diceAmmount > maxDiceRollValue || diceAmmount <= 0 {
+	if diceAmmount > maxDiceRollValue {
 		return fmt.Errorf("invalid dice ammout %d. %s", diceAmmount, bigNumberErrorMsg)
 	} else if diceAmmount <= 0 {
 		return fmt.Errorf("invalid dice ammout %d", diceAmmount)
@@ -131,8 +130,10 @@ func validateDiceAmmout(diceAmmount int) error {
 
 // Validates diceSize values for DiceRoll. Returns nil if valid, an error if invalid.
 func validateDiceSize(diceSize int) error {
-	if diceSize > maxDiceRollValue || diceSize <= 1 {
+	if diceSize > maxDiceRollValue {
 		return fmt.Errorf("invalid dice size %d. %s", diceSize, bigNumberErrorMsg)
+	} else if diceSize <= 1 {
+		return fmt.Errorf("invalid dice size %d", diceSize)
 	}
 	return nil
 }
@@ -143,9 +144,4 @@ func validateDiceModifier(modifier int) error {
 		return fmt.Errorf("invalid dice modifier %d. %s", modifier, bigNumberErrorMsg)
 	}
 	return nil
-}
-
-// Returns a formatted invalid DiceRoll error.
-func formattedInvalidDiceRollError(diceRollStr string, diceErr error) error {
-	return fmt.Errorf("%s: %s", diceRollStr, diceErr.Error())
 }

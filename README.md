@@ -1,6 +1,6 @@
 # diceroller
 
-Package diceroller generates either a sum or DiceRollResults out of RollArgs or DiceRolls. It's just that simple so get rolling!
+Easy to use library of any kind of dice rolling. Can perform complex dice rolling expressions in a single function call.
 
 Supports DnD-style rolls.
 
