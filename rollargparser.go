@@ -41,7 +41,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	}
 
 	// Parse the RollArg
-	if rollArg, modifier, argErr := evaluateModifier(rollArg); argErr != nil {
+	if modifier, argErr := evaluateModifier(&rollArg); argErr != nil {
 		// Invalid modifier
 		return nil, argErr
 	} else if diceAmmount, diceSize, argErr := evaluateDiceSizeAndAmmount(rollArg); argErr != nil {
@@ -55,28 +55,28 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 
 // Evaluates rollArg modifier if present.
 //
-//	-If present, returns parseModifier function call results.
-//	-If not present, returns rollArg, a zero and no error.
-func evaluateModifier(rollArg string) (string, int, error) {
+//	-If present, returns the modifier values and no error.
+//	-If not present, returns zero and an error.
+func evaluateModifier(rollArg *string) (int, error) {
 	// Detect modifier
-	if strings.ContainsAny(rollArg, plusSymbol) {
+	if strings.ContainsAny(*rollArg, plusSymbol) {
 		return parseModifier(rollArg, plusSymbol)
 
-	} else if strings.ContainsAny(rollArg, minusSymbol) {
+	} else if strings.ContainsAny(*rollArg, minusSymbol) {
 		return parseModifier(rollArg, minusSymbol)
 	}
 
 	// Modifier not present in rollArg
-	return rollArg, 0, nil
+	return 0, nil
 }
 
 // Parses and validates the size of rollArg modifier.
 //
-//	-If valid, returns rollArg with the modifier part removed, the modifier value and no error.
-//	-If invalid an unexpected parsing error happens, returns rollArg, a zero and an error.
-func parseModifier(rollArg string, symbol string) (string, int, error) {
+//	-If valid, returns the modifier value and no error.
+//	-If invalid, returns zero and an error.
+func parseModifier(rollArg *string, symbol string) (int, error) {
 	// Extract the modifier from rollArg and validate its size
-	rollArgSlices := strings.Split(rollArg, symbol)
+	rollArgSlices := strings.Split(*rollArg, symbol)
 
 	// Parse the modifier
 	if modifier, argErr := parseRollArgSlice(rollArgSlices[1]); argErr == nil {
@@ -84,11 +84,12 @@ func parseModifier(rollArg string, symbol string) (string, int, error) {
 			// Make the modifier value negative for minus modifiers
 			modifier = -modifier
 		}
-		// Modifier is valid and processed, return a rollArg slice without the modifier part
-		return rollArgSlices[0], modifier, nil
+		// Modifier is valid and processed, update rollArg to a slice without the modifier part
+		*rollArg = rollArgSlices[0]
+		return modifier, nil
 	} else {
 		// Invalid modifier
-		return rollArg, 0, argErr
+		return 0, argErr
 	}
 }
 
