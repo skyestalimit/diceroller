@@ -37,7 +37,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	// Validate RollArg format
 	if !regexp.MustCompile("^[[:digit:]]+[d|D][[:digit:]]+([+|-][[:digit:]]+)?$").MatchString(rollArg) {
 		// Invalid RollArg, return error
-		return nil, fmt.Errorf("invalid roll arg: %s", rollArg)
+		return nil, fmt.Errorf("invalid RollArg: %s", rollArg)
 	}
 
 	// Parse the RollArg
