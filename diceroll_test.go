@@ -66,39 +66,10 @@ func TestInvalidDiceRollString(t *testing.T) {
 	}
 }
 
-// Test simple rolling with valid values
-func TestPerformRollWithValidDiceValues(t *testing.T) {
-	for i := range validDiceRollsValues {
-		diceRoll := validDiceRollsValues[i].diceRoll
-		if sum := PerformRollAndSum(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); sum <= 0 {
-			t.Fatalf("Valid diceRoll %s returned invalid result %d", diceRoll.String(), sum)
-		}
-		if result, diceErr := PerformRoll(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); diceErr != nil {
-			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
-		} else {
-			validateDiceRollResult(*result, validDiceRollsValues[i], t)
-		}
-	}
-}
-
-// Test simple rolling with invalid values
-func TestPerformRollWithInvalidDiceValues(t *testing.T) {
-	for i := range invalidDiceRollsValues {
-		diceRoll := invalidDiceRollsValues[i].diceRoll
-		if sum := PerformRollAndSum(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); sum > 0 {
-			t.Fatalf("Invalid diceRoll %s returned valid result %d", diceRoll.String(), sum)
-		}
-		if _, diceErr := PerformRoll(diceRoll.DiceAmmount, diceRoll.DiceSize, diceRoll.Modifier); diceErr == nil {
-			t.Fatalf("Invalid dice roll %s did not generate an error", diceRoll.String())
-
-		}
-	}
-}
-
 // Test valid DiceRoll results
 func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
-		if result, diceErr := validDiceRollsValues[i].diceRoll.PerformRoll(); diceErr == nil {
+		if result, diceErr := performRoll(validDiceRollsValues[i].diceRoll); diceErr == nil {
 			validateDiceRollResult(*result, validDiceRollsValues[i], t)
 		} else {
 			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
@@ -109,7 +80,7 @@ func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
 // Test rolling invalid DiceRolls
 func TestDiceRollPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		if _, diceErr := invalidDiceRollsValues[i].diceRoll.PerformRoll(); diceErr == nil {
+		if _, diceErr := performRoll(invalidDiceRollsValues[i].diceRoll); diceErr == nil {
 			t.Fatalf("Invalid dice roll %s did not generate an error", invalidDiceRollsValues[i].wantedDiceStr)
 		}
 	}
@@ -137,9 +108,9 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	}
 }
 
-// Test rolling with valid rollArgs
+// Test rolling with valid RollArgs
 func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
-	// Test valid rollArgs individually
+	// Test valid RollArgs individually
 	for i := range validRollArgs {
 		if sum := PerformRollArgsAndSum(validRollArgs[i]); sum <= 0 {
 			t.Fatalf("Valid RollArg %s result = %d, want > 0", validRollArgs[i], sum)
@@ -148,7 +119,7 @@ func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 
 	// Test the full array
 	if sum := PerformRollArgsAndSum(validRollArgs...); sum <= 0 {
-		t.Fatalf("Valid rollArgs result = %d, want > 0", sum)
+		t.Fatalf("Valid RollArgs result = %d, want > 0", sum)
 	}
 }
 
@@ -163,9 +134,9 @@ func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	}
 }
 
-// Test rolling with invalid rollArgs
+// Test rolling with invalid RollArgs
 func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
-	// Test valid rollArgs individually
+	// Test valid RollArgs individually
 	for i := range invalidRollArgs {
 		if sum := PerformRollArgsAndSum(invalidRollArgs[i]); sum > 0 {
 			t.Fatalf("Invalid RollArg %s result = %d, want 0", invalidRollArgs[i], sum)
@@ -174,7 +145,7 @@ func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 
 	// Test the full array
 	if sum := PerformRollArgsAndSum(invalidRollArgs...); sum > 0 {
-		t.Fatalf("Invalid rollArgs result = %d, want 0", sum)
+		t.Fatalf("Invalid RollArgs result = %d, want 0", sum)
 	}
 }
 

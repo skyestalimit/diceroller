@@ -43,7 +43,7 @@ func TestParseInvalidRollArgs(t *testing.T) {
 
 func TestParseSingleValidRollArg(t *testing.T) {
 	for i := range validRollArgs {
-		if _, argErr := ParseRollArg(validRollArgs[i]); argErr != nil {
+		if _, argErr := parseRollArg(validRollArgs[i]); argErr != nil {
 			validArgParsingError(argErr, t)
 		}
 	}
@@ -51,7 +51,7 @@ func TestParseSingleValidRollArg(t *testing.T) {
 
 func TestParseSingleInvalidRollArg(t *testing.T) {
 	for i := range invalidRollArgs {
-		if _, argErr := ParseRollArg(invalidRollArgs[i]); argErr == nil {
+		if _, argErr := parseRollArg(invalidRollArgs[i]); argErr == nil {
 			invalidArgParsingError(invalidRollArgs[i], t)
 		}
 	}

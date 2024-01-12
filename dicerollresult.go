@@ -4,7 +4,7 @@ import "fmt"
 
 // A DiceRollResult contains the results of performing a DiceRoll
 type DiceRollResult struct {
-	DiceRollStr string // String representation of the performed DiceRoll
+	DiceRollStr string // String representation of the performed DiceRoll, such as 1d6
 	Dice        []int  // Individual dice roll results
 	Sum         int    // Sum of Dice array
 }
@@ -20,7 +20,7 @@ func (result DiceRollResult) String() string {
 }
 
 // Returns the total sum of a DiceRollResult array.
-func DiceRollResultsSum(results []DiceRollResult) (sum int) {
+func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 	for i := range results {
 		sum += results[i].Sum
 	}

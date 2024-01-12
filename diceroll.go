@@ -1,5 +1,5 @@
-// Package diceroller can generate either a sum or DiceRollResults out of
-// rollArgs or DiceRolls. It's just that simple so get rolling!
+// Package diceroller generates either a sum or DiceRollResults out of
+// RollArgs or DiceRolls. It's just that simple so get rolling!
 package diceroller
 
 import (
@@ -31,14 +31,55 @@ func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error)
 	}
 }
 
-// Performs the DiceRoll. Returns the sum if diceRoll valid, zero if invalid.
-func (diceRoll DiceRoll) PerformRollAndSum() int {
-	result, _ := diceRoll.PerformRoll()
-	return result.Sum
+// Human readable DiceRoll string in XdY([+|-]Z) format.
+// DiceRoll{2, 8, 1}.PerformRoll() would return "2d8+1"
+func (diceRoll DiceRoll) String() string {
+	strDiceRoll := fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
+
+	// Add modifier when necessary
+	if diceRoll.Modifier != 0 {
+		if diceRoll.Modifier > 0 {
+			strDiceRoll += plusSymbol
+		}
+		strDiceRoll += fmt.Sprint(diceRoll.Modifier)
+	}
+	return strDiceRoll
+}
+
+// Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
+func PerformRollArgsAndSum(rollArgs ...string) int {
+	diceRolls, _ := ParseRollArgs(rollArgs...)
+	return PerformRollsAndSum(diceRolls...)
+}
+
+// Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
+func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
+	diceRolls, argErrs := ParseRollArgs(rollArgs...)
+	results, diceErrs := PerformRolls(diceRolls...)
+	argErrs = append(argErrs, diceErrs...)
+	return results, argErrs
+}
+
+// Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
+func PerformRollsAndSum(diceRolls ...DiceRoll) int {
+	results, _ := PerformRolls(diceRolls...)
+	return DiceRollResultsSum(results...)
+}
+
+// Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
+func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
+	for i := range diceRolls {
+		if result, diceErr := performRoll(diceRolls[i]); diceErr == nil {
+			results = append(results, *result)
+		} else {
+			diceErrs = append(diceErrs, diceErr)
+		}
+	}
+	return results, diceErrs
 }
 
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
-func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
+func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		// Invalid DiceRoll, return error
@@ -62,73 +103,6 @@ func (diceRoll DiceRoll) PerformRoll() (*DiceRollResult, error) {
 
 	// Valid DiceRoll, return DiceRollResult
 	return diceRollResult, nil
-}
-
-// Human readable DiceRoll string in XdY([+|-]Z) format.
-// DiceRoll{2, 8, 1}.PerformRoll() would return "2d8+1"
-func (diceRoll DiceRoll) String() string {
-	strDiceRoll := fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
-
-	// Add modifier when necessary
-	if diceRoll.Modifier != 0 {
-		if diceRoll.Modifier > 0 {
-			strDiceRoll += plusSymbol
-		}
-		strDiceRoll += fmt.Sprint(diceRoll.Modifier)
-	}
-	return strDiceRoll
-}
-
-// Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.
-// Returns the sum if valid, zero if invalid.
-func PerformRollAndSum(diceAmmount int, diceSize int, modifier int) int {
-	if result, _ := PerformRoll(diceAmmount, diceSize, modifier); result != nil {
-		return result.Sum
-	} else {
-		return 0
-	}
-}
-
-// Straightforward rolling. Rolls diceAmmount times a diceSize sized dice plus modifier.
-// Returns a DiceRollResult if valid, an error if invalid.
-func PerformRoll(diceAmmount int, diceSize int, modifier int) (*DiceRollResult, error) {
-	if diceRoll, diceErr := NewDiceRoll(diceAmmount, diceSize, modifier); diceErr != nil {
-		return nil, diceErr
-	} else {
-		return diceRoll.PerformRoll()
-	}
-}
-
-// Straightforward rolling using rollArgs. Returns the sum, invalid rollArgs are worth 0.
-func PerformRollArgsAndSum(rollArgs ...string) int {
-	diceRolls, _ := ParseRollArgs(rollArgs...)
-	return PerformRollsAndSum(diceRolls...)
-}
-
-// Performs an array of rollArgs. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
-	diceRolls, argErrs := ParseRollArgs(rollArgs...)
-	results, diceErrs := PerformRolls(diceRolls...)
-	argErrs = append(argErrs, diceErrs...)
-	return results, argErrs
-}
-
-// Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
-func PerformRollsAndSum(diceRolls ...DiceRoll) int {
-	results, _ := PerformRolls(diceRolls...)
-	return DiceRollResultsSum(results)
-}
-
-// Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
-	for i := range diceRolls {
-		if result, diceErr := diceRolls[i].PerformRoll(); diceErr == nil {
-			results = append(results, *result)
-		} else {
-			diceErrs = append(diceErrs, diceErr)
-		}
-	}
-	return results, diceErrs
 }
 
 // Validates diceRoll values. Returns nil if valid, error if invalid.
