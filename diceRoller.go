@@ -35,6 +35,10 @@ func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []e
 	return results, diceErrs
 }
 
+func specialRoll(diceRoll DiceRoll, attribs rollAttribs) {
+
+}
+
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll

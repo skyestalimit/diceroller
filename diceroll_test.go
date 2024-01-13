@@ -18,19 +18,19 @@ var validDiceRollsValues = []diceRollTestValues{values4d4Plus1, values10d10, val
 var values4d4Plus1 diceRollTestValues = diceRollTestValues{
 	`4d4+1`,
 	regexp.MustCompile(`\[[1-4] [1-4] [1-4] [1-4]\]`),
-	DiceRoll{4, 4, 1}}
+	*newDiceRoll(4, 4, 1)}
 var values10d10 diceRollTestValues = diceRollTestValues{
 	`10d10`,
 	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-	DiceRoll{10, 10, 0}}
+	*newDiceRoll(10, 10, 0)}
 var values1d6Minus1 diceRollTestValues = diceRollTestValues{
 	`1d6-1`,
 	regexp.MustCompile(`\[[1-6]\]`),
-	DiceRoll{1, 6, -1}}
+	*newDiceRoll(1, 6, -1)}
 var values4d12Minus2500 diceRollTestValues = diceRollTestValues{
 	`4d12-2500`,
 	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-	DiceRoll{4, 12, -2500}}
+	*newDiceRoll(4, 12, -2500)}
 
 // Invalid Dice Rolls
 var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSize, valuesBigModifier, valuesZeroAmmount, valuesZeroSize}
@@ -38,23 +38,23 @@ var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSiz
 var valuesBigAmmount diceRollTestValues = diceRollTestValues{
 	`123456d10`,
 	nil,
-	DiceRoll{123456, 10, 0}}
+	*newDiceRoll(123456, 10, 0)}
 var valuesBigSize diceRollTestValues = diceRollTestValues{
 	`10d123456+10`,
 	nil,
-	DiceRoll{10, 123456, 10}}
+	*newDiceRoll(10, 123456, 10)}
 var valuesBigModifier diceRollTestValues = diceRollTestValues{
 	`10d10-123456`,
 	nil,
-	DiceRoll{10, 10, -123456}}
+	*newDiceRoll(10, 10, -123456)}
 var valuesZeroAmmount diceRollTestValues = diceRollTestValues{
 	`0d8`,
 	nil,
-	DiceRoll{0, 8, 0}}
+	*newDiceRoll(0, 8, 0)}
 var valuesZeroSize diceRollTestValues = diceRollTestValues{
 	`1d0`,
 	nil,
-	DiceRoll{1, 0, 0}}
+	*newDiceRoll(1, 0, 0)}
 
 // Test basic init and string representation for valid DiceRolls
 func TestValidDiceRollString(t *testing.T) {
@@ -206,14 +206,14 @@ func FuzzTestPerformRollArgs(f *testing.F) {
 func FuzzTestPerformRollsAndSum(f *testing.F) {
 	f.Add(6, 2, 4)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRollsAndSum(DiceRoll{diceAmmount, diceSize, modifier})
+		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }
 
 func FuzzPerformRolls(f *testing.F) {
 	f.Add(12, 18, 11)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRolls(DiceRoll{diceAmmount, diceSize, modifier})
+		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }
 
