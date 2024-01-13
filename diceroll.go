@@ -10,8 +10,6 @@ type DiceRoll struct {
 	DiceAmmount int // Ammount of dice to be rolled
 	DiceSize    int // Size, or number of faces, of the dice to be rolled
 	Modifier    int // Value to be applied to the sum of rolled dices
-
-	rollType rollType
 }
 
 // Max allowed values for DiceRoll to avoid long run times and overflow.
@@ -22,20 +20,11 @@ const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
 func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error) {
-	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, normalRoll}
+	diceRoll := DiceRoll{diceAmmount, diceSize, modifier}
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
 	}
 	return &diceRoll, nil
-}
-
-// DiceRoll constructor without errors.
-func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
-	diceRoll := &DiceRoll{diceAmmount, diceSize, modifier, normalRoll}
-	if diceErr := validateDiceRoll(*diceRoll); diceErr != nil {
-		return nil
-	}
-	return diceRoll
 }
 
 // Human readable DiceRoll string, such as "2d8+1".
