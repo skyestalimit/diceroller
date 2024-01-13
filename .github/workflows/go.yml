@@ -31,6 +31,12 @@ jobs:
     # You may pin to the exact commit or the version.
     # uses: vladopajic/go-test-coverage@bcd064e5ceef1ccec5441519eb054263b6a44787
       uses: vladopajic/go-test-coverage@v2.8.2
+      with:
+        profile: cover.out
+        local-prefix: github.com/skyestalimit/diceroller
+        threshold-file: 100
+        threshold-package: 100
+        threshold-total: 100
       
        
             
