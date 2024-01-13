@@ -1,4 +1,4 @@
-            - name: go-test-coverage
+name: go-test-coverage
   # You may pin to the exact commit or the version.
   # uses: vladopajic/go-test-coverage@bcd064e5ceef1ccec5441519eb054263b6a44787
   uses: vladopajic/go-test-coverage@v2.8.2
