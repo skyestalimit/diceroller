@@ -11,7 +11,8 @@ var validRollArgs = []string{
 	"1d6-1",
 	"10000d10000-10000",
 	"1D8-00",
-	"1d100+0"}
+	"1d100+0",
+	"4d12-2500"}
 
 // Invalid Roll Args
 var invalidRollArgs = []string{
@@ -63,4 +64,11 @@ func validArgParsingError(argErr error, t *testing.T) {
 
 func invalidArgParsingError(diceRollStr string, t *testing.T) {
 	t.Fatalf("Invalid roll %s did not generate an error!", diceRollStr)
+}
+
+func FuzzParseRollArgs(f *testing.F) {
+	f.Add("8d4-1")
+	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {
+		ParseRollArgs(fuzzedRollArg)
+	})
 }

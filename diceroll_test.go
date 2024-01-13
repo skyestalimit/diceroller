@@ -13,7 +13,7 @@ type diceRollTestValues struct {
 }
 
 // Valid Dice Rolls
-var validDiceRollsValues = []diceRollTestValues{values4d4Plus1, values10d10, values1d6Minus1}
+var validDiceRollsValues = []diceRollTestValues{values4d4Plus1, values10d10, values1d6Minus1, values4d12Minus2500}
 
 var values4d4Plus1 diceRollTestValues = diceRollTestValues{
 	`4d4+1`,
@@ -27,6 +27,10 @@ var values1d6Minus1 diceRollTestValues = diceRollTestValues{
 	`1d6-1`,
 	regexp.MustCompile(`\[[1-6]\]`),
 	DiceRoll{1, 6, -1}}
+var values4d12Minus2500 diceRollTestValues = diceRollTestValues{
+	`4d12-2500`,
+	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
+	DiceRoll{4, 12, -2500}}
 
 // Invalid Dice Rolls
 var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSize, valuesBigModifier, valuesZeroAmmount, valuesZeroSize}
@@ -183,4 +187,47 @@ func diceRollsFromTestValues(testValues []diceRollTestValues) (diceRolls []DiceR
 		diceRolls = append(diceRolls, testValues[i].diceRoll)
 	}
 	return
+}
+
+func FuzzPerformRollArgsAndSum(f *testing.F) {
+	f.Add("8d4-1")
+	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {
+		PerformRollArgsAndSum(fuzzedRollArg)
+	})
+}
+
+func FuzzTestPerformRollArgs(f *testing.F) {
+	f.Add("6d6+66")
+	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {
+		PerformRollArgs(fuzzedRollArg)
+	})
+}
+
+func FuzzTestPerformRollsAndSum(f *testing.F) {
+	f.Add(6, 2, 4)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		PerformRollsAndSum(DiceRoll{diceAmmount, diceSize, modifier})
+	})
+}
+
+func FuzzPerformRolls(f *testing.F) {
+	f.Add(12, 18, 11)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		PerformRolls(DiceRoll{diceAmmount, diceSize, modifier})
+	})
+}
+
+func FuzzNewDiceRoll(f *testing.F) {
+	f.Add(2, 8, 1)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		NewDiceRoll(diceAmmount, diceSize, modifier)
+	})
+}
+
+func FuzzDiceRollResultSum(f *testing.F) {
+	f.Add("2d6+1")
+	f.Fuzz(func(t *testing.T, diceStr string) {
+		NewDiceRollResult(diceStr)
+		DiceRollResultsSum(*NewDiceRollResult(diceStr))
+	})
 }
