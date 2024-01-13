@@ -44,7 +44,7 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	}
 
 	// Generate rolls
-	diceRollResult := NewDiceRollResult(diceRoll.String())
+	diceRollResult := newDiceRollResult(diceRoll.String())
 	for i := 0; i < diceRoll.DiceAmmount; i++ {
 		diceRollResult.Dice = append(diceRollResult.Dice, rand.Intn(diceRoll.DiceSize)+1)
 		diceRollResult.Sum += diceRollResult.Dice[i]

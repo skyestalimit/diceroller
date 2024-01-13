@@ -227,7 +227,7 @@ func FuzzNewDiceRoll(f *testing.F) {
 func FuzzDiceRollResultSum(f *testing.F) {
 	f.Add("2d6+1")
 	f.Fuzz(func(t *testing.T, diceStr string) {
-		NewDiceRollResult(diceStr)
-		DiceRollResultsSum(*NewDiceRollResult(diceStr))
+		newDiceRollResult(diceStr)
+		DiceRollResultsSum(*newDiceRollResult(diceStr))
 	})
 }

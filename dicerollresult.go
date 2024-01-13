@@ -10,7 +10,7 @@ type DiceRollResult struct {
 }
 
 // DiceRollResult constructor with DiceRoll readable string.
-func NewDiceRollResult(diceRollStr string) *DiceRollResult {
+func newDiceRollResult(diceRollStr string) *DiceRollResult {
 	return &DiceRollResult{diceRollStr, []int{}, 0}
 }
 
