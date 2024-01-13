@@ -9,6 +9,10 @@ import (
 
 // Parses a RollArg array. Returns a DiceRoll array for valid RollArgs
 // and an error array for invalid ones.
+//
+// Expected format is XdY[+|-Z].
+//
+// Valid RollArg examples: "4d4+1", "10d10", "1d6-1", "1D8".
 func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
 	for i := range rollArgs {
 		if diceRoll, err := parseRollArg(rollArgs[i]); diceRoll != nil {
@@ -21,9 +25,6 @@ func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
 }
 
 // Parses rollArg. Returns a DiceRoll if valid, an error if invalid.
-// Expected format is XdY[+|-Z].
-//
-// Valid RollArg examples: "4d4+1", "10d10", "1d6-1", "1D8".
 func parseRollArg(rollArg string) (*DiceRoll, error) {
 	// Validate rollArg format
 	regex := regexp.MustCompile(`^(\d+)+[dD](\d+)([+-](\d+))?$`)

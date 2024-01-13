@@ -12,7 +12,7 @@ var validRollArgs = []string{
 	"10000d10000-10000",
 	"1D8-00",
 	"1d100+0",
-	"4d12-2500"}
+	"20d12-9901"}
 
 // Invalid Roll Args
 var invalidRollArgs = []string{
@@ -23,7 +23,7 @@ var invalidRollArgs = []string{
 	"patate1",
 	"sudo reboot",
 	"1d4 1d4",
-	"0d1",
+	"0d2",
 	"1d0",
 	"1b8",
 	"1+8d8+1"}
