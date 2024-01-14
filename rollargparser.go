@@ -37,18 +37,7 @@ func checkForRollAttribute(rollArg string) rollAttribute {
 	var rollAttrib rollAttribute = 0
 	attribRegEx := regexp.MustCompile(rollAttribsFormat)
 	if attribRegEx.MatchString(strings.ToLower(rollArg)) {
-		switch rollArg {
-		case critStr:
-			rollAttrib = critAttrib
-		case spellStr:
-			rollAttrib = spellAttrib
-		case advantageStr:
-			rollAttrib = advantageAttrib
-		case disadvantageStr:
-			rollAttrib = disadvantageAttrib
-		case dropLowStr:
-			rollAttrib = dropLowAttrib
-		}
+		rollAttrib, _ = rollAttributeMapKey(rollAttributeMap, rollArg)
 	}
 	return rollAttrib
 }

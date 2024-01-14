@@ -2,18 +2,21 @@
 // RollArgs or DiceRolls. It's just that simple so get rolling!
 package diceroller
 
-import "math/rand"
+import (
+	"math/rand"
+	"slices"
+)
 
 // Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
 func PerformRollArgsAndSum(rollArgs ...string) int {
 	rollExpr, _ := ParseRollArgs(rollArgs...)
-	return performRollsAndSum(rollExpr)
+	return performRollingExpressionAndSum(rollExpr)
 }
 
 // Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
 func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
 	rollExpr, argErrs := ParseRollArgs(rollArgs...)
-	results, diceErrs := performRolls(rollExpr)
+	results, diceErrs := performRollingExpression(rollExpr)
 	return results, append(argErrs, diceErrs...)
 }
 
@@ -35,12 +38,14 @@ func PerformRolls(attribs *rollAttributes, diceRolls ...DiceRoll) (results []Dic
 	return results, diceErrs
 }
 
-func performRollsAndSum(rollExpr rollingExpression) int {
-	results, _ := performRolls(rollExpr)
+// Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
+func performRollingExpressionAndSum(rollExpr rollingExpression) int {
+	results, _ := performRollingExpression(rollExpr)
 	return DiceRollResultsSum(results...)
 }
 
-func performRolls(rollExpr rollingExpression) (results []DiceRollResult, diceErrs []error) {
+// Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
+func performRollingExpression(rollExpr rollingExpression) (results []DiceRollResult, diceErrs []error) {
 	rollAttribs := rollExpr.attribs.(*rollAttributes)
 	for i := range rollExpr.diceRolls {
 		if result, diceErr := performRoll(rollAttribs, rollExpr.diceRolls[i].(DiceRoll)); diceErr == nil {
@@ -55,13 +60,13 @@ func performRolls(rollExpr rollingExpression) (results []DiceRollResult, diceErr
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func performRoll(attribs *rollAttributes, diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
-	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
+	if diceErr, ok := validateDiceRoll(diceRoll); !ok {
 		// Invalid DiceRoll, return error
 		return nil, diceErr
 	}
 
-	// Generate rolls
-	diceRollResult := generateRolls(attribs, diceRoll)
+	// Generate roll results
+	diceRollResult := generateRollResults(attribs, diceRoll)
 
 	// Apply modifier
 	diceRollResult.Sum += diceRoll.Modifier
@@ -80,23 +85,31 @@ func performRoll(attribs *rollAttributes, diceRoll DiceRoll) (*DiceRollResult, e
 	return diceRollResult, nil
 }
 
-func generateRolls(attribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
+// Generates DiceRollResult and applies attribs.
+func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll.String())
-	diceRollResult.attribs = attribs
+	diceRollResult.Attribs = rollAttribs
 
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
-	var hasAdvDis rollAttribute = 0
+	var advDis rollAttribute = 0
+	var dropDice rollAttribute = 0
 
-	if attribs != nil {
-		if attribs.hasAttrib(critAttrib) {
-			diceAmmount = diceAmmount * 2
-		}
-		if attribs.hasAttrib(advantageAttrib) {
-			hasAdvDis = advantageAttrib
-		}
-		if attribs.hasAttrib(disadvantageAttrib) {
-			hasAdvDis = disadvantageAttrib
+	if rollAttribs != nil {
+		for attrib := range rollAttribs.attribs {
+			switch attrib {
+			case critAttrib:
+				// Crit
+				diceAmmount = diceAmmount * 2
+			case advantageAttrib:
+				advDis = advantageAttrib
+			case disadvantageAttrib:
+				advDis = disadvantageAttrib
+			case dropHighAttrib:
+				dropDice = dropHighAttrib
+			case dropLowAttrib:
+				dropDice = dropLowAttrib
+			}
 		}
 	}
 
@@ -105,10 +118,9 @@ func generateRolls(attribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
 		roll := rollDice(diceRoll.DiceSize)
 
 		// Advantage / disadvantage
-		if hasAdvDis > 0 {
-			roll2 := rollDice(diceRoll.DiceSize)
+		if advDis > 0 {
 			toDrop := 0
-			roll, toDrop = advantageDisadvantage(hasAdvDis, roll, roll2)
+			roll, toDrop = advantageDisadvantage(advDis, roll, rollDice(diceRoll.DiceSize))
 			diceRollResult.Dropped = append(diceRollResult.Dropped, toDrop)
 		}
 
@@ -116,27 +128,48 @@ func generateRolls(attribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
 		diceRollResult.Sum += roll
 	}
 
+	// Drop Low / High
+	if dropDice > 0 {
+		dropIndex := dropHighLow(dropDice, diceRollResult.Dice)
+		diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
+		diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
+	}
+
 	return diceRollResult
 }
 
+// Generates a single die roll.
 func rollDice(diceSize int) int {
 	return rand.Intn(diceSize) + 1
 }
 
-func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (int, int) {
-	toDrop := 0
-	if attrib == advantageAttrib {
+// Applies advantage or disavantage logic. Returns the roll to keep and the roll to drop.
+func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (toKeep int, toDrop int) {
+	switch attrib {
+	case advantageAttrib:
 		if roll == max(roll, roll2) {
-			toDrop = roll2
+			toKeep, toDrop = roll, roll2
 		} else {
-			toDrop, roll = roll, roll2
+			toKeep, toDrop = roll2, roll
 		}
-	} else {
+	case disadvantageAttrib:
 		if roll == min(roll, roll2) {
-			toDrop = roll2
+			toKeep, toDrop = roll, roll2
 		} else {
-			toDrop, roll = roll, roll2
+			toKeep, toDrop = roll2, roll
 		}
 	}
-	return roll, toDrop
+	return
+}
+
+// Applies drop high or drop low logic. Returns the roll to drop and its index.
+func dropHighLow(attrib rollAttribute, dice []int) int {
+	drop := 0
+	switch attrib {
+	case dropLowAttrib:
+		drop = slices.Min(dice)
+	case dropHighAttrib:
+		drop = slices.Max(dice)
+	}
+	return slices.Index(dice, drop)
 }
