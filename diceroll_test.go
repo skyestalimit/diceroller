@@ -18,19 +18,19 @@ var validDiceRollsValues = []diceRollTestValues{values4d4Plus1, values10d10, val
 var values4d4Plus1 diceRollTestValues = diceRollTestValues{
 	`4d4+1`,
 	regexp.MustCompile(`\[[1-4] [1-4] [1-4] [1-4]\]`),
-	*newDiceRoll(4, 4, 1)}
+	*newDiceRoll(4, 4, 1, true)}
 var values10d10 diceRollTestValues = diceRollTestValues{
 	`10d10`,
 	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-	*newDiceRoll(10, 10, 0)}
+	*newDiceRoll(10, 10, 0, true)}
 var values1d6Minus1 diceRollTestValues = diceRollTestValues{
 	`1d6-1`,
 	regexp.MustCompile(`\[[1-6]\]`),
-	*newDiceRoll(1, 6, -1)}
+	*newDiceRoll(1, 6, -1, true)}
 var values4d12Minus2500 diceRollTestValues = diceRollTestValues{
 	`4d12-2500`,
 	regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-	*newDiceRoll(4, 12, -2500)}
+	*newDiceRoll(4, 12, -2500, true)}
 
 // Invalid Dice Rolls
 var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSize, valuesBigModifier, valuesZeroAmmount, valuesZeroSize}
@@ -38,23 +38,23 @@ var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSiz
 var valuesBigAmmount diceRollTestValues = diceRollTestValues{
 	`123456d10`,
 	nil,
-	*newDiceRoll(123456, 10, 0)}
+	DiceRoll{123456, 10, 0, true}}
 var valuesBigSize diceRollTestValues = diceRollTestValues{
 	`10d123456+10`,
 	nil,
-	*newDiceRoll(10, 123456, 10)}
+	DiceRoll{10, 123456, 10, true}}
 var valuesBigModifier diceRollTestValues = diceRollTestValues{
 	`10d10-123456`,
 	nil,
-	*newDiceRoll(10, 10, -123456)}
+	DiceRoll{10, 10, -123456, true}}
 var valuesZeroAmmount diceRollTestValues = diceRollTestValues{
 	`0d8`,
 	nil,
-	*newDiceRoll(0, 8, 0)}
+	DiceRoll{0, 8, 0, true}}
 var valuesZeroSize diceRollTestValues = diceRollTestValues{
 	`1d0`,
 	nil,
-	*newDiceRoll(1, 0, 0)}
+	DiceRoll{1, 0, 0, true}}
 
 // Test basic init and string representation for valid DiceRolls
 func TestValidDiceRollString(t *testing.T) {
@@ -73,7 +73,7 @@ func TestInvalidDiceRollString(t *testing.T) {
 // Test valid DiceRoll results
 func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
-		if result, diceErr := performRoll(validDiceRollsValues[i].diceRoll); diceErr == nil {
+		if result, diceErr := performRoll(nil, validDiceRollsValues[i].diceRoll); diceErr == nil {
 			validateDiceRollResult(*result, validDiceRollsValues[i], t)
 		} else {
 			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
@@ -84,7 +84,7 @@ func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
 // Test rolling invalid DiceRolls
 func TestDiceRollPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		if _, diceErr := performRoll(invalidDiceRollsValues[i].diceRoll); diceErr == nil {
+		if _, diceErr := performRoll(nil, invalidDiceRollsValues[i].diceRoll); diceErr == nil {
 			t.Fatalf("Invalid dice roll %s did not generate an error", invalidDiceRollsValues[i].wantedDiceStr)
 		}
 	}
@@ -93,7 +93,7 @@ func TestDiceRollPerformRollWithInvalidDiceRolls(t *testing.T) {
 // Test rolling an array of valid DiceRoll
 func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	if results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...); len(diceErrs) == 0 {
+	if results, diceErrs := PerformRolls(nil, diceRollsFromTestValues(validDiceRollsValues)...); len(diceErrs) == 0 {
 		if len(results) == len(validDiceRollsValues) {
 			for i := range results {
 				validateDiceRollResult(results[i], validDiceRollsValues[i], t)
@@ -130,7 +130,7 @@ func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 // Test rolling an array of invalid DiceRoll
 func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	if _, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...); len(diceErrs) > 0 {
+	if _, diceErrs := PerformRolls(nil, diceRollsFromTestValues(invalidDiceRollsValues)...); len(diceErrs) > 0 {
 		if len(diceErrs) != len(invalidDiceRollsValues) {
 			// Missing errors, fail the test
 			t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
@@ -204,23 +204,23 @@ func FuzzTestPerformRollArgs(f *testing.F) {
 }
 
 func FuzzTestPerformRollsAndSum(f *testing.F) {
-	f.Add(6, 2, 4)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier))
+	f.Add(6, 2, 4, true)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
+		PerformRollsAndSum(nil, *newDiceRoll(diceAmmount, diceSize, modifier, plus))
 	})
 }
 
 func FuzzPerformRolls(f *testing.F) {
-	f.Add(12, 18, 11)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier))
+	f.Add(12, 18, 11, true)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
+		PerformRolls(nil, *newDiceRoll(diceAmmount, diceSize, modifier, plus))
 	})
 }
 
 func FuzzNewDiceRoll(f *testing.F) {
-	f.Add(2, 8, 1)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		NewDiceRoll(diceAmmount, diceSize, modifier)
+	f.Add(2, 8, 1, true)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
+		NewDiceRoll(diceAmmount, diceSize, modifier, plus)
 	})
 }
 
