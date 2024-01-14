@@ -86,17 +86,29 @@ func generateRolls(attribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
 
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
-	if attribs != nil && attribs.hasAttrib(critAttrib) {
-		diceAmmount = diceAmmount * 2
+	var hasAdvDis rollAttribute = 0
+
+	if attribs != nil {
+		if attribs.hasAttrib(critAttrib) {
+			diceAmmount = diceAmmount * 2
+		}
+		if attribs.hasAttrib(advantageAttrib) {
+			hasAdvDis = advantageAttrib
+		}
+		if attribs.hasAttrib(disadvantageAttrib) {
+			hasAdvDis = disadvantageAttrib
+		}
 	}
 
 	// Generate rolls
 	for i := 0; i < diceAmmount; i++ {
 		roll := rollDice(diceRoll.DiceSize)
-		if attribs != nil && (attribs.hasAttrib(advantageAttrib) || attribs.hasAttrib(disadvantageAttrib)) {
+
+		// Advantage / disadvantage
+		if hasAdvDis > 0 {
 			roll2 := rollDice(diceRoll.DiceSize)
 			toDrop := 0
-			roll, toDrop = advantageDisadvantage(attribs, roll, roll2)
+			roll, toDrop = advantageDisadvantage(hasAdvDis, roll, roll2)
 			diceRollResult.Dropped = append(diceRollResult.Dropped, toDrop)
 		}
 
@@ -111,9 +123,9 @@ func rollDice(diceSize int) int {
 	return rand.Intn(diceSize) + 1
 }
 
-func advantageDisadvantage(attribs *rollAttributes, roll int, roll2 int) (int, int) {
+func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (int, int) {
 	toDrop := 0
-	if attribs.hasAttrib(advantageAttrib) {
+	if attrib == advantageAttrib {
 		if roll == max(roll, roll2) {
 			toDrop = roll2
 		} else {

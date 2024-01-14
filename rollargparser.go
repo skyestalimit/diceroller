@@ -8,7 +8,7 @@ import (
 )
 
 // RollArg regex
-const rollArgFormat string = `^([-])?(\d+)+[dD](\d+)([+-](\d+))?$`
+const rollArgFormat string = `^([+-])?(\d+)+[dD](\d+)([+-](\d+))?$`
 
 // Attributes regex
 const rollAttribsFormat string = `^[a-z]+$`
@@ -68,7 +68,9 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	plus := true
 	// Parse minus sign
 	if len(matches[1]) > 0 {
-		plus = false
+		if strings.EqualFold(matches[1], "-") {
+			plus = false
+		}
 	}
 	// Parse dice ammount
 	if value, argErr := parseRollArgSlice(matches[2]); argErr == nil {

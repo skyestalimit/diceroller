@@ -33,8 +33,13 @@ func newRollAttributes() *rollAttributes {
 	return newRollAttributes
 }
 
-func (attribs rollAttributes) setRollAttrib(attrib rollAttribute) {
-	attribs.attribs[attrib] = true
+func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
+	if attrib == advantageAttrib {
+		rollAttribs.attribs[disadvantageAttrib] = false
+	} else if attrib == disadvantageAttrib {
+		rollAttribs.attribs[advantageAttrib] = false
+	}
+	rollAttribs.attribs[attrib] = true
 }
 
 func (dndAttrib rollAttributes) hasAttrib(attrib rollAttribute) bool {
