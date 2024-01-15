@@ -132,6 +132,7 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 	if dropDice > 0 {
 		dropIndex := dropHighLow(dropDice, diceRollResult.Dice)
 		diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
+		diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
 		diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
 	}
 

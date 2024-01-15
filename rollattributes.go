@@ -6,6 +6,7 @@ type rollAttribute int
 
 const (
 	critAttrib         rollAttribute = iota + 1
+	spellAttrib        rollAttribute = iota + 1
 	halfAttrib         rollAttribute = iota + 1
 	advantageAttrib    rollAttribute = iota + 1
 	disadvantageAttrib rollAttribute = iota + 1
@@ -15,6 +16,7 @@ const (
 
 const (
 	critStr         string = "crit"
+	spellStr        string = "spell"
 	halfStr         string = "half"
 	advantageStr    string = "adv"
 	disadvantageStr string = "dis"
@@ -24,6 +26,7 @@ const (
 
 var rollAttributeMap = map[rollAttribute]string{
 	critAttrib:         critStr,
+	spellAttrib:        spellStr,
 	halfAttrib:         halfStr,
 	advantageAttrib:    advantageStr,
 	disadvantageAttrib: disadvantageStr,

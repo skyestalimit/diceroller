@@ -17,13 +17,13 @@ type DiceRollResult struct {
 
 // DiceRollResult constructor with DiceRoll readable string.
 func newDiceRollResult(diceRollStr string) *DiceRollResult {
-	return &DiceRollResult{diceRollStr, nil, []int{}, []int{}, 0}
+	return &DiceRollResult{diceRollStr, newRollAttributes(), []int{}, []int{}, 0}
 }
 
 // Human readable DiceRollResult string.
 func (result DiceRollResult) String() string {
 	resultStr := "Result of DiceRoll \""
-	half := false
+	half, spell := false, false
 
 	rollAttribsMap := result.Attribs.(*rollAttributes)
 	if rollAttribsMap != nil {
@@ -40,6 +40,8 @@ func (result DiceRollResult) String() string {
 		for i := range attribs {
 			rollAttrib := rollAttribute(attribs[i])
 			switch rollAttrib {
+			case spellAttrib:
+				spell = true
 			case halfAttrib:
 				half = true
 			}
@@ -53,10 +55,14 @@ func (result DiceRollResult) String() string {
 		resultStr += fmt.Sprintf("Dropped: %s ", fmt.Sprint(result.Dropped))
 	}
 
-	resultStr += fmt.Sprintf("Sum: %d", result.Sum)
-
+	sum := result.Sum
 	if half {
-		resultStr += fmt.Sprintf(" Half: %d", halve(result.Sum))
+		sum = halve(sum)
+	}
+	resultStr += fmt.Sprintf("Sum: %d", sum)
+
+	if spell {
+		resultStr += fmt.Sprintf(" Save: %d", halve(sum))
 	}
 
 	return resultStr
@@ -66,8 +72,10 @@ func (result DiceRollResult) String() string {
 func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 	for i := range results {
 		toAdd := results[i].Sum
-		if results[i].Attribs.hasAttrib(halfAttrib) {
-			toAdd = halve(toAdd)
+		if results[i].Attribs.(*rollAttributes) != nil {
+			if results[i].Attribs.hasAttrib(halfAttrib) {
+				toAdd = halve(toAdd)
+			}
 		}
 		sum += toAdd
 	}
