@@ -2,7 +2,6 @@ package diceroller
 
 import (
 	"fmt"
-	"math"
 	"sort"
 )
 
@@ -23,7 +22,7 @@ func newDiceRollResult(diceRollStr string) *DiceRollResult {
 // Human readable DiceRollResult string.
 func (result DiceRollResult) String() string {
 	resultStr := "Result of DiceRoll \""
-	half, spell := false, false
+	spell := false
 
 	rollAttribsMap := result.Attribs.(*rollAttributes)
 	if rollAttribsMap != nil {
@@ -42,8 +41,6 @@ func (result DiceRollResult) String() string {
 			switch rollAttrib {
 			case spellAttrib:
 				spell = true
-			case halfAttrib:
-				half = true
 			}
 			resultStr += fmt.Sprintf("%s ", rollAttributeMap[rollAttrib])
 		}
@@ -56,9 +53,6 @@ func (result DiceRollResult) String() string {
 	}
 
 	sum := result.Sum
-	if half {
-		sum = halve(sum)
-	}
 	resultStr += fmt.Sprintf("Sum: %d", sum)
 
 	if spell {
@@ -83,20 +77,4 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 		sum = 1
 	}
 	return
-}
-
-func halve(result int) int {
-	halved := 0
-	minus := false
-	if result < 0 {
-		minus = true
-	}
-	halved = int(math.Abs(float64(result))) / 2
-	if halved < 1 {
-		halved = 1
-	}
-	if minus {
-		halved = -halved
-	}
-	return halved
 }

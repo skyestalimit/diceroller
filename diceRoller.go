@@ -3,6 +3,7 @@
 package diceroller
 
 import (
+	"math"
 	"math/rand"
 	"slices"
 )
@@ -94,12 +95,13 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 	diceAmmount := diceRoll.DiceAmmount
 	var advDis rollAttribute = 0
 	var dropDice rollAttribute = 0
+	var half rollAttribute = 0
 
 	if rollAttribs != nil {
 		for attrib := range rollAttribs.attribs {
 			switch attrib {
 			case critAttrib:
-				// Crit
+				// Crit attrib
 				diceAmmount = diceAmmount * 2
 			case advantageAttrib:
 				advDis = advantageAttrib
@@ -109,6 +111,8 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 				dropDice = dropHighAttrib
 			case dropLowAttrib:
 				dropDice = dropLowAttrib
+			case halfAttrib:
+				half = halfAttrib
 			}
 		}
 	}
@@ -117,7 +121,7 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 	for i := 0; i < diceAmmount; i++ {
 		roll := rollDice(diceRoll.DiceSize)
 
-		// Advantage / disadvantage
+		// Advantage / disadvantage attrib
 		if advDis > 0 {
 			toDrop := 0
 			roll, toDrop = advantageDisadvantage(advDis, roll, rollDice(diceRoll.DiceSize))
@@ -128,12 +132,17 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 		diceRollResult.Sum += roll
 	}
 
-	// Drop Low / High
+	// Drop Low / High attrib
 	if dropDice > 0 {
 		dropIndex := dropHighLow(dropDice, diceRollResult.Dice)
 		diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
 		diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
 		diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
+	}
+
+	// Half attrib
+	if half == halfAttrib {
+		diceRollResult.Sum = halve(diceRollResult.Sum)
 	}
 
 	return diceRollResult
@@ -146,31 +155,55 @@ func rollDice(diceSize int) int {
 
 // Applies advantage or disavantage logic. Returns the roll to keep and the roll to drop.
 func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (toKeep int, toDrop int) {
+	toKeep, toDrop = roll, roll2 // Default return order, change if needed
+
 	switch attrib {
 	case advantageAttrib:
-		if roll == max(roll, roll2) {
-			toKeep, toDrop = roll, roll2
-		} else {
+		if roll != max(roll, roll2) {
 			toKeep, toDrop = roll2, roll
 		}
 	case disadvantageAttrib:
-		if roll == min(roll, roll2) {
-			toKeep, toDrop = roll, roll2
-		} else {
+		if roll != min(roll, roll2) {
 			toKeep, toDrop = roll2, roll
 		}
 	}
+
 	return
 }
 
-// Applies drop high or drop low logic. Returns the roll to drop and its index.
+// Applies drop high or drop low logic. Returns the index of the roll to drop.
 func dropHighLow(attrib rollAttribute, dice []int) int {
 	drop := 0
+
 	switch attrib {
 	case dropLowAttrib:
 		drop = slices.Min(dice)
 	case dropHighAttrib:
 		drop = slices.Max(dice)
 	}
+
 	return slices.Index(dice, drop)
+}
+
+// Applies half logic. Rounds down.
+func halve(result int) int {
+	halved := 0
+	minus := false
+
+	if result < 0 {
+		minus = true
+	}
+
+	halved = int(math.Abs(float64(result))) / 2
+
+	// Minimum result is 1 even if rounded down to 0
+	if halved < 1 {
+		halved = 1
+	}
+
+	if minus {
+		halved = -halved
+	}
+
+	return halved
 }

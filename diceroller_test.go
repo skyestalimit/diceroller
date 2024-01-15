@@ -109,7 +109,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 		t.Fatalf("Roll result = %s, want match for %#q", resultStr, diceValues.resultFormat)
 	}
 
-	// Validate sum
+	// Reproduce sum calculations
 	sum := 0
 	for i := range result.Dice {
 		sum += result.Dice[i]
@@ -121,6 +121,8 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 	if !diceValues.diceRoll.Plus {
 		sum = -sum
 	}
+
+	// Validate sum
 	if result.Sum != sum {
 		t.Fatalf("DiceRoll %s result is %d, wanted be %d", diceValues.diceRoll.String(), result.Sum, sum)
 	}
