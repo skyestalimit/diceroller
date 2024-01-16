@@ -13,6 +13,9 @@ const rollArgFormat string = `^([+-])?(\d+)+[dD](\d+)([+-](\d+))?$`
 // Attributes regex
 const rollAttribsFormat string = `^[a-z]+$`
 
+// Maximum allowed RollArg length
+const maxAllowedRollArgLength int = 5
+
 // Parses a RollArg array. Returns a DiceRoll array for valid RollArgs
 // and an error array for invalid ones.
 //
@@ -33,6 +36,7 @@ func ParseRollArgs(rollArgs ...string) (rollExpr rollingExpression, errors []err
 	return
 }
 
+// Checks if the rollArg is a rollAttribute. Returns the rollAttribute value if it matches, otherwise zero.
 func checkForRollAttribute(rollArg string) rollAttribute {
 	var rollAttrib rollAttribute = 0
 	attribRegEx := regexp.MustCompile(rollAttribsFormat)
@@ -55,24 +59,28 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 
 	var diceAmmount, diceSize, modifier = 0, 0, 0
 	plus := true
+
 	// Parse minus sign
 	if len(matches[1]) > 0 {
 		if strings.EqualFold(matches[1], "-") {
 			plus = false
 		}
 	}
+
 	// Parse dice ammount
 	if value, argErr := parseRollArgSlice(matches[2]); argErr == nil {
 		diceAmmount = value
 	} else {
 		return nil, argErr
 	}
+
 	// Parse dice size
 	if value, argErr := parseRollArgSlice(matches[3]); argErr == nil {
 		diceSize = value
 	} else {
 		return nil, argErr
 	}
+
 	// Parse modifier
 	if len(matches[4]) > 0 {
 		if value, argErr := parseRollArgSlice(matches[4]); argErr == nil {
@@ -88,7 +96,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 // Parses a rollArg slice. Returns its value if valid, zero and an error if invalid.
 func parseRollArgSlice(rollArgSlice string) (int, error) {
 	// Validate rollArgSlice size, max allowed is 5 not including minus symbol
-	maxAllowedLength := 5
+	maxAllowedLength := maxAllowedRollArgLength
 	if strings.ContainsAny(rollArgSlice, "-") {
 		maxAllowedLength++
 	}

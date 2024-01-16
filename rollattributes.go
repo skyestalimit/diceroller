@@ -2,8 +2,7 @@ package diceroller
 
 import "strings"
 
-type rollAttribute int
-
+// rollAttribute values. 0 is invalid.
 const (
 	critAttrib         rollAttribute = iota + 1
 	spellAttrib        rollAttribute = iota + 1
@@ -14,6 +13,7 @@ const (
 	dropLowAttrib      rollAttribute = iota + 1
 )
 
+// Allowed rollAttributes as RollArgs.
 const (
 	critStr         string = "crit"
 	spellStr        string = "spell"
@@ -34,19 +34,7 @@ var rollAttributeMap = map[rollAttribute]string{
 	dropLowAttrib:      dropLowStr,
 }
 
-func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) (rollAttribute, bool) {
-	for attrib, attribStr := range attribMap {
-		if strings.EqualFold(attribStr, wanted) {
-			return attrib, true
-		}
-	}
-	return 0, false
-}
-
-type attributes interface {
-	setRollAttrib(rollAttribute)
-	hasAttrib(rollAttribute) bool
-}
+type rollAttribute int
 
 type rollAttributes struct {
 	attribs map[rollAttribute]bool
@@ -56,6 +44,16 @@ func newRollAttributes() *rollAttributes {
 	newRollAttributes := new(rollAttributes)
 	newRollAttributes.attribs = make(map[rollAttribute]bool)
 	return newRollAttributes
+}
+
+// If wanted matches, returns the matching rollAttribute value and true. If not, returns zero and false.
+func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) (rollAttribute, bool) {
+	for attrib, attribStr := range attribMap {
+		if strings.EqualFold(attribStr, wanted) {
+			return attrib, true
+		}
+	}
+	return 0, false
 }
 
 func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {

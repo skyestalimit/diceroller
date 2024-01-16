@@ -24,6 +24,7 @@ func (result DiceRollResult) String() string {
 	resultStr := "Result of DiceRoll \""
 	spell := false
 
+	// Start with roll attributes
 	rollAttribsMap := result.Attribs.(*rollAttributes)
 	if rollAttribsMap != nil {
 		// Sort the attributes
@@ -46,17 +47,20 @@ func (result DiceRollResult) String() string {
 		}
 	}
 
+	// DiceRoll string and dice result array
 	resultStr += fmt.Sprintf("%s\": %s ", result.DiceRollStr, fmt.Sprint(result.Dice))
 
+	// Dropped dice array
 	if len(result.Dropped) > 0 {
 		resultStr += fmt.Sprintf("Dropped: %s ", fmt.Sprint(result.Dropped))
 	}
 
-	sum := result.Sum
-	resultStr += fmt.Sprintf("Sum: %d", sum)
+	// The DiceRoll sum
+	resultStr += fmt.Sprintf("Sum: %d", result.Sum)
 
+	// Half ammount for passing a spell saving throw
 	if spell {
-		resultStr += fmt.Sprintf(" Save: %d", halve(sum))
+		resultStr += fmt.Sprintf(" Save: %d", halve(result.Sum))
 	}
 
 	return resultStr
@@ -66,6 +70,7 @@ func (result DiceRollResult) String() string {
 func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 	for i := range results {
 		toAdd := results[i].Sum
+		// Halve the sum to add if half attrib is present
 		if results[i].Attribs.(*rollAttributes) != nil {
 			if results[i].Attribs.hasAttrib(halfAttrib) {
 				toAdd = halve(toAdd)
@@ -73,6 +78,8 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 		}
 		sum += toAdd
 	}
+
+	// Minimum DiceRoll result is 1, if at least a die was rolled
 	if len(results) > 0 && sum < 1 {
 		sum = 1
 	}

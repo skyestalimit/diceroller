@@ -14,6 +14,16 @@ var validRollArgs = []string{
 	"1d100+0",
 	"20d12-9901"}
 
+// Valid Roll Args attribs
+var validRollArgsAttribs = []string{
+	"crit",
+	"spell",
+	"half",
+	"adv",
+	"dis",
+	"droplow",
+	"drophigh"}
+
 // Invalid Roll Args
 var invalidRollArgs = []string{
 	"9dd9-+1",
@@ -28,15 +38,27 @@ var invalidRollArgs = []string{
 	"1b8",
 	"1+8d8+1"}
 
+// Invalid Roll Args attribs
+var invalidRollArgsAttribs = []string{
+	"bonus",
+	"damidge",
+	"!@#$%^&*()",
+	"sudo reboot",
+	"check",
+	"11",
+	"\"hai\""}
+
 func TestParseValidRollArgs(t *testing.T) {
-	_, errors := ParseRollArgs(validRollArgs...)
+	rollArgsArray := append(validRollArgs, validRollArgsAttribs...)
+	_, errors := ParseRollArgs(rollArgsArray...)
 	for i := range errors {
 		validArgParsingError(errors[i], t)
 	}
 }
 
 func TestParseInvalidRollArgs(t *testing.T) {
-	rollExpr, _ := ParseRollArgs(invalidRollArgs...)
+	rollArgsArray := append(invalidRollArgs, invalidRollArgsAttribs...)
+	rollExpr, _ := ParseRollArgs(rollArgsArray...)
 	for i := range rollExpr.diceRolls {
 		invalidArgParsingError(rollExpr.diceRolls[i].(DiceRoll).String(), t)
 	}

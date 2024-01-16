@@ -1,12 +1,11 @@
 package diceroller
 
 import (
-	"strings"
 	"testing"
 )
 
 // Test valid DiceRoll results
-func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
+func TestPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
 		result, diceErr := performRoll(nil, validDiceRollsValues[i].diceRoll)
 		if diceErr != nil {
@@ -17,7 +16,7 @@ func TestDiceRollPerformRollWithValidDiceRolls(t *testing.T) {
 }
 
 // Test rolling invalid DiceRolls
-func TestDiceRollPerformRollWithInvalidDiceRolls(t *testing.T) {
+func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
 		_, diceErr := performRoll(nil, invalidDiceRollsValues[i].diceRoll)
 		if diceErr == nil {
@@ -54,6 +53,17 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	}
 }
 
+// Test rolling an array of invalid DiceRoll
+func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
+	// Perform rolls on DiceRoll array
+	_, diceErrs := PerformRolls(nil, diceRollsFromTestValues(invalidDiceRollsValues)...)
+
+	// One error per invalid DiceRoll should be received
+	if len(diceErrs) != len(invalidDiceRollsValues) {
+		t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
+	}
+}
+
 // Test rolling with valid RollArgs
 func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
@@ -69,17 +79,6 @@ func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 	}
 }
 
-// Test rolling an array of invalid DiceRoll
-func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
-	// Perform rolls on DiceRoll array
-	_, diceErrs := PerformRolls(nil, diceRollsFromTestValues(invalidDiceRollsValues)...)
-
-	// One error per invalid DiceRoll should be received
-	if len(diceErrs) != len(invalidDiceRollsValues) {
-		t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
-	}
-}
-
 // Test rolling with invalid RollArgs
 func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
@@ -92,13 +91,6 @@ func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 	// Test the full array
 	if sum := PerformRollArgsAndSum(invalidRollArgs...); sum > 0 {
 		t.Fatalf("Invalid RollArgs result = %d, want 0", sum)
-	}
-}
-
-// Validates DiceRoll string format
-func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
-	if diceStr := diceValues.diceRoll.String(); !strings.EqualFold(diceValues.wantedDiceStr, diceStr) {
-		t.Fatalf("DiceRoll = %s, must equal %s", diceStr, diceValues.wantedDiceStr)
 	}
 }
 

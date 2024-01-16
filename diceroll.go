@@ -10,7 +10,7 @@ type DiceRoll struct {
 	DiceAmmount int  // Ammount of dice to be rolled
 	DiceSize    int  // Size, or number of faces, of the dice to be rolled
 	Modifier    int  // Value to be applied to the sum of rolled dices
-	Plus        bool // Determines if the result of the roll is a plus or a minus
+	Plus        bool // Determines if the result of the roll is to be added or substracted
 }
 
 // Max allowed values for DiceRoll to avoid long run times and overflow.

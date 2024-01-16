@@ -1,6 +1,11 @@
 package diceroller
 
-type rollable interface {
+// To allow adding DiceRolls to a rollingExpression
+type rollable interface{}
+
+type attributes interface {
+	setRollAttrib(rollAttribute)
+	hasAttrib(rollAttribute) bool
 }
 
 type rollingExpression struct {

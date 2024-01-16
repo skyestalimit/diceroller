@@ -2,6 +2,7 @@ package diceroller
 
 import (
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -70,6 +71,13 @@ func TestValidDiceRollString(t *testing.T) {
 func TestInvalidDiceRollString(t *testing.T) {
 	for i := range invalidDiceRollsValues {
 		validateDiceRollString(invalidDiceRollsValues[i], t)
+	}
+}
+
+// Validates DiceRoll string format
+func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
+	if diceStr := diceValues.diceRoll.String(); !strings.EqualFold(diceValues.wantedDiceStr, diceStr) {
+		t.Fatalf("DiceRoll = %s, must equal %s", diceStr, diceValues.wantedDiceStr)
 	}
 }
 
