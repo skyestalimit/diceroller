@@ -53,11 +53,11 @@ func (result DiceRollResult) String() string {
 	}
 
 	// DiceRoll string and dice result array
-	resultStr += fmt.Sprintf("%s\": %s ", result.DiceRollStr, fmt.Sprint(result.Dice))
+	resultStr += fmt.Sprintf("%s\": \nRolls:   %s\n", result.DiceRollStr, fmt.Sprint(result.Dice))
 
 	// Dropped dice array
 	if len(result.Dropped) > 0 {
-		resultStr += fmt.Sprintf("Dropped: %s ", fmt.Sprint(result.Dropped))
+		resultStr += fmt.Sprintf("Dropped: %s\n", fmt.Sprint(result.Dropped))
 	}
 
 	// The DiceRoll sum
@@ -68,20 +68,15 @@ func (result DiceRollResult) String() string {
 		resultStr += fmt.Sprintf(" Save: %d", halve(result.Sum))
 	}
 
+	resultStr += "\n"
+
 	return resultStr
 }
 
 // Returns the total sum of a DiceRollResult array.
 func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 	for i := range results {
-		toAdd := results[i].Sum
-		// Halve the sum to add if half attrib is present
-		if results[i].Attribs.(*rollAttributes) != nil {
-			if results[i].Attribs.hasAttrib(halfAttrib) {
-				toAdd = halve(toAdd)
-			}
-		}
-		sum += toAdd
+		sum += results[i].Sum
 	}
 
 	// Minimum DiceRoll result is 1, if at least a die was rolled

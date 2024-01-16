@@ -1,6 +1,7 @@
 package diceroller
 
 import (
+	"math/rand"
 	"testing"
 )
 
@@ -92,5 +93,23 @@ func FuzzParseRollArgs(f *testing.F) {
 	f.Add("8d4-1")
 	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {
 		ParseRollArgs(fuzzedRollArg)
+	})
+}
+
+func FuzzParseManyRollArgs(f *testing.F) {
+	f.Add(1)
+	f.Fuzz(func(t *testing.T, rollArgAmmount int) {
+		rollArgsArray := make([]string, 0)
+		for i := 0; i < rollArgAmmount; i++ {
+			rollArg := ""
+			if rand.Intn(2) == 1 {
+				rollArg = validRollArgs[rand.Intn(len(validRollArgs))]
+			} else {
+				rollArg = invalidRollArgs[rand.Intn(len(invalidRollArgs))]
+
+			}
+			rollArgsArray = append(rollArgsArray, rollArg)
+		}
+		ParseRollArgs(rollArgsArray...)
 	})
 }
