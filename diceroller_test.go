@@ -44,7 +44,7 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	// One result per valid DiceRoll should be received
 	if lenResults, lenValues := len(results), len(validDiceRollsValues); lenResults != lenValues {
 		// Missing results, fail the test
-		t.Fatalf("Result list length = %d, want match for %d", lenResults, lenValues)
+		t.Fatalf("Result list length = %d, wanted %d", lenResults, lenValues)
 	}
 
 	// Validate result array
@@ -60,7 +60,7 @@ func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 
 	// One error per invalid DiceRoll should be received
 	if lenDiceErrs, lenValues := len(diceErrs), len(invalidDiceRollsValues); lenDiceErrs != lenValues {
-		t.Fatalf("Error list length = %d, want match for %d", lenDiceErrs, lenValues)
+		t.Fatalf("Error list length = %d, wanted %d", lenDiceErrs, lenValues)
 	}
 }
 
@@ -69,13 +69,13 @@ func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
 	for i := range validRollArgs {
 		if sum := PerformRollArgsAndSum(validRollArgs[i]); sum <= 0 {
-			t.Fatalf("Valid RollArg %s result = %d, want > 0", validRollArgs[i], sum)
+			t.Fatalf("Valid RollArg %s result = %d, wanted > 0", validRollArgs[i], sum)
 		}
 	}
 
 	// Test sending the whole array
 	if sum := PerformRollArgsAndSum(validRollArgs...); sum <= 0 {
-		t.Fatalf("Valid RollArgs result = %d, want > 0", sum)
+		t.Fatalf("Valid RollArgs result = %d, wanted > 0", sum)
 	}
 }
 
@@ -84,13 +84,13 @@ func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
 	for i := range invalidRollArgs {
 		if sum := PerformRollArgsAndSum(invalidRollArgs[i]); sum > 0 {
-			t.Fatalf("Invalid RollArg %s result = %d, want 0", invalidRollArgs[i], sum)
+			t.Fatalf("Invalid RollArg %s result = %d, wanted 0", invalidRollArgs[i], sum)
 		}
 	}
 
 	// Test the full array
 	if sum := PerformRollArgsAndSum(invalidRollArgs...); sum > 0 {
-		t.Fatalf("Invalid RollArgs result = %d, want 0", sum)
+		t.Fatalf("Invalid RollArgs result = %d, wanted 0", sum)
 	}
 }
 
@@ -98,7 +98,7 @@ func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues, t *testing.T) {
 	// validate result format
 	if resultStr := result.String(); !diceValues.resultFormat.MatchString(result.String()) {
-		t.Fatalf("Roll result = %s, want match for %#q", resultStr, diceValues.resultFormat)
+		t.Fatalf("Roll result = %s, wanted %#q", resultStr, diceValues.resultFormat)
 	}
 
 	// Reproduce sum calculations
@@ -116,7 +116,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 
 	// Validate sum
 	if result.Sum != sum {
-		t.Fatalf("DiceRoll %s result is %d, wanted be %d", diceValues.diceRoll.String(), result.Sum, sum)
+		t.Fatalf("DiceRoll %s result = %d, wanted be %d", diceValues.diceRoll.String(), result.Sum, sum)
 	}
 }
 

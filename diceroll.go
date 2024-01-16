@@ -85,20 +85,22 @@ func validateDiceRoll(diceRoll DiceRoll) error {
 
 // Validates diceAmmount values for DiceRoll. Returns nil if valid, an error if invalid.
 func validateDiceAmmout(diceAmmount int) error {
+	ammountErrStr := "invalid dice ammout"
 	if diceAmmount > maxDiceRollValue {
-		return fmt.Errorf("invalid dice ammout %d. %s", diceAmmount, bigNumberErrorMsg)
+		return fmt.Errorf("%s %d. %s", ammountErrStr, diceAmmount, bigNumberErrorMsg)
 	} else if diceAmmount <= 0 {
-		return fmt.Errorf("invalid dice ammout %d", diceAmmount)
+		return fmt.Errorf("%s %d", ammountErrStr, diceAmmount)
 	}
 	return nil
 }
 
 // Validates diceSize values for DiceRoll. Returns nil if valid, an error if invalid.
 func validateDiceSize(diceSize int) error {
+	sizeErrStr := "invalid dice size"
 	if diceSize > maxDiceRollValue {
-		return fmt.Errorf("invalid dice size %d. %s", diceSize, bigNumberErrorMsg)
+		return fmt.Errorf("%s %d. %s", sizeErrStr, diceSize, bigNumberErrorMsg)
 	} else if diceSize <= 1 {
-		return fmt.Errorf("invalid dice size %d", diceSize)
+		return fmt.Errorf("%s %d", sizeErrStr, diceSize)
 	}
 	return nil
 }
