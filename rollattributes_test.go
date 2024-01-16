@@ -7,7 +7,7 @@ import (
 func TestRollAttributes(t *testing.T) {
 	rollAttribs := newRollAttributes()
 	for i := range rollAttributeMap {
-		rollAttrib, _ := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
+		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
 		if rollAttribs.hasAttrib(rollAttrib) == true {
 			t.Fatalf("hasAttrib %d returned true, wanted false", i)
 		}

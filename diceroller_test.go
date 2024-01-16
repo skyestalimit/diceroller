@@ -31,7 +31,7 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...)
 
 	// No errors should be received for a valid DiceRoll array
-	if len(diceErrs) != 0 {
+	if diceErrs != nil {
 		// Received errors, fail the test
 		errStr := ""
 		for i := range diceErrs {
@@ -42,9 +42,9 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	}
 
 	// One result per valid DiceRoll should be received
-	if len(results) != len(validDiceRollsValues) {
+	if lenResults, lenValues := len(results), len(validDiceRollsValues); lenResults != lenValues {
 		// Missing results, fail the test
-		t.Fatalf("Result list length = %d, want match for %d", len(results), len(validDiceRollsValues))
+		t.Fatalf("Result list length = %d, want match for %d", lenResults, lenValues)
 	}
 
 	// Validate result array
@@ -59,8 +59,8 @@ func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	_, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...)
 
 	// One error per invalid DiceRoll should be received
-	if len(diceErrs) != len(invalidDiceRollsValues) {
-		t.Fatalf("Error list length = %d, want match for %d", len(diceErrs), len(invalidDiceRollsValues))
+	if lenDiceErrs, lenValues := len(diceErrs), len(invalidDiceRollsValues); lenDiceErrs != lenValues {
+		t.Fatalf("Error list length = %d, want match for %d", lenDiceErrs, lenValues)
 	}
 }
 

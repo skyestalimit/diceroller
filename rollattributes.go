@@ -2,6 +2,8 @@ package diceroller
 
 import "strings"
 
+type rollAttribute int
+
 // rollAttribute values. 0 is invalid.
 const (
 	critAttrib         rollAttribute = iota + 1
@@ -13,7 +15,7 @@ const (
 	dropLowAttrib      rollAttribute = iota + 1
 )
 
-// Allowed rollAttributes as RollArgs.
+// Allowed rollAttribute string as RollArg.
 const (
 	critStr         string = "crit"
 	spellStr        string = "spell"
@@ -34,8 +36,6 @@ var rollAttributeMap = map[rollAttribute]string{
 	dropLowAttrib:      dropLowStr,
 }
 
-type rollAttribute int
-
 type rollAttributes struct {
 	attribs map[rollAttribute]bool
 }
@@ -46,18 +46,18 @@ func newRollAttributes() *rollAttributes {
 	return newRollAttributes
 }
 
-// If wanted matches, returns the matching rollAttribute value and true. If not, returns zero and false.
-func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) (rollAttribute, bool) {
+// To retrieve the roleAttribute matching wanted roleAttribute string.
+func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) rollAttribute {
 	for attrib, attribStr := range attribMap {
 		if strings.EqualFold(attribStr, wanted) {
-			return attrib, true
+			return attrib
 		}
 	}
-	return 0, false
+	return 0
 }
 
+// Sets attrib to true and prevents rollAttribute incompatibilities.
 func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
-	// Prevent attrib incompatibilities.
 	switch attrib {
 	case advantageAttrib:
 		delete(rollAttribs.attribs, disadvantageAttrib)
@@ -79,6 +79,7 @@ func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
 	rollAttribs.attribs[attrib] = true
 }
 
-func (dndAttrib rollAttributes) hasAttrib(attrib rollAttribute) bool {
-	return dndAttrib.attribs[attrib]
+// Returns true if wanted is set.
+func (attrib rollAttributes) hasAttrib(wanted rollAttribute) bool {
+	return attrib.attribs[wanted]
 }

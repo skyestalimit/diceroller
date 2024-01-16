@@ -2,7 +2,7 @@
 
 Easy to use package for any kind of dice rolling. Can perform complex dice rolling expressions in a single function call.
 
-Supports DnD-style rolls.
+Supports DnD 5e rolls.
 
 ## Installation
 

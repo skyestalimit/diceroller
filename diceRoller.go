@@ -60,34 +60,18 @@ func performRollingExpression(rollExpr rollingExpression) (results []DiceRollRes
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
-	if diceErr, ok := validateDiceRoll(diceRoll); !ok {
+	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		// Invalid DiceRoll, return error
 		return nil, diceErr
 	}
 
-	// Generate roll results
-	diceRollResult := generateRollResults(diceRoll)
-
-	// Apply modifier
-	diceRollResult.Sum += diceRoll.Modifier
-
-	// Minimum roll result is always 1, even after applying negative modifiers
-	if diceRollResult.Sum <= 0 {
-		diceRollResult.Sum = 1
-	}
-
-	// Negative Sum if minus DiceRoll
-	if !diceRoll.Plus {
-		diceRollResult.Sum = -diceRollResult.Sum
-	}
-
-	// Valid DiceRoll, return DiceRollResult
-	return diceRollResult, nil
+	// Valid DiceRoll. Generate and return DiceRollResult
+	return generateRolls(diceRoll), nil
 }
 
 // Generates DiceRollResult and applies attribs.
-func generateRollResults(diceRoll DiceRoll) *DiceRollResult {
-	rollAttributes := diceRoll.attribs.(*rollAttributes)
+func generateRolls(diceRoll DiceRoll) *DiceRollResult {
+	rollAttributes := diceRoll.Attribs.(*rollAttributes)
 	diceRollResult := newDiceRollResultWithAttribs(diceRoll.String(), rollAttributes)
 
 	// Setup according to attribs
@@ -132,6 +116,7 @@ func generateRollResults(diceRoll DiceRoll) *DiceRollResult {
 	// Drop Low / High attrib
 	if dropDice > 0 {
 		dropIndex := dropHighLow(dropDice, diceRollResult.Dice)
+
 		diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
 		diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
 		diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
@@ -140,6 +125,19 @@ func generateRollResults(diceRoll DiceRoll) *DiceRollResult {
 	// Half attrib
 	if half == halfAttrib {
 		diceRollResult.Sum = halve(diceRollResult.Sum)
+	}
+
+	// Apply modifier
+	diceRollResult.Sum += diceRoll.Modifier
+
+	// Minimum roll result is always 1, even after applying negative modifiers
+	if diceRollResult.Sum <= 0 {
+		diceRollResult.Sum = 1
+	}
+
+	// Negative Sum if minus DiceRoll
+	if !diceRoll.Plus {
+		diceRollResult.Sum = -diceRollResult.Sum
 	}
 
 	return diceRollResult
@@ -183,15 +181,15 @@ func dropHighLow(attrib rollAttribute, dice []int) int {
 }
 
 // Applies half logic. Rounds down.
-func halve(result int) int {
+func halve(sum int) int {
 	halved := 0
 	minus := false
 
-	if result < 0 {
+	if sum < 0 {
 		minus = true
 	}
 
-	halved = int(math.Abs(float64(result))) / 2
+	halved = int(math.Abs(float64(sum))) / 2
 
 	// Minimum result is 1 even if rounded down to 0
 	if halved < 1 {

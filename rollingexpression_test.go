@@ -9,12 +9,9 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 	rollAttribs := newRollAttributes()
 
-	diceRollArray := make([]rollable, 0)
 	for i := range validDiceRollsValues {
-		diceRollArray = append(diceRollArray, validDiceRollsValues[i].diceRoll)
+		rollExpr.diceRolls = append(rollExpr.diceRolls, validDiceRollsValues[i].diceRoll)
 	}
-
-	rollExpr.diceRolls = append(rollExpr.diceRolls, diceRollArray)
 
 	for i := range validRollArgsAttribs {
 
@@ -26,11 +23,10 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	}
 
 	rollExpr.attribs = rollAttribs
-	rollExpr.diceRolls = diceRollArray
 
 	results, diceErrs := performRollingExpression(rollExpr)
 
-	if len(diceErrs) > 0 {
+	if diceErrs != nil {
 		strErr := ""
 		for i := range diceErrs {
 			strErr += diceErrs[i].Error() + "\n"
@@ -39,7 +35,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	}
 
 	if sum := DiceRollResultsSum(results...); sum < 1 {
-		t.Fatalf("Rolling Expression results %d, wanted > 0", sum)
+		t.Fatalf("Rolling Expression results sum %d, wanted > 0", sum)
 
 	}
 }
@@ -48,12 +44,9 @@ func TestRollingExpressionWithInvalidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 	rollAttribs := newRollAttributes()
 
-	diceRollArray := make([]rollable, 0)
 	for i := range invalidDiceRollsValues {
-		diceRollArray = append(diceRollArray, invalidDiceRollsValues[i].diceRoll)
+		rollExpr.diceRolls = append(rollExpr.diceRolls, invalidDiceRollsValues[i].diceRoll)
 	}
-
-	rollExpr.diceRolls = append(rollExpr.diceRolls, diceRollArray)
 
 	for i := range invalidRollArgsAttribs {
 
@@ -63,11 +56,10 @@ func TestRollingExpressionWithInvalidValues(t *testing.T) {
 	}
 
 	rollExpr.attribs = rollAttribs
-	rollExpr.diceRolls = diceRollArray
 
 	results, diceErrs := performRollingExpression(rollExpr)
 
-	if len(diceErrs) <= 0 {
+	if diceErrs == nil {
 		t.Fatalf("Invalid Rolling Expression did not return errors")
 	}
 
@@ -91,7 +83,7 @@ func FuzzRollingExpression(f *testing.F) {
 			rollExpr.attribs.setRollAttrib(rollAttribute(i))
 
 			if !rollExpr.attribs.hasAttrib(rollAttribute(i)) {
-				t.Fatalf("Random attrib %d not set", i)
+				t.Fatalf("Random attrib %d is false, wanted true", i)
 			}
 
 			checkForAttribCompatibility(*rollAttribs, t)
@@ -99,7 +91,7 @@ func FuzzRollingExpression(f *testing.F) {
 
 		_, diceErrs := performRollingExpression(rollExpr)
 
-		if len(diceErrs) > 0 {
+		if diceErrs != nil {
 			strErr := ""
 			for i := range diceErrs {
 				strErr += diceErrs[i].Error() + "\n"

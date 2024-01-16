@@ -8,7 +8,7 @@ import (
 )
 
 // RollArg regex
-const rollArgFormat string = `^([+-])?(\d+)+[dD](\d+)([+-](\d+))?$`
+const rollArgFormat string = `^([+-])?(\d+)?[dD](\d+)([+-](\d+))?$`
 
 // Attributes regex
 const rollAttribsFormat string = `^[a-z]+$`
@@ -16,25 +16,29 @@ const rollAttribsFormat string = `^[a-z]+$`
 // Maximum allowed RollArg length
 const maxAllowedRollArgLength int = 5
 
-// Parses a RollArg array. Returns a DiceRoll array for valid RollArgs
-// and an error array for invalid ones.
+// Parses a RollArg array. Returns a DiceRoll array for valid RollArgs, an
+// error array for invalid ones.
 //
-// Expected format is XdY[+|-Z].
+// A valid RollArg matches either the DiceRoll format or a roleAttribute string.
 //
-// Valid RollArg examples: "4d4+1", "10d10", "1d6-1", "1D8".
+// DiceRoll format: [X]dY[+|-]Z. In other words XdY or dY followed by + or - Z.
+// Valid DiceRoll examples: "5d6", "d20", "4d4+1", "10d10", "1d6-1", "1D8".
+//
+// roleAttribute string list: "crit", "spell", "half", "adv", "dis", "drophigh", "droplow".
 func ParseRollArgs(rollArgs ...string) (rollExpr rollingExpression, errors []error) {
 	rollExpr = newRollingExpression()
 	diceRollSequence := false
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib > 0 {
 			if diceRollSequence {
-				// Reset roll attribs after a dice roll sequence ends
+				// Reset rollExpr attribs after a dice roll sequence ends
 				rollExpr.attribs = newRollAttributes()
 			}
 			rollExpr.attribs.setRollAttrib(rollAttrib)
 			diceRollSequence = false
-		} else if diceRoll, err := parseRollArg(rollArgs[i]); diceRoll != nil {
-			diceRoll.attribs = rollExpr.attribs
+		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
+			// Assign current set of attribs to diceRoll
+			diceRoll.Attribs = rollExpr.attribs
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 			diceRollSequence = true
 		} else {
@@ -49,7 +53,7 @@ func checkForRollAttribute(rollArg string) rollAttribute {
 	var rollAttrib rollAttribute = 0
 	attribRegEx := regexp.MustCompile(rollAttribsFormat)
 	if attribRegEx.MatchString(strings.ToLower(rollArg)) {
-		rollAttrib, _ = rollAttributeMapKey(rollAttributeMap, rollArg)
+		rollAttrib = rollAttributeMapKey(rollAttributeMap, rollArg)
 	}
 	return rollAttrib
 }
@@ -76,10 +80,15 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	}
 
 	// Parse dice ammount
-	if value, argErr := parseRollArgSlice(matches[2]); argErr == nil {
-		diceAmmount = value
+	if len(matches[2]) > 0 {
+		if value, argErr := parseRollArgSlice(matches[2]); argErr == nil {
+			diceAmmount = value
+		} else {
+			return nil, argErr
+		}
 	} else {
-		return nil, argErr
+		// dY syntax.
+		diceAmmount = 1
 	}
 
 	// Parse dice size

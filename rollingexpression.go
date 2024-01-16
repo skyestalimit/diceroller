@@ -1,7 +1,10 @@
 package diceroller
 
 // To allow adding DiceRolls to a rollingExpression
-type rollable interface{}
+type rollable interface {
+	String() string
+	Roll() int
+}
 
 type attributes interface {
 	setRollAttrib(rollAttribute)

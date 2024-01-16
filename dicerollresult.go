@@ -7,11 +7,11 @@ import (
 
 // A DiceRollResult contains the results of performing a DiceRoll
 type DiceRollResult struct {
-	DiceRollStr string // String representation of the performed DiceRoll, such as 1d6
-	Attribs     attributes
-	Dice        []int // Individual dice roll results
-	Dropped     []int
-	Sum         int // Sum of Dice array
+	DiceRollStr string     // String representation of the performed DiceRoll, such as 1d6
+	Attribs     attributes // Contains rollAttributes used to generate the rolls
+	Dice        []int      // Individual dice roll result
+	Dropped     []int      // Dropped dice roll result
+	Sum         int        // Sum of Dice
 }
 
 // DiceRollResult constructor with DiceRoll readable string.

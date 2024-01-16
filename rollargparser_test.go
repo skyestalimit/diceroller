@@ -102,12 +102,19 @@ func FuzzParseManyRollArgs(f *testing.F) {
 		rollArgsArray := make([]string, 0)
 		for i := 0; i < rollArgAmmount; i++ {
 			rollArg := ""
-			if rand.Intn(2) == 1 {
-				rollArg = validRollArgs[rand.Intn(len(validRollArgs))]
-			} else {
-				rollArg = invalidRollArgs[rand.Intn(len(invalidRollArgs))]
+			argType := rand.Intn(4) + 1
 
+			switch argType {
+			case 1:
+				rollArg = validRollArgs[rand.Intn(len(validRollArgs))]
+			case 2:
+				rollArg = invalidRollArgs[rand.Intn(len(invalidRollArgs))]
+			case 3:
+				rollArg = validRollArgsAttribs[rand.Intn(len(validRollArgsAttribs))]
+			case 4:
+				rollArg = invalidRollArgsAttribs[rand.Intn(len(invalidRollArgsAttribs))]
 			}
+
 			rollArgsArray = append(rollArgsArray, rollArg)
 		}
 		ParseRollArgs(rollArgsArray...)
