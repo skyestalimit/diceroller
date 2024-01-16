@@ -7,7 +7,7 @@ import (
 // Test valid DiceRoll results
 func TestPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
-		result, diceErr := performRoll(nil, validDiceRollsValues[i].diceRoll)
+		result, diceErr := performRoll(validDiceRollsValues[i].diceRoll)
 		if diceErr != nil {
 			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
 		}
@@ -18,7 +18,7 @@ func TestPerformRollWithValidDiceRolls(t *testing.T) {
 // Test rolling invalid DiceRolls
 func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		_, diceErr := performRoll(nil, invalidDiceRollsValues[i].diceRoll)
+		_, diceErr := performRoll(invalidDiceRollsValues[i].diceRoll)
 		if diceErr == nil {
 			t.Fatalf("Invalid dice roll %s did not generate an error", invalidDiceRollsValues[i].wantedDiceStr)
 		}
@@ -28,7 +28,7 @@ func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 // Test rolling an array of valid DiceRoll
 func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	results, diceErrs := PerformRolls(nil, diceRollsFromTestValues(validDiceRollsValues)...)
+	results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...)
 
 	// No errors should be received for a valid DiceRoll array
 	if len(diceErrs) != 0 {
@@ -56,7 +56,7 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 // Test rolling an array of invalid DiceRoll
 func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	_, diceErrs := PerformRolls(nil, diceRollsFromTestValues(invalidDiceRollsValues)...)
+	_, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...)
 
 	// One error per invalid DiceRoll should be received
 	if len(diceErrs) != len(invalidDiceRollsValues) {
@@ -145,13 +145,13 @@ func FuzzTestPerformRollArgs(f *testing.F) {
 func FuzzTestPerformRollsAndSum(f *testing.F) {
 	f.Add(6, 2, 4, true)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
-		PerformRollsAndSum(nil, *newDiceRoll(diceAmmount, diceSize, modifier, plus))
+		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier, plus))
 	})
 }
 
 func FuzzPerformRolls(f *testing.F) {
 	f.Add(12, 18, 11, true)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
-		PerformRolls(nil, *newDiceRoll(diceAmmount, diceSize, modifier, plus))
+		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier, plus))
 	})
 }

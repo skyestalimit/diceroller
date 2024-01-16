@@ -22,15 +22,15 @@ func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
 }
 
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
-func PerformRollsAndSum(attribs *rollAttributes, diceRolls ...DiceRoll) int {
-	results, _ := PerformRolls(attribs, diceRolls...)
+func PerformRollsAndSum(diceRolls ...DiceRoll) int {
+	results, _ := PerformRolls(diceRolls...)
 	return DiceRollResultsSum(results...)
 }
 
 // Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(attribs *rollAttributes, diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
+func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
 	for i := range diceRolls {
-		if result, diceErr := performRoll(attribs, diceRolls[i]); diceErr == nil {
+		if result, diceErr := performRoll(diceRolls[i]); diceErr == nil {
 			results = append(results, *result)
 		} else {
 			diceErrs = append(diceErrs, diceErr)
@@ -47,9 +47,8 @@ func performRollingExpressionAndSum(rollExpr rollingExpression) int {
 
 // Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
 func performRollingExpression(rollExpr rollingExpression) (results []DiceRollResult, diceErrs []error) {
-	rollAttribs := rollExpr.attribs.(*rollAttributes)
 	for i := range rollExpr.diceRolls {
-		if result, diceErr := performRoll(rollAttribs, rollExpr.diceRolls[i].(DiceRoll)); diceErr == nil {
+		if result, diceErr := performRoll(rollExpr.diceRolls[i].(DiceRoll)); diceErr == nil {
 			results = append(results, *result)
 		} else {
 			diceErrs = append(diceErrs, diceErr)
@@ -59,7 +58,7 @@ func performRollingExpression(rollExpr rollingExpression) (results []DiceRollRes
 }
 
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
-func performRoll(attribs *rollAttributes, diceRoll DiceRoll) (*DiceRollResult, error) {
+func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr, ok := validateDiceRoll(diceRoll); !ok {
 		// Invalid DiceRoll, return error
@@ -67,7 +66,7 @@ func performRoll(attribs *rollAttributes, diceRoll DiceRoll) (*DiceRollResult, e
 	}
 
 	// Generate roll results
-	diceRollResult := generateRollResults(attribs, diceRoll)
+	diceRollResult := generateRollResults(diceRoll)
 
 	// Apply modifier
 	diceRollResult.Sum += diceRoll.Modifier
@@ -87,9 +86,9 @@ func performRoll(attribs *rollAttributes, diceRoll DiceRoll) (*DiceRollResult, e
 }
 
 // Generates DiceRollResult and applies attribs.
-func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRollResult {
-	diceRollResult := newDiceRollResult(diceRoll.String())
-	diceRollResult.Attribs = rollAttribs
+func generateRollResults(diceRoll DiceRoll) *DiceRollResult {
+	rollAttributes := diceRoll.attribs.(*rollAttributes)
+	diceRollResult := newDiceRollResultWithAttribs(diceRoll.String(), rollAttributes)
 
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
@@ -97,23 +96,21 @@ func generateRollResults(rollAttribs *rollAttributes, diceRoll DiceRoll) *DiceRo
 	var dropDice rollAttribute = 0
 	var half rollAttribute = 0
 
-	if rollAttribs != nil {
-		for attrib := range rollAttribs.attribs {
-			switch attrib {
-			case critAttrib:
-				// Crit attrib
-				diceAmmount = diceAmmount * 2
-			case advantageAttrib:
-				advDis = advantageAttrib
-			case disadvantageAttrib:
-				advDis = disadvantageAttrib
-			case dropHighAttrib:
-				dropDice = dropHighAttrib
-			case dropLowAttrib:
-				dropDice = dropLowAttrib
-			case halfAttrib:
-				half = halfAttrib
-			}
+	for attrib := range rollAttributes.attribs {
+		switch attrib {
+		case critAttrib:
+			// Crit attrib
+			diceAmmount = diceAmmount * 2
+		case advantageAttrib:
+			advDis = advantageAttrib
+		case disadvantageAttrib:
+			advDis = disadvantageAttrib
+		case dropHighAttrib:
+			dropDice = dropHighAttrib
+		case dropLowAttrib:
+			dropDice = dropLowAttrib
+		case halfAttrib:
+			half = halfAttrib
 		}
 	}
 

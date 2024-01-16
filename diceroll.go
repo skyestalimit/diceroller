@@ -11,6 +11,7 @@ type DiceRoll struct {
 	DiceSize    int  // Size, or number of faces, of the dice to be rolled
 	Modifier    int  // Value to be applied to the sum of rolled dices
 	Plus        bool // Determines if the result of the roll is to be added or substracted
+	attribs     attributes
 }
 
 // Max allowed values for DiceRoll to avoid long run times and overflow.
@@ -21,7 +22,12 @@ const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
 func NewDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) (*DiceRoll, error) {
-	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, plus}
+	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, plus, newRollAttributes())
+}
+
+// DiceRoll constructor with rollAttributes, validates values.
+func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, plus bool, attribs *rollAttributes) (*DiceRoll, error) {
+	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, plus, attribs}
 	if diceErr, ok := validateDiceRoll(diceRoll); !ok {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
 	}

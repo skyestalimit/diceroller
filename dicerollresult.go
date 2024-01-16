@@ -16,7 +16,12 @@ type DiceRollResult struct {
 
 // DiceRollResult constructor with DiceRoll readable string.
 func newDiceRollResult(diceRollStr string) *DiceRollResult {
-	return &DiceRollResult{diceRollStr, newRollAttributes(), []int{}, []int{}, 0}
+	return newDiceRollResultWithAttribs(diceRollStr, newRollAttributes())
+}
+
+// DiceRollResult constructor with DiceRoll readable string and rollAttributes.
+func newDiceRollResultWithAttribs(diceRollStr string, attribs *rollAttributes) *DiceRollResult {
+	return &DiceRollResult{diceRollStr, attribs, []int{}, []int{}, 0}
 }
 
 // Human readable DiceRollResult string.

@@ -24,11 +24,19 @@ const maxAllowedRollArgLength int = 5
 // Valid RollArg examples: "4d4+1", "10d10", "1d6-1", "1D8".
 func ParseRollArgs(rollArgs ...string) (rollExpr rollingExpression, errors []error) {
 	rollExpr = newRollingExpression()
+	diceRollSequence := false
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib > 0 {
+			if diceRollSequence {
+				// Reset roll attribs after a dice roll sequence ends
+				rollExpr.attribs = newRollAttributes()
+			}
 			rollExpr.attribs.setRollAttrib(rollAttrib)
+			diceRollSequence = false
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); diceRoll != nil {
+			diceRoll.attribs = rollExpr.attribs
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
+			diceRollSequence = true
 		} else {
 			errors = append(errors, err)
 		}

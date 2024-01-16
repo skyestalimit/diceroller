@@ -42,23 +42,23 @@ var invalidDiceRollsValues = []diceRollTestValues{valuesBigAmmount, valuesBigSiz
 var valuesBigAmmount diceRollTestValues = diceRollTestValues{
 	`123456d10`,
 	nil,
-	DiceRoll{123456, 10, 0, true}}
+	DiceRoll{123456, 10, 0, true, newRollAttributes()}}
 var valuesBigSize diceRollTestValues = diceRollTestValues{
 	`10d123456+10`,
 	nil,
-	DiceRoll{10, 123456, 10, true}}
+	DiceRoll{10, 123456, 10, true, newRollAttributes()}}
 var valuesBigModifier diceRollTestValues = diceRollTestValues{
 	`10d10-123456`,
 	nil,
-	DiceRoll{10, 10, -123456, true}}
+	DiceRoll{10, 10, -123456, true, newRollAttributes()}}
 var valuesZeroAmmount diceRollTestValues = diceRollTestValues{
 	`0d8`,
 	nil,
-	DiceRoll{0, 8, 0, true}}
+	DiceRoll{0, 8, 0, true, newRollAttributes()}}
 var valuesZeroSize diceRollTestValues = diceRollTestValues{
 	`1d0`,
 	nil,
-	DiceRoll{1, 0, 0, true}}
+	DiceRoll{1, 0, 0, true, newRollAttributes()}}
 
 // Test basic init and string representation for valid DiceRolls
 func TestValidDiceRollString(t *testing.T) {
