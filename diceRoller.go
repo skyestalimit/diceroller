@@ -10,14 +10,14 @@ import (
 
 // Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
 func PerformRollArgsAndSum(rollArgs ...string) int {
-	diceRolls, _ := ParseRollArgs(rollArgs...)
-	return PerformRollsAndSum(diceRolls...)
+	rollExprs, _ := ParseRollArgs(rollArgs...)
+	return performRollingExpressionsAndSum(rollExprs...)
 }
 
 // Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
-func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
-	diceRolls, argErrs := ParseRollArgs(rollArgs...)
-	results, diceErrs := PerformRolls(diceRolls...)
+func PerformRollArgs(rollArgs ...string) ([]rollingExpressionResult, []error) {
+	rollExprs, argErrs := ParseRollArgs(rollArgs...)
+	results, diceErrs := performRollingExpressions(rollExprs...)
 	return results, append(argErrs, diceErrs...)
 }
 
@@ -39,6 +39,28 @@ func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []e
 	return results, diceErrs
 }
 
+// Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
+func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
+	results, _ := performRollingExpressions(rollExprs...)
+	return RollingExpressionResultSum(results...)
+}
+
+// Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
+func performRollingExpressions(rollExprs ...rollingExpression) (results []rollingExpressionResult, diceErrs []error) {
+	for e := range rollExprs {
+		rollExprResult := newRollingExpressionResult()
+		for i := range rollExprs[e].diceRolls {
+			if result, diceErr := performRoll(rollExprs[e].diceRolls[i]); diceErr == nil {
+				rollExprResult.results = append(rollExprResult.results, *result)
+			} else {
+				diceErrs = append(diceErrs, diceErr)
+			}
+		}
+		results = append(results, *rollExprResult)
+	}
+	return results, diceErrs
+}
+
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
 func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
@@ -53,8 +75,8 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 
 // Generates DiceRollResult and applies attribs.
 func generateRolls(diceRoll DiceRoll) *DiceRollResult {
-	rollAttributes := diceRoll.Attribs.(*rollAttributes)
-	diceRollResult := newDiceRollResultWithAttribs(diceRoll.String(), rollAttributes)
+	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
+	diceRollResult := newDiceRollResultWithAttribs(diceRoll.String(), dndRollAttributes)
 
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
@@ -63,21 +85,23 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 	var dropLow rollAttribute = 0
 	var half rollAttribute = 0
 
-	for attrib := range rollAttributes.attribs {
-		switch attrib {
-		case critAttrib:
-			// Crit attrib
-			diceAmmount = diceAmmount * 2
-		case advantageAttrib:
-			advDis = advantageAttrib
-		case disadvantageAttrib:
-			advDis = disadvantageAttrib
-		case dropHighAttrib:
-			dropHigh = dropHighAttrib
-		case dropLowAttrib:
-			dropLow = dropLowAttrib
-		case halfAttrib:
-			half = halfAttrib
+	if dndRollAttributes != nil {
+		for attrib := range dndRollAttributes.attribs {
+			switch attrib {
+			case critAttrib:
+				// Crit attrib
+				diceAmmount = diceAmmount * 2
+			case advantageAttrib:
+				advDis = advantageAttrib
+			case disadvantageAttrib:
+				advDis = disadvantageAttrib
+			case dropHighAttrib:
+				dropHigh = dropHighAttrib
+			case dropLowAttrib:
+				dropLow = dropLowAttrib
+			case halfAttrib:
+				half = halfAttrib
+			}
 		}
 	}
 

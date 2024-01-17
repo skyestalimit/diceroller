@@ -25,27 +25,32 @@ const maxAllowedRollArgLength int = 5
 // Valid DiceRoll examples: "5d6", "d20", "4d4+1", "10d10", "1d6-1", "1D8".
 //
 // roleAttribute string list: "crit", "spell", "half", "adv", "dis", "drophigh", "droplow".
-func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
-	attribs := newRollAttributes()
+func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, errors []error) {
+	// We're building rollingExpressions along with their rollAttributes
+	rollExpr := newRollingExpression()
+	attribs := newDnDRollAttributes()
 	diceRollSequence := false
 
 	for i := range rollArgs {
-		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib > 0 {
-			if diceRollSequence || rollAttrib == hitAttrib || rollAttrib == dmgAttrib {
-				// Reset attribs after a dice roll sequence ends
-				// hitAttrib or dmgAttrib also resets the attribs
-				attribs = newRollAttributes()
+		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib != 0 {
+			if diceRollSequence {
+				// Start a new rolling expression after a dice roll sequence ends
+				rollingExpressions = append(rollingExpressions, *rollExpr)
+				rollExpr = newRollingExpression()
+				attribs = newDnDRollAttributes()
 			}
 			attribs.setRollAttrib(rollAttrib)
 			diceRollSequence = false
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
 			diceRoll.Attribs = attribs
-			diceRolls = append(diceRolls, *diceRoll)
+			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 			diceRollSequence = true
 		} else {
 			errors = append(errors, err)
 		}
 	}
+
+	rollingExpressions = append(rollingExpressions, *rollExpr)
 
 	return
 }

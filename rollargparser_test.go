@@ -59,9 +59,11 @@ func TestParseValidRollArgs(t *testing.T) {
 
 func TestParseInvalidRollArgs(t *testing.T) {
 	rollArgsArray := append(invalidRollArgs, invalidRollArgsAttribs...)
-	diceRolls, _ := ParseRollArgs(rollArgsArray...)
-	for i := range diceRolls {
-		invalidArgParsingError(diceRolls[i].String(), t)
+	rollExprs, _ := ParseRollArgs(rollArgsArray...)
+	for e := range rollExprs {
+		for i := range rollExprs[e].diceRolls {
+			invalidArgParsingError(rollExprs[e].diceRolls[i].String(), t)
+		}
 	}
 }
 

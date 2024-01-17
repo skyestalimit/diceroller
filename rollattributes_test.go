@@ -5,7 +5,7 @@ import (
 )
 
 func TestRollAttributes(t *testing.T) {
-	rollAttribs := newRollAttributes()
+	rollAttribs := newDnDRollAttributes()
 	for i := range rollAttributeMap {
 		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
 		if rollAttribs.hasAttrib(rollAttrib) == true {
@@ -22,7 +22,7 @@ func TestRollAttributes(t *testing.T) {
 	}
 }
 
-func checkForAttribCompatibility(rollAttribs rollAttributes, t *testing.T) {
+func checkForAttribCompatibility(rollAttribs dndRollAttributes, t *testing.T) {
 	for rollAttrib := range rollAttribs.attribs {
 		switch rollAttrib {
 		case advantageAttrib:
@@ -40,7 +40,7 @@ func checkForAttribCompatibility(rollAttribs rollAttributes, t *testing.T) {
 func FuzzSetRollAttrib(f *testing.F) {
 	f.Add(0)
 	f.Fuzz(func(t *testing.T, fuzzedRollAttrib int) {
-		rollAttribs := newRollAttributes()
+		rollAttribs := newDnDRollAttributes()
 		rollAttrib := rollAttribute(fuzzedRollAttrib)
 		rollAttribs.setRollAttrib(rollAttrib)
 

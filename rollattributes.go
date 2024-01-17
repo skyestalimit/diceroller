@@ -50,15 +50,15 @@ type attributes interface {
 	hasAttrib(rollAttribute) bool
 }
 
-type rollAttributes struct {
+type dndRollAttributes struct {
 	attribs map[rollAttribute]bool
 }
 
 // Constructor for rollAttributes.
-func newRollAttributes() *rollAttributes {
-	newRollAttributes := new(rollAttributes)
-	newRollAttributes.attribs = make(map[rollAttribute]bool)
-	return newRollAttributes
+func newDnDRollAttributes() *dndRollAttributes {
+	newDnDRollAttributes := new(dndRollAttributes)
+	newDnDRollAttributes.attribs = make(map[rollAttribute]bool)
+	return newDnDRollAttributes
 }
 
 // To retrieve the roleAttribute matching wanted roleAttribute string.
@@ -72,17 +72,17 @@ func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) roll
 }
 
 // Sets attrib to true and prevents rollAttribute incompatibilities.
-func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
+func (dndAttribs dndRollAttributes) setRollAttrib(attrib rollAttribute) {
 	switch attrib {
 	case advantageAttrib:
-		delete(rollAttribs.attribs, disadvantageAttrib)
+		delete(dndAttribs.attribs, disadvantageAttrib)
 	case disadvantageAttrib:
-		delete(rollAttribs.attribs, advantageAttrib)
+		delete(dndAttribs.attribs, advantageAttrib)
 	}
-	rollAttribs.attribs[attrib] = true
+	dndAttribs.attribs[attrib] = true
 }
 
 // Returns true if wanted is set.
-func (attrib rollAttributes) hasAttrib(wanted rollAttribute) bool {
-	return attrib.attribs[wanted]
+func (dndAttrib dndRollAttributes) hasAttrib(wanted rollAttribute) bool {
+	return dndAttrib.attribs[wanted]
 }

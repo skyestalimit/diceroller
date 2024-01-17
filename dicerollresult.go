@@ -18,11 +18,11 @@ type DiceRollResult struct {
 
 // DiceRollResult constructor with DiceRoll readable string.
 func newDiceRollResult(diceRollStr string) *DiceRollResult {
-	return newDiceRollResultWithAttribs(diceRollStr, newRollAttributes())
+	return newDiceRollResultWithAttribs(diceRollStr, newDnDRollAttributes())
 }
 
 // DiceRollResult constructor with DiceRoll readable string and rollAttributes.
-func newDiceRollResultWithAttribs(diceRollStr string, attribs *rollAttributes) *DiceRollResult {
+func newDiceRollResultWithAttribs(diceRollStr string, attribs *dndRollAttributes) *DiceRollResult {
 	return &DiceRollResult{diceRollStr, attribs, []int{}, 0, []int{}, []int{}, []int{}}
 }
 
@@ -46,7 +46,7 @@ func (result DiceRollResult) String() string {
 	spell := false
 
 	// Start with roll attributes
-	rollAttribsMap := result.Attribs.(*rollAttributes)
+	rollAttribsMap := result.Attribs.(*dndRollAttributes)
 	if rollAttribsMap != nil {
 		// Sort the attributes
 		attribs := make([]rollAttribute, 0, len(rollAttribsMap.attribs))

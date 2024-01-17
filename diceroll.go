@@ -22,11 +22,11 @@ const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
 func NewDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) (*DiceRoll, error) {
-	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, plus, newRollAttributes())
+	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, plus, nil)
 }
 
 // DiceRoll constructor with rollAttributes, validates values.
-func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, plus bool, attribs *rollAttributes) (*DiceRoll, error) {
+func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, plus bool, attribs attributes) (*DiceRoll, error) {
 	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, plus, attribs}
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
@@ -38,6 +38,12 @@ func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, plus bo
 func newDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) *DiceRoll {
 	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier, plus)
 	return diceRoll
+}
+
+// Performs the DiceRoll. Returns the sum if valid, zero if invalid.
+func (diceRoll DiceRoll) Roll() int {
+	result, _ := performRoll(diceRoll)
+	return result.Sum
 }
 
 // Human readable DiceRoll string, such as "2d8+1".

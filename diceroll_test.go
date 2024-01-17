@@ -46,27 +46,27 @@ var invalidDiceRollsValues = []diceRollTestValues{
 	{
 		`123456d10`,
 		nil,
-		DiceRoll{123456, 10, 0, true, newRollAttributes()},
+		DiceRoll{123456, 10, 0, true, newDnDRollAttributes()},
 	},
 	{
 		`10d123456+10`,
 		nil,
-		DiceRoll{10, 123456, 10, true, newRollAttributes()},
+		DiceRoll{10, 123456, 10, true, newDnDRollAttributes()},
 	},
 	{
 		`10d10-123456`,
 		nil,
-		DiceRoll{10, 10, -123456, true, newRollAttributes()},
+		DiceRoll{10, 10, -123456, true, newDnDRollAttributes()},
 	},
 	{
 		`0d8`,
 		nil,
-		DiceRoll{0, 8, 0, true, newRollAttributes()},
+		DiceRoll{0, 8, 0, true, newDnDRollAttributes()},
 	},
 	{
 		`1d0`,
 		nil,
-		DiceRoll{1, 0, 0, true, newRollAttributes()},
+		DiceRoll{1, 0, 0, true, newDnDRollAttributes()},
 	},
 }
 
