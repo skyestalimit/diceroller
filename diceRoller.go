@@ -104,13 +104,13 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 		dropHighLow(dropLow, diceRollResult)
 	}
 
+	// Apply modifier
+	diceRollResult.Sum += diceRoll.Modifier
+
 	// Half attrib
 	if half == halfAttrib {
 		diceRollResult.Sum = halve(diceRollResult.Sum)
 	}
-
-	// Apply modifier
-	diceRollResult.Sum += diceRoll.Modifier
 
 	// Minimum roll result is always 1, even after applying negative modifiers
 	if diceRollResult.Sum <= 0 {
