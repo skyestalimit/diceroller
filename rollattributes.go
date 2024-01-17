@@ -6,6 +6,7 @@ type rollAttribute int
 
 // rollAttribute values. 0 is invalid.
 const (
+	// DnD rollAttribute
 	critAttrib         rollAttribute = iota + 1
 	spellAttrib        rollAttribute = iota + 1
 	halfAttrib         rollAttribute = iota + 1
@@ -17,6 +18,7 @@ const (
 
 // Allowed rollAttribute string as RollArg.
 const (
+	// DnD rollAttribute strings
 	critStr         string = "crit"
 	spellStr        string = "spell"
 	halfStr         string = "half"
@@ -27,6 +29,7 @@ const (
 )
 
 var rollAttributeMap = map[rollAttribute]string{
+	// DnD rollAttribute map
 	critAttrib:         critStr,
 	spellAttrib:        spellStr,
 	halfAttrib:         halfStr,
@@ -36,10 +39,16 @@ var rollAttributeMap = map[rollAttribute]string{
 	dropLowAttrib:      dropLowStr,
 }
 
+type attributes interface {
+	setRollAttrib(rollAttribute)
+	hasAttrib(rollAttribute) bool
+}
+
 type rollAttributes struct {
 	attribs map[rollAttribute]bool
 }
 
+// Constructor for rollAttributes.
 func newRollAttributes() *rollAttributes {
 	newRollAttributes := new(rollAttributes)
 	newRollAttributes.attribs = make(map[rollAttribute]bool)
@@ -61,20 +70,20 @@ func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
 	switch attrib {
 	case advantageAttrib:
 		delete(rollAttribs.attribs, disadvantageAttrib)
-		delete(rollAttribs.attribs, dropHighAttrib)
-		delete(rollAttribs.attribs, dropLowAttrib)
+		// delete(rollAttribs.attribs, dropHighAttrib)
+		// delete(rollAttribs.attribs, dropLowAttrib)
 	case disadvantageAttrib:
 		delete(rollAttribs.attribs, advantageAttrib)
-		delete(rollAttribs.attribs, dropHighAttrib)
-		delete(rollAttribs.attribs, dropLowAttrib)
-	case dropLowAttrib:
-		delete(rollAttribs.attribs, advantageAttrib)
-		delete(rollAttribs.attribs, disadvantageAttrib)
-		delete(rollAttribs.attribs, dropHighAttrib)
-	case dropHighAttrib:
-		delete(rollAttribs.attribs, advantageAttrib)
-		delete(rollAttribs.attribs, disadvantageAttrib)
-		delete(rollAttribs.attribs, dropLowAttrib)
+		// delete(rollAttribs.attribs, dropHighAttrib)
+		// delete(rollAttribs.attribs, dropLowAttrib)
+		// case dropLowAttrib:
+		// 	delete(rollAttribs.attribs, advantageAttrib)
+		// 	delete(rollAttribs.attribs, disadvantageAttrib)
+		// 	delete(rollAttribs.attribs, dropHighAttrib)
+		// case dropHighAttrib:
+		// 	delete(rollAttribs.attribs, advantageAttrib)
+		// 	delete(rollAttribs.attribs, disadvantageAttrib)
+		// 	delete(rollAttribs.attribs, dropLowAttrib)
 	}
 	rollAttribs.attribs[attrib] = true
 }

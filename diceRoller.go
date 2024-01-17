@@ -10,14 +10,14 @@ import (
 
 // Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
 func PerformRollArgsAndSum(rollArgs ...string) int {
-	rollExpr, _ := ParseRollArgs(rollArgs...)
-	return performRollingExpressionAndSum(rollExpr)
+	diceRolls, _ := ParseRollArgs(rollArgs...)
+	return PerformRollsAndSum(diceRolls...)
 }
 
 // Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
 func PerformRollArgs(rollArgs ...string) ([]DiceRollResult, []error) {
-	rollExpr, argErrs := ParseRollArgs(rollArgs...)
-	results, diceErrs := performRollingExpression(rollExpr)
+	diceRolls, argErrs := ParseRollArgs(rollArgs...)
+	results, diceErrs := PerformRolls(diceRolls...)
 	return results, append(argErrs, diceErrs...)
 }
 
@@ -31,24 +31,6 @@ func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
 	for i := range diceRolls {
 		if result, diceErr := performRoll(diceRolls[i]); diceErr == nil {
-			results = append(results, *result)
-		} else {
-			diceErrs = append(diceErrs, diceErr)
-		}
-	}
-	return results, diceErrs
-}
-
-// Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
-func performRollingExpressionAndSum(rollExpr rollingExpression) int {
-	results, _ := performRollingExpression(rollExpr)
-	return DiceRollResultsSum(results...)
-}
-
-// Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func performRollingExpression(rollExpr rollingExpression) (results []DiceRollResult, diceErrs []error) {
-	for i := range rollExpr.diceRolls {
-		if result, diceErr := performRoll(rollExpr.diceRolls[i].(DiceRoll)); diceErr == nil {
 			results = append(results, *result)
 		} else {
 			diceErrs = append(diceErrs, diceErr)
@@ -77,7 +59,8 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
 	var advDis rollAttribute = 0
-	var dropDice rollAttribute = 0
+	var dropHigh rollAttribute = 0
+	var dropLow rollAttribute = 0
 	var half rollAttribute = 0
 
 	for attrib := range rollAttributes.attribs {
@@ -90,9 +73,9 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 		case disadvantageAttrib:
 			advDis = disadvantageAttrib
 		case dropHighAttrib:
-			dropDice = dropHighAttrib
+			dropHigh = dropHighAttrib
 		case dropLowAttrib:
-			dropDice = dropLowAttrib
+			dropLow = dropLowAttrib
 		case halfAttrib:
 			half = halfAttrib
 		}
@@ -113,13 +96,14 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 		diceRollResult.Sum += roll
 	}
 
-	// Drop Low / High attrib
-	if dropDice > 0 {
-		dropIndex := dropHighLow(dropDice, diceRollResult.Dice)
+	// Drop High attrib
+	if dropHigh > 0 && len(diceRollResult.Dice) > 1 {
+		dropHighLow(dropHigh, diceRollResult)
+	}
 
-		diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
-		diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
-		diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
+	// Drop Low attrib
+	if dropLow > 0 && len(diceRollResult.Dice) > 1 {
+		dropHighLow(dropLow, diceRollResult)
 	}
 
 	// Half attrib
@@ -167,17 +151,21 @@ func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (toKeep in
 }
 
 // Applies drop high or drop low logic. Returns the index of the roll to drop.
-func dropHighLow(attrib rollAttribute, dice []int) int {
+func dropHighLow(attrib rollAttribute, diceRollResult *DiceRollResult) {
 	drop := 0
 
 	switch attrib {
 	case dropLowAttrib:
-		drop = slices.Min(dice)
+		drop = slices.Min(diceRollResult.Dice)
 	case dropHighAttrib:
-		drop = slices.Max(dice)
+		drop = slices.Max(diceRollResult.Dice)
 	}
 
-	return slices.Index(dice, drop)
+	dropIndex := slices.Index(diceRollResult.Dice, drop)
+
+	diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
+	diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
+	diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
 }
 
 // Applies half logic. Rounds down.

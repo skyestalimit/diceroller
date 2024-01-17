@@ -40,12 +40,6 @@ func newDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) *DiceRo
 	return diceRoll
 }
 
-// Performs the DiceRoll. Returns the sum if valid, zero if invalid.
-func (diceRoll DiceRoll) Roll() int {
-	result, _ := performRoll(diceRoll)
-	return result.Sum
-}
-
 // Human readable DiceRoll string, such as "2d8+1".
 func (diceRoll DiceRoll) String() string {
 	strDiceRoll := ""

@@ -25,26 +25,27 @@ const maxAllowedRollArgLength int = 5
 // Valid DiceRoll examples: "5d6", "d20", "4d4+1", "10d10", "1d6-1", "1D8".
 //
 // roleAttribute string list: "crit", "spell", "half", "adv", "dis", "drophigh", "droplow".
-func ParseRollArgs(rollArgs ...string) (rollExpr rollingExpression, errors []error) {
-	rollExpr = newRollingExpression()
+func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
+	attribs := newRollAttributes()
 	diceRollSequence := false
+
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib > 0 {
 			if diceRollSequence {
-				// Reset rollExpr attribs after a dice roll sequence ends
-				rollExpr.attribs = newRollAttributes()
+				// Reset attribs after a dice roll sequence ends
+				attribs = newRollAttributes()
 			}
-			rollExpr.attribs.setRollAttrib(rollAttrib)
+			attribs.setRollAttrib(rollAttrib)
 			diceRollSequence = false
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
-			// Assign current set of attribs to diceRoll
-			diceRoll.Attribs = rollExpr.attribs
-			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
+			diceRoll.Attribs = attribs
+			diceRolls = append(diceRolls, *diceRoll)
 			diceRollSequence = true
 		} else {
 			errors = append(errors, err)
 		}
 	}
+
 	return
 }
 
