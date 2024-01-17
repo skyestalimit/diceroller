@@ -26,20 +26,12 @@ func checkForAttribCompatibility(rollAttribs rollAttributes, t *testing.T) {
 	for rollAttrib := range rollAttribs.attribs {
 		switch rollAttrib {
 		case advantageAttrib:
-			if rollAttribs.hasAttrib(disadvantageAttrib) || rollAttribs.hasAttrib(dropHighAttrib) || rollAttribs.hasAttrib(dropLowAttrib) {
+			if rollAttribs.hasAttrib(disadvantageAttrib) {
 				t.Fatalf("Advantage attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
 			}
 		case disadvantageAttrib:
-			if rollAttribs.hasAttrib(advantageAttrib) || rollAttribs.hasAttrib(dropHighAttrib) || rollAttribs.hasAttrib(dropLowAttrib) {
+			if rollAttribs.hasAttrib(advantageAttrib) {
 				t.Fatalf("Disadvantage attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
-			}
-		case dropHighAttrib:
-			if rollAttribs.hasAttrib(advantageAttrib) || rollAttribs.hasAttrib(disadvantageAttrib) || rollAttribs.hasAttrib(dropLowAttrib) {
-				t.Fatalf("Drop high attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
-			}
-		case dropLowAttrib:
-			if rollAttribs.hasAttrib(advantageAttrib) || rollAttribs.hasAttrib(disadvantageAttrib) || rollAttribs.hasAttrib(dropHighAttrib) {
-				t.Fatalf("Drop low attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
 			}
 		}
 	}

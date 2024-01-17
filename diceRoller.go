@@ -87,9 +87,7 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 
 		// Advantage / disadvantage attrib
 		if advDis > 0 {
-			toDrop := 0
-			roll, toDrop = advantageDisadvantage(advDis, roll, rollDice(diceRoll.DiceSize))
-			diceRollResult.Dropped = append(diceRollResult.Dropped, toDrop)
+			roll = advantageDisadvantage(advDis, roll, rollDice(diceRoll.DiceSize), diceRollResult)
 		}
 
 		diceRollResult.Dice = append(diceRollResult.Dice, roll)
@@ -133,8 +131,8 @@ func rollDice(diceSize int) int {
 }
 
 // Applies advantage or disavantage logic. Returns the roll to keep and the roll to drop.
-func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (toKeep int, toDrop int) {
-	toKeep, toDrop = roll, roll2 // Default return order, change if needed
+func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep int) {
+	toKeep, toDrop := roll, roll2 // Default return order, change if needed
 
 	switch attrib {
 	case advantageAttrib:
@@ -147,7 +145,9 @@ func advantageDisadvantage(attrib rollAttribute, roll int, roll2 int) (toKeep in
 		}
 	}
 
-	return
+	diceRollResult.AdvDisDropped = append(diceRollResult.AdvDisDropped, toDrop)
+
+	return toKeep
 }
 
 // Applies drop high or drop low logic. Returns the index of the roll to drop.
@@ -163,7 +163,13 @@ func dropHighLow(attrib rollAttribute, diceRollResult *DiceRollResult) {
 
 	dropIndex := slices.Index(diceRollResult.Dice, drop)
 
-	diceRollResult.Dropped = append(diceRollResult.Dropped, diceRollResult.Dice[dropIndex])
+	switch attrib {
+	case dropLowAttrib:
+		diceRollResult.LowDropped = append(diceRollResult.LowDropped, diceRollResult.Dice[dropIndex])
+	case dropHighAttrib:
+		diceRollResult.HighDropped = append(diceRollResult.HighDropped, diceRollResult.Dice[dropIndex])
+	}
+
 	diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
 	diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
 }

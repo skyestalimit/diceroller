@@ -7,6 +7,8 @@ type rollAttribute int
 // rollAttribute values. 0 is invalid.
 const (
 	// DnD rollAttribute
+	hitAttrib          rollAttribute = iota + 1
+	dmgAttrib          rollAttribute = iota + 1
 	critAttrib         rollAttribute = iota + 1
 	spellAttrib        rollAttribute = iota + 1
 	halfAttrib         rollAttribute = iota + 1
@@ -19,6 +21,8 @@ const (
 // Allowed rollAttribute string as RollArg.
 const (
 	// DnD rollAttribute strings
+	hitStr          string = "hit"
+	dmgStr          string = "dmg"
 	critStr         string = "crit"
 	spellStr        string = "spell"
 	halfStr         string = "half"
@@ -30,6 +34,8 @@ const (
 
 var rollAttributeMap = map[rollAttribute]string{
 	// DnD rollAttribute map
+	hitAttrib:          hitStr,
+	dmgAttrib:          dmgStr,
 	critAttrib:         critStr,
 	spellAttrib:        spellStr,
 	halfAttrib:         halfStr,
@@ -70,20 +76,8 @@ func (rollAttribs rollAttributes) setRollAttrib(attrib rollAttribute) {
 	switch attrib {
 	case advantageAttrib:
 		delete(rollAttribs.attribs, disadvantageAttrib)
-		// delete(rollAttribs.attribs, dropHighAttrib)
-		// delete(rollAttribs.attribs, dropLowAttrib)
 	case disadvantageAttrib:
 		delete(rollAttribs.attribs, advantageAttrib)
-		// delete(rollAttribs.attribs, dropHighAttrib)
-		// delete(rollAttribs.attribs, dropLowAttrib)
-		// case dropLowAttrib:
-		// 	delete(rollAttribs.attribs, advantageAttrib)
-		// 	delete(rollAttribs.attribs, disadvantageAttrib)
-		// 	delete(rollAttribs.attribs, dropHighAttrib)
-		// case dropHighAttrib:
-		// 	delete(rollAttribs.attribs, advantageAttrib)
-		// 	delete(rollAttribs.attribs, disadvantageAttrib)
-		// 	delete(rollAttribs.attribs, dropLowAttrib)
 	}
 	rollAttribs.attribs[attrib] = true
 }

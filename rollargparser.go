@@ -31,8 +31,9 @@ func ParseRollArgs(rollArgs ...string) (diceRolls []DiceRoll, errors []error) {
 
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib > 0 {
-			if diceRollSequence {
+			if diceRollSequence || rollAttrib == hitAttrib || rollAttrib == dmgAttrib {
 				// Reset attribs after a dice roll sequence ends
+				// hitAttrib or dmgAttrib also resets the attribs
 				attribs = newRollAttributes()
 			}
 			attribs.setRollAttrib(rollAttrib)
