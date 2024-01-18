@@ -2,40 +2,46 @@ package diceroller
 
 import "fmt"
 
+// Represents a sequence of DiceRolls.
 type rollingExpression struct {
-	attribs   attributes
 	diceRolls []DiceRoll
 }
 
-type rollingExpressionResult struct {
-	results []DiceRollResult
+// Results of performing a rollingExpression.
+type RollingExpressionResult struct {
+	Results []DiceRollResult
+	Sum     int
 }
 
+// Constructor of rollingExpression.
 func newRollingExpression() *rollingExpression {
 	rollExpr := new(rollingExpression)
-	rollExpr.attribs = newDnDRollAttributes()
 	rollExpr.diceRolls = make([]DiceRoll, 0)
 	return rollExpr
 }
 
-func newRollingExpressionResult() *rollingExpressionResult {
-	rollExpr := new(rollingExpressionResult)
-	rollExpr.results = make([]DiceRollResult, 0)
+// Constructor of RollingExpressionResult.
+func newRollingExpressionResult() *RollingExpressionResult {
+	rollExpr := new(RollingExpressionResult)
+	rollExpr.Sum = 0
+	rollExpr.Results = make([]DiceRollResult, 0)
 	return rollExpr
 }
 
-func RollingExpressionResultSum(results ...rollingExpressionResult) (sum int) {
+// Sums multiple RollingExpressionResult.
+func RollingExpressionResultSum(results ...RollingExpressionResult) (sum int) {
 	for i := range results {
-		sum += DiceRollResultsSum(results[i].results...)
+		sum += results[i].Sum
 	}
 	return
 }
 
-func (rollExpr rollingExpressionResult) String() string {
+// Formatted result output.
+func (rollExpr RollingExpressionResult) String() string {
 	resultStr := ""
-	for i := range rollExpr.results {
-		resultStr += rollExpr.results[i].String()
+	for i := range rollExpr.Results {
+		resultStr += rollExpr.Results[i].String()
 	}
-	resultStr += fmt.Sprintf("\nRoll sum: %d \n", DiceRollResultsSum(rollExpr.results...))
+	resultStr += fmt.Sprintf("\nRoll sum: %d \n", DiceRollResultsSum(rollExpr.Results...))
 	return resultStr
 }

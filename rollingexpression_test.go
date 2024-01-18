@@ -9,12 +9,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 	rollAttribs := newDnDRollAttributes()
 
-	for i := range validDiceRollsValues {
-		rollExpr.diceRolls = append(rollExpr.diceRolls, validDiceRollsValues[i].diceRoll)
-	}
-
 	for i := range validRollArgsAttribs {
-
 		if rollAttrib := checkForRollAttribute(validRollArgsAttribs[i]); rollAttrib > 0 {
 			rollAttribs.setRollAttrib(rollAttrib)
 		} else {
@@ -22,7 +17,11 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 		}
 	}
 
-	rollExpr.attribs = rollAttribs
+	for i := range validDiceRollsValues {
+		diceRoll := validDiceRollsValues[i].diceRoll
+		diceRoll.Attribs = rollAttribs
+		rollExpr.diceRolls = append(rollExpr.diceRolls, diceRoll)
+	}
 
 	results, diceErrs := performRollingExpressions(*rollExpr)
 
@@ -42,20 +41,16 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 
 func TestRollingExpressionWithInvalidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
-	rollAttribs := newDnDRollAttributes()
-
-	for i := range invalidDiceRollsValues {
-		rollExpr.diceRolls = append(rollExpr.diceRolls, invalidDiceRollsValues[i].diceRoll)
-	}
 
 	for i := range invalidRollArgsAttribs {
-
 		if checkForRollAttribute(invalidRollArgsAttribs[i]) > 0 {
 			t.Fatalf("Invalid roll attrib %s has matching rollAttributes value", invalidRollArgsAttribs[i])
 		}
 	}
 
-	rollExpr.attribs = rollAttribs
+	for i := range invalidDiceRollsValues {
+		rollExpr.diceRolls = append(rollExpr.diceRolls, invalidDiceRollsValues[i].diceRoll)
+	}
 
 	results, diceErrs := performRollingExpressions(*rollExpr)
 
@@ -80,9 +75,9 @@ func FuzzRollingExpression(f *testing.F) {
 		}
 
 		for i := 0; i < attribAmmount; i++ {
-			rollExpr.attribs.setRollAttrib(rollAttribute(i))
+			rollAttribs.setRollAttrib(rollAttribute(i))
 
-			if !rollExpr.attribs.hasAttrib(rollAttribute(i)) {
+			if !rollAttribs.hasAttrib(rollAttribute(i)) {
 				t.Fatalf("Random attrib %d is false, wanted true", i)
 			}
 

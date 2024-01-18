@@ -36,7 +36,7 @@ func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, plus bo
 
 // DiceRoll constructor without errors.
 func newDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) *DiceRoll {
-	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier, plus)
+	diceRoll, _ := NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, plus, nil)
 	return diceRoll
 }
 

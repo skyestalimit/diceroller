@@ -94,6 +94,6 @@ func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
 func FuzzNewDiceRoll(f *testing.F) {
 	f.Add(2, 8, 1, true)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
-		NewDiceRoll(diceAmmount, diceSize, modifier, plus)
+		NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, plus, nil)
 	})
 }
