@@ -38,7 +38,7 @@ func RollingExpressionResultSum(results ...RollingExpressionResult) (sum int) {
 
 // Formatted result output.
 func (rollExpr RollingExpressionResult) String() string {
-	resultStr := ""
+	resultStr := "Rolling expression\n"
 	for i := range rollExpr.Results {
 		resultStr += rollExpr.Results[i].String()
 	}

@@ -41,7 +41,7 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 
 // Human readable DiceRollResult string.
 func (result DiceRollResult) String() string {
-	resultStr := "Result of DiceRoll \""
+	resultStr := " Result of DiceRoll \""
 	var advDis rollAttribute = 0
 	spell := false
 
@@ -73,7 +73,7 @@ func (result DiceRollResult) String() string {
 	}
 
 	// DiceRoll string and dice result array
-	resultStr += fmt.Sprintf("%s\": \n Rolls:     %s\n", result.DiceRollStr, fmt.Sprint(result.Dice))
+	resultStr += fmt.Sprintf("%s\": \n  Rolls:     %s\n", result.DiceRollStr, fmt.Sprint(result.Dice))
 
 	// Advantage / disadvantage dropped dice array
 	if len(result.AdvDisDropped) > 0 {
@@ -85,21 +85,21 @@ func (result DiceRollResult) String() string {
 			advDisStr = "Dis drop:"
 		}
 
-		resultStr += fmt.Sprintf(" %s  %s\n", advDisStr, fmt.Sprint(result.AdvDisDropped))
+		resultStr += fmt.Sprintf("  %s  %s\n", advDisStr, fmt.Sprint(result.AdvDisDropped))
 	}
 
 	// Dropped High dice array
 	if len(result.HighDropped) > 0 {
-		resultStr += fmt.Sprintf(" Drop High: %s\n", fmt.Sprint(result.HighDropped))
+		resultStr += fmt.Sprintf("  Drop High: %s\n", fmt.Sprint(result.HighDropped))
 	}
 
 	// Dropped Low dice array
 	if len(result.LowDropped) > 0 {
-		resultStr += fmt.Sprintf(" Drop Low:  %s\n", fmt.Sprint(result.LowDropped))
+		resultStr += fmt.Sprintf("  Drop Low:  %s\n", fmt.Sprint(result.LowDropped))
 	}
 
 	// The DiceRoll sum
-	resultStr += fmt.Sprintf(" Sum:       %d", result.Sum)
+	resultStr += fmt.Sprintf("  Sum:       %d", result.Sum)
 
 	// Half ammount for passing a spell saving throw
 	if spell {
