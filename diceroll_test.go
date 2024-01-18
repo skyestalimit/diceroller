@@ -84,6 +84,17 @@ func TestInvalidDiceRollString(t *testing.T) {
 	}
 }
 
+// Test basic init and string representation for invalid DiceRolls
+func TestValidRoll(t *testing.T) {
+	for i := range validDiceRollsValues {
+		diceRoll := validDiceRollsValues[i].diceRoll
+		roll := diceRoll.Roll()
+		if roll == 0 {
+			t.Fatalf("Valid DiceRoll %s rolled %d, wanted > 1", diceRoll.String(), roll)
+		}
+	}
+}
+
 // Validates DiceRoll string format
 func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
 	if diceStr := diceValues.diceRoll.String(); !strings.EqualFold(diceValues.wantedDiceStr, diceStr) {

@@ -1,6 +1,7 @@
 package diceroller
 
 import (
+	"math/rand"
 	"testing"
 )
 
@@ -19,6 +20,24 @@ func TestRollAttributes(t *testing.T) {
 		}
 
 		checkForAttribCompatibility(*rollAttribs, t)
+	}
+}
+
+func TestPerformRollWithRollAttributes(t *testing.T) {
+	rollAttribs := newDnDRollAttributes()
+	for i := range rollAttributeMap {
+		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
+
+		rollAttribs.setRollAttrib(rollAttrib)
+
+		diceRoll := validDiceRollsValues[rand.Intn(len(validDiceRollsValues))].diceRoll
+		diceRoll.Attribs = rollAttribs
+
+		if result, diceErr := performRoll(diceRoll); diceErr != nil {
+			t.Fatalf("DiceRoll %s returned error: %s", diceRoll.String(), diceErr.Error())
+		} else if result.Sum == 0 {
+			t.Fatalf("DiceRoll %s result = %d, wanted > 0", diceRoll.String(), result.Sum)
+		}
 	}
 }
 

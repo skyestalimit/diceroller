@@ -94,6 +94,19 @@ func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 	}
 }
 
+// Test tricky rolls
+func TestTrickyRolls(t *testing.T) {
+	rollExpr, _ := ParseRollArgs("half", "1d2-2", "roll", "-d20-1")
+
+	if sum := rollExpr[0].diceRolls[0].Roll(); sum < 1 {
+		t.Fatalf("half 1d2-2 rolled %d, wanted > 1", sum)
+	}
+
+	if _, diceErrs := performRollingExpressions(rollExpr...); diceErrs != nil {
+		t.Fatalf("Tricky roll expr returned errors: %s", diceErrs)
+	}
+}
+
 // Validates roll result matches expected format
 func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues, t *testing.T) {
 	// validate result format

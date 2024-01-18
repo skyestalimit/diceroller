@@ -2,6 +2,7 @@ package diceroller
 
 import (
 	"math/rand"
+	"strings"
 	"testing"
 )
 
@@ -15,27 +16,34 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 		} else {
 			t.Fatalf("Valid roll attrib %s has no matching rollAttributes value", validRollArgsAttribs[i])
 		}
-	}
 
-	for i := range validDiceRollsValues {
-		diceRoll := validDiceRollsValues[i].diceRoll
-		diceRoll.Attribs = rollAttribs
-		rollExpr.diceRolls = append(rollExpr.diceRolls, diceRoll)
-	}
-
-	results, diceErrs := performRollingExpressions(*rollExpr)
-
-	if diceErrs != nil {
-		strErr := ""
-		for i := range diceErrs {
-			strErr += diceErrs[i].Error() + "\n"
+		for i := range validDiceRollsValues {
+			diceRoll := validDiceRollsValues[i].diceRoll
+			diceRoll.Attribs = rollAttribs
+			rollExpr.diceRolls = append(rollExpr.diceRolls, diceRoll)
 		}
-		t.Fatalf("Rolling Expression returned errors: %s", strErr)
-	}
 
-	if sum := RollingExpressionResultSum(results...); sum < 1 {
-		t.Fatalf("Rolling Expression results sum %d, wanted > 0", sum)
+		results, diceErrs := performRollingExpressions(*rollExpr)
+		resultStr := results[0].String()
 
+		for i := range validDiceRollsValues {
+			if !strings.Contains(resultStr, validDiceRollsValues[i].diceRoll.String()) {
+				t.Fatalf("Roll result = %s, no match for %s", resultStr, validDiceRollsValues[i].diceRoll.String())
+			}
+		}
+
+		if diceErrs != nil {
+			strErr := ""
+			for i := range diceErrs {
+				strErr += diceErrs[i].Error() + "\n"
+			}
+			t.Fatalf("Rolling Expression returned errors: %s", strErr)
+		}
+
+		if sum := RollingExpressionResultSum(results...); sum < 1 {
+			t.Fatalf("Rolling Expression results sum %d, wanted > 0", sum)
+
+		}
 	}
 }
 
