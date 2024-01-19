@@ -17,9 +17,9 @@ go get github.com/skyestalimit/diceroller
 A RollArg is simply a string representing a dice rolling expression, such as `1d6`, `1d8-1`, `4d4+4` or `10d10`.
 
 - A valid RollArg matches either of these formats: `XdY`, `XdY+Z`, `XdY-Z`.
-- It can be a roll attribute such as `crit`, `adv`, `half`, `droplow`. 
-- It can be a separator, to signal the start of a new dice rolling expression, such as `roll`. 
-- See the `ParseRollArgs` function documentation for more details. 
+- It can be a roll attribute such as `crit`, `adv`, `half`, `droplow`.
+- It can be a separator, to signal the start of a new dice rolling expression, such as `roll`.
+- See the `ParseRollArgs` function documentation for more details.
 
 To perform the dice rolling expression `1d6`:
 

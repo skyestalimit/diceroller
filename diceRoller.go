@@ -64,8 +64,6 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []Rollin
 		}
 		if rollExprResult.detectCritHit() {
 			wasCritHit = true
-		} else {
-			wasCritHit = false
 		}
 
 		results = append(results, *rollExprResult)
