@@ -41,7 +41,7 @@ You can build multiple dice rolling expressions, which can be summed separately,
 
 Performing these RollArgs `adv`, `d20`, `roll`, `1d4`, `half`, `2d6+1`, `roll`, `2d6` at once would result in the rolling expressions `adv d20`, `1d4`, `half 2d6+1` and `2d6` being rolled separately, with their own roll attributes applied and separate sums. Of course, they all can be summed together as well.
 
-### Rolling API style using DiceRolls
+### Rolling library style using DiceRolls
 
 A `DiceRoll` is not necessarily a single dice roll, but a single dice rolling expression, such as `2d6`.
 

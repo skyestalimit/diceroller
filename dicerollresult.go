@@ -7,23 +7,17 @@ import (
 
 // A DiceRollResult contains the results of performing a DiceRoll
 type DiceRollResult struct {
-	DiceRollStr   string     // String representation of the performed DiceRoll, such as 1d6
-	Attribs       attributes // Contains rollAttributes used to generate the rolls
-	Dice          []int      // Individual dice roll result
-	Sum           int        // Sum of Dice
-	AdvDisDropped []int      // Dropped advantage/disadvantage dice
-	HighDropped   []int      // Dropped high dice
-	LowDropped    []int      // Dropped low dice
-}
-
-// DiceRollResult constructor with DiceRoll readable string.
-func newDiceRollResult(diceRollStr string) *DiceRollResult {
-	return newDiceRollResultWithAttribs(diceRollStr, newDnDRollAttributes())
+	diceRoll      DiceRoll // Performed DiceRoll
+	Dice          []int    // Individual dice roll result
+	Sum           int      // Sum of Dice
+	AdvDisDropped []int    // Dropped advantage/disadvantage dice
+	HighDropped   []int    // Dropped high dice
+	LowDropped    []int    // Dropped low dice
 }
 
 // DiceRollResult constructor with DiceRoll readable string and rollAttributes.
-func newDiceRollResultWithAttribs(diceRollStr string, attribs *dndRollAttributes) *DiceRollResult {
-	return &DiceRollResult{diceRollStr, attribs, []int{}, 0, []int{}, []int{}, []int{}}
+func newDiceRollResult(diceRoll DiceRoll) *DiceRollResult {
+	return &DiceRollResult{diceRoll, []int{}, 0, []int{}, []int{}, []int{}}
 }
 
 // Returns the total sum of a DiceRollResult array.
@@ -46,7 +40,7 @@ func (result DiceRollResult) String() string {
 	spell := false
 
 	// Start with roll attributes
-	rollAttribsMap := result.Attribs.(*dndRollAttributes)
+	rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
 	if rollAttribsMap != nil {
 		// Sort the attributes
 		attribs := make([]rollAttribute, 0, len(rollAttribsMap.attribs))
@@ -73,7 +67,7 @@ func (result DiceRollResult) String() string {
 	}
 
 	// DiceRoll string and dice result array
-	resultStr += fmt.Sprintf("%s\": \n  Rolls:     %s\n", result.DiceRollStr, fmt.Sprint(result.Dice))
+	resultStr += fmt.Sprintf("%s\": \n  Rolls:     %s\n", result.diceRoll, fmt.Sprint(result.Dice))
 
 	// Advantage / disadvantage dropped dice array
 	if len(result.AdvDisDropped) > 0 {

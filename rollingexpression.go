@@ -45,3 +45,18 @@ func (rollExpr RollingExpressionResult) String() string {
 	resultStr += fmt.Sprintf("\nRoll sum: %d \n", DiceRollResultsSum(rollExpr.Results...))
 	return resultStr
 }
+
+// Detects a critical hit.
+func (rollExprResult RollingExpressionResult) detectCritHit() bool {
+	critHit := false
+	for i := range rollExprResult.Results {
+		result := rollExprResult.Results[i]
+
+		if len(result.Dice) == 1 && result.Dice[0] == 20 && result.diceRoll.DiceAmmount == 1 &&
+			result.diceRoll.DiceSize == 20 && result.diceRoll.Attribs.hasAttrib(hitAttrib) {
+			critHit = true
+			continue
+		}
+	}
+	return critHit
+}

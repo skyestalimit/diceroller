@@ -47,16 +47,27 @@ func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 
 // Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
 func performRollingExpressions(rollExprs ...rollingExpression) (results []RollingExpressionResult, diceErrs []error) {
+	wasCritHit := false
 	for e := range rollExprs {
 		rollExprResult := newRollingExpressionResult()
 		for i := range rollExprs[e].diceRolls {
-			if result, diceErr := performRoll(rollExprs[e].diceRolls[i]); diceErr == nil {
+			diceRoll := rollExprs[e].diceRolls[i]
+			if wasCritHit && diceRoll.Attribs.hasAttrib(dmgAttrib) {
+				diceRoll.Attribs.setRollAttrib(critAttrib)
+			}
+			if result, diceErr := performRoll(diceRoll); diceErr == nil {
 				rollExprResult.Results = append(rollExprResult.Results, *result)
 				rollExprResult.Sum += result.Sum
 			} else {
 				diceErrs = append(diceErrs, diceErr)
 			}
 		}
+		if rollExprResult.detectCritHit() {
+			wasCritHit = true
+		} else {
+			wasCritHit = false
+		}
+
 		results = append(results, *rollExprResult)
 	}
 	return results, diceErrs
@@ -77,7 +88,7 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 // Generates DiceRollResult and applies attribs.
 func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
-	diceRollResult := newDiceRollResultWithAttribs(diceRoll.String(), dndRollAttributes)
+	diceRollResult := newDiceRollResult(diceRoll)
 
 	// Setup according to attribs
 	diceAmmount := diceRoll.DiceAmmount
