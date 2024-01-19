@@ -40,8 +40,8 @@ func (result DiceRollResult) String() string {
 	spell := false
 
 	// Start with roll attributes
-	rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
-	if rollAttribsMap != nil {
+	if result.diceRoll.Attribs != nil {
+		rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
 		// Sort the attributes
 		attribs := make([]rollAttribute, 0, len(rollAttribsMap.attribs))
 		for rollAttrib := range rollAttribsMap.attribs {

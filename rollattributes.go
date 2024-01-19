@@ -6,6 +6,7 @@ type rollAttribute int
 
 // rollAttribute values. 0 is invalid.
 const (
+	rollAttrib rollAttribute = iota + 1
 	// DnD rollAttribute
 	hitAttrib          rollAttribute = iota + 1
 	dmgAttrib          rollAttribute = iota + 1
@@ -20,6 +21,7 @@ const (
 
 // Allowed rollAttribute string as RollArg.
 const (
+	rollStr string = "roll"
 	// DnD rollAttribute strings
 	hitStr          string = "hit"
 	dmgStr          string = "dmg"
@@ -33,6 +35,7 @@ const (
 )
 
 var rollAttributeMap = map[rollAttribute]string{
+	rollAttrib: rollStr,
 	// DnD rollAttribute map
 	hitAttrib:          hitStr,
 	dmgAttrib:          dmgStr,
