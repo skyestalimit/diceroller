@@ -2,7 +2,9 @@
 
 Easy to use package for any kind of dice rolling. Can perform complex dice rolling expressions in a single function call.
 
-Supports DnD 5e rolls.
+- Provides every individual dice roll result, kept or dropped, for more result viewing fun.
+- Production grade library with complete test coverage and fuzz tests. This lib is bug free.
+- Supports DnD 5e rolls.
 
 ## Installation
 
