@@ -8,6 +8,14 @@ import (
 	"slices"
 )
 
+type DiceRollAttribs struct {
+	diceAmmount int
+	advDis      rollAttribute
+	dropHigh    rollAttribute
+	dropLow     rollAttribute
+	half        rollAttribute
+}
+
 // Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
 func PerformRollArgsAndSum(rollArgs ...string) int {
 	rollExprs, _ := ParseRollArgs(rollArgs...)
@@ -85,43 +93,16 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 
 // Generates DiceRollResult and applies attribs.
 func generateRolls(diceRoll DiceRoll) *DiceRollResult {
-	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
 	diceRollResult := newDiceRollResult(diceRoll)
-
-	// Setup according to attribs
-	diceAmmount := diceRoll.DiceAmmount
-	var advDis rollAttribute = 0
-	var dropHigh rollAttribute = 0
-	var dropLow rollAttribute = 0
-	var half rollAttribute = 0
-
-	if dndRollAttributes != nil {
-		for attrib := range dndRollAttributes.attribs {
-			switch attrib {
-			case critAttrib:
-				// Crit attrib
-				diceAmmount = diceAmmount * 2
-			case advantageAttrib:
-				advDis = advantageAttrib
-			case disadvantageAttrib:
-				advDis = disadvantageAttrib
-			case dropHighAttrib:
-				dropHigh = dropHighAttrib
-			case dropLowAttrib:
-				dropLow = dropLowAttrib
-			case halfAttrib:
-				half = halfAttrib
-			}
-		}
-	}
+	diceRollAttribs := prepareDiceRollAttribs(diceRoll)
 
 	// Generate rolls
-	for i := 0; i < diceAmmount; i++ {
+	for i := 0; i < diceRollAttribs.diceAmmount; i++ {
 		roll := rollDice(diceRoll.DiceSize)
 
 		// Advantage / disadvantage attrib
-		if advDis > 0 {
-			roll = advantageDisadvantage(advDis, roll, rollDice(diceRoll.DiceSize), diceRollResult)
+		if diceRollAttribs.advDis > 0 {
+			roll = advantageDisadvantage(diceRollAttribs.advDis, roll, rollDice(diceRoll.DiceSize), diceRollResult)
 		}
 
 		diceRollResult.Dice = append(diceRollResult.Dice, roll)
@@ -129,20 +110,20 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 	}
 
 	// Drop High attrib
-	if dropHigh > 0 && len(diceRollResult.Dice) > 1 {
-		dropHighLow(dropHigh, diceRollResult)
+	if diceRollAttribs.dropHigh > 0 && len(diceRollResult.Dice) > 1 {
+		dropHighLow(diceRollAttribs.dropHigh, diceRollResult)
 	}
 
 	// Drop Low attrib
-	if dropLow > 0 && len(diceRollResult.Dice) > 1 {
-		dropHighLow(dropLow, diceRollResult)
+	if diceRollAttribs.dropLow > 0 && len(diceRollResult.Dice) > 1 {
+		dropHighLow(diceRollAttribs.dropLow, diceRollResult)
 	}
 
 	// Apply modifier
 	diceRollResult.Sum += diceRoll.Modifier
 
 	// Half attrib
-	if half == halfAttrib {
+	if diceRollAttribs.half == halfAttrib {
 		diceRollResult.Sum = halve(diceRollResult.Sum)
 	}
 
@@ -162,6 +143,36 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 // Generates a single die roll.
 func rollDice(diceSize int) int {
 	return rand.Intn(diceSize) + 1
+}
+
+func prepareDiceRollAttribs(diceRoll DiceRoll) DiceRollAttribs {
+
+	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
+
+	// Setup according to attribs
+	diceRollAttribs := DiceRollAttribs{diceRoll.DiceAmmount, 0, 0, 0, 0}
+
+	if dndRollAttributes != nil {
+		for attrib := range dndRollAttributes.attribs {
+			switch attrib {
+			case critAttrib:
+				// Crit attrib
+				diceRollAttribs.diceAmmount = diceRollAttribs.diceAmmount * 2
+			case advantageAttrib:
+				diceRollAttribs.advDis = advantageAttrib
+			case disadvantageAttrib:
+				diceRollAttribs.advDis = disadvantageAttrib
+			case dropHighAttrib:
+				diceRollAttribs.dropHigh = dropHighAttrib
+			case dropLowAttrib:
+				diceRollAttribs.dropLow = dropLowAttrib
+			case halfAttrib:
+				diceRollAttribs.half = halfAttrib
+			}
+		}
+	}
+
+	return diceRollAttribs
 }
 
 // Applies advantage or disavantage logic. Returns the roll to keep and the roll to drop.
