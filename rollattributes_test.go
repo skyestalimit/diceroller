@@ -33,7 +33,7 @@ func TestPerformRollWithRollAttributes(t *testing.T) {
 		diceRoll := validDiceRollsValues[rand.Intn(len(validDiceRollsValues))].diceRoll
 		diceRoll.Attribs = rollAttribs
 
-		if result, diceErr := performRoll(diceRoll); diceErr != nil {
+		if result, diceErr := validateAndperformRoll(diceRoll); diceErr != nil {
 			t.Fatalf("DiceRoll %s returned error: %s", diceRoll.String(), diceErr.Error())
 		} else if result.Sum == 0 {
 			t.Fatalf("DiceRoll %s result = %d, wanted > 0", diceRoll.String(), result.Sum)

@@ -30,7 +30,7 @@ func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 // Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
 func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
 	for i := range diceRolls {
-		if result, diceErr := performRoll(diceRolls[i]); diceErr == nil {
+		if result, diceErr := validateAndperformRoll(diceRolls[i]); diceErr == nil {
 			results = append(results, *result)
 		} else {
 			diceErrs = append(diceErrs, diceErr)
@@ -55,7 +55,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []Rollin
 			if wasCritHit {
 				diceRoll.Attribs.setRollAttrib(critAttrib)
 			}
-			if result, diceErr := performRoll(diceRoll); diceErr == nil {
+			if result, diceErr := validateAndperformRoll(diceRoll); diceErr == nil {
 				rollExprResult.Results = append(rollExprResult.Results, *result)
 				rollExprResult.Sum += result.Sum
 			} else {
@@ -71,7 +71,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []Rollin
 }
 
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
-func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
+func validateAndperformRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		// Invalid DiceRoll, return error
@@ -79,35 +79,16 @@ func performRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 	}
 
 	// Valid DiceRoll. Generate and return DiceRollResult
-	return generateRolls(diceRoll), nil
+	return performRoll(diceRoll), nil
 }
 
 // Generates DiceRollResult and applies attribs.
-func generateRolls(diceRoll DiceRoll) *DiceRollResult {
+func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll)
 	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
 
-	actualDiceAmmount := diceRoll.DiceAmmount
-	if dndRollAttributes.isCrit() {
-		actualDiceAmmount = actualDiceAmmount * 2
-	}
-
 	// Generate rolls
-	for i := 0; i < actualDiceAmmount; i++ {
-		roll := rollDice(diceRoll.DiceSize)
-
-		// Advantage attrib
-		if dndRollAttributes.isAdvantage() {
-			roll = advantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
-		}
-		// Disadvantage attrib
-		if dndRollAttributes.isDisadvantage() {
-			roll = disadvantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
-		}
-
-		diceRollResult.Dice = append(diceRollResult.Dice, roll)
-		diceRollResult.Sum += roll
-	}
+	generateRolls(diceRoll, diceRollResult, dndRollAttributes)
 
 	// Drop High attrib
 	if dndRollAttributes.isDropHigh() && len(diceRollResult.Dice) > 1 {
@@ -138,6 +119,31 @@ func generateRolls(diceRoll DiceRoll) *DiceRollResult {
 	}
 
 	return diceRollResult
+}
+
+func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *dndRollAttributes) {
+	// Determine actual dice ammount to roll
+	actualDiceAmmount := diceRoll.DiceAmmount
+	if dndRollAttributes.isCrit() {
+		actualDiceAmmount = actualDiceAmmount * 2
+	}
+
+	// Generate rolls
+	for i := 0; i < actualDiceAmmount; i++ {
+		roll := rollDice(diceRoll.DiceSize)
+
+		// Advantage attrib
+		if dndRollAttributes.isAdvantage() {
+			roll = advantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
+		}
+		// Disadvantage attrib
+		if dndRollAttributes.isDisadvantage() {
+			roll = disadvantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
+		}
+
+		diceRollResult.Dice = append(diceRollResult.Dice, roll)
+		diceRollResult.Sum += roll
+	}
 }
 
 // Generates a single die roll.

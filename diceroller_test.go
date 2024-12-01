@@ -7,7 +7,7 @@ import (
 // Test valid DiceRoll results
 func TestPerformRollWithValidDiceRolls(t *testing.T) {
 	for i := range validDiceRollsValues {
-		result, diceErr := performRoll(validDiceRollsValues[i].diceRoll)
+		result, diceErr := validateAndperformRoll(validDiceRollsValues[i].diceRoll)
 		if diceErr != nil {
 			t.Fatalf("Unexpected dice roll error: %s", diceErr.Error())
 		}
@@ -18,7 +18,7 @@ func TestPerformRollWithValidDiceRolls(t *testing.T) {
 // Test rolling invalid DiceRolls
 func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 	for i := range invalidDiceRollsValues {
-		_, diceErr := performRoll(invalidDiceRollsValues[i].diceRoll)
+		_, diceErr := validateAndperformRoll(invalidDiceRollsValues[i].diceRoll)
 		if diceErr == nil {
 			t.Fatalf("Invalid dice roll %s did not generate an error", invalidDiceRollsValues[i].wantedDiceStr)
 		}

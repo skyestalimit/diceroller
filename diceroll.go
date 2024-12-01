@@ -42,7 +42,7 @@ func newDiceRoll(diceAmmount int, diceSize int, modifier int, plus bool) *DiceRo
 
 // Performs the DiceRoll. Returns the sum if valid, zero if invalid.
 func (diceRoll DiceRoll) Roll() int {
-	result, _ := performRoll(diceRoll)
+	result, _ := validateAndperformRoll(diceRoll)
 	return result.Sum
 }
 
