@@ -37,9 +37,9 @@ jobs:
       with:
         profile: cover.out
         local-prefix: github.com/skyestalimit/diceroller
-        threshold-file: 90
-        threshold-package: 90
-        threshold-total: 90
+        threshold-file: 100
+        threshold-package: 100
+        threshold-total: 100
       
        
             
