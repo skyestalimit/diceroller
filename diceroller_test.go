@@ -141,6 +141,18 @@ func diceRollsFromTestValues(testValues []diceRollTestValues) (diceRolls []DiceR
 	return
 }
 
+// Tests critical hit detection
+func TestDnDHitRollUntilCrit(t *testing.T) {
+	// Performs two rolling expressions until a critical hit is scored
+	for {
+		results, _ := PerformRollArgs("hit", "1d20", "dmg", "2d6+3")
+
+		if results[0].detectScoredCritHit() {
+			break
+		}
+	}
+}
+
 func FuzzPerformRollArgsAndSum(f *testing.F) {
 	f.Add("8d4-1")
 	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {

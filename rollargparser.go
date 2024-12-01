@@ -50,22 +50,19 @@ func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, 
 	// We're building rollingExpressions along with their rollAttributes
 	rollExpr := newRollingExpression()
 	attribs := newDnDRollAttributes()
-	diceRollSequence := false
 
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib != 0 {
-			if diceRollSequence {
-				// Start a new rolling expression after a dice roll sequence ends
+			// Start a new rolling expression after a dice roll sequence ends
+			if len(rollExpr.diceRolls) > 0 {
 				rollingExpressions = append(rollingExpressions, *rollExpr)
 				rollExpr = newRollingExpression()
 				attribs = newDnDRollAttributes()
 			}
 			attribs.setRollAttrib(rollAttrib)
-			diceRollSequence = false
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
 			diceRoll.Attribs = attribs
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
-			diceRollSequence = true
 		} else {
 			errors = append(errors, err)
 		}

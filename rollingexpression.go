@@ -47,15 +47,14 @@ func (rollExpr RollingExpressionResult) String() string {
 }
 
 // Detects a critical hit.
-func (rollExprResult RollingExpressionResult) detectCritHit() bool {
+func (rollExprResult RollingExpressionResult) detectScoredCritHit() bool {
 	critHit := false
 	for i := range rollExprResult.Results {
 		result := rollExprResult.Results[i]
 
-		if len(result.Dice) == 1 && result.Dice[0] == 20 && result.diceRoll.DiceAmmount == 1 &&
-			result.diceRoll.DiceSize == 20 && result.diceRoll.Attribs.hasAttrib(hitAttrib) {
+		if result.hasScoredCritHit() {
 			critHit = true
-			continue
+			break
 		}
 	}
 	return critHit

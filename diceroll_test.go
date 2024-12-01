@@ -39,6 +39,11 @@ var validDiceRollsValues = []diceRollTestValues{
 		regexp.MustCompile(`\[[1-6] [1-6] [1-6] [1-6] [1-6]\]`),
 		*newDiceRoll(5, 6, -1, false),
 	},
+	{
+		`1d2-4`,
+		regexp.MustCompile(`\[[1-2]\]`),
+		*newDiceRoll(1, 2, -4, true),
+	},
 }
 
 // Invalid Dice Rolls

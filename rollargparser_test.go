@@ -17,6 +17,9 @@ var validRollArgs = []string{
 
 // Valid Roll Args attribs
 var validRollArgsAttribs = []string{
+	"roll",
+	"hit",
+	"dmg",
 	"crit",
 	"spell",
 	"half",

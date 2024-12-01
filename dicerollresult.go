@@ -26,10 +26,6 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 		sum += results[i].Sum
 	}
 
-	// Minimum DiceRoll result is 1, if at least a die was rolled
-	if len(results) > 0 && sum < 1 {
-		sum = 1
-	}
 	return
 }
 
@@ -103,4 +99,16 @@ func (result DiceRollResult) String() string {
 	resultStr += "\n"
 
 	return resultStr
+}
+
+// Detects a critical hit.
+func (rollResult DiceRollResult) hasScoredCritHit() bool {
+	critHit := false
+
+	if len(rollResult.Dice) == 1 && rollResult.Dice[0] == 20 &&
+		rollResult.diceRoll.DiceAmmount == 1 && rollResult.diceRoll.DiceSize == 20 {
+		critHit = true
+	}
+
+	return critHit
 }

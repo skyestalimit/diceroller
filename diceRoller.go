@@ -70,9 +70,8 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []Rollin
 				diceErrs = append(diceErrs, diceErr)
 			}
 		}
-		if rollExprResult.detectCritHit() {
-			wasCritHit = true
-		}
+
+		wasCritHit = rollExprResult.detectScoredCritHit()
 
 		results = append(results, *rollExprResult)
 	}
