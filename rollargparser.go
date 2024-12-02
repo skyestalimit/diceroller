@@ -49,7 +49,7 @@ const maxAllowedRollArgLength int = 5
 func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, errors []error) {
 	// We're building rollingExpressions along with their rollAttributes
 	rollExpr := newRollingExpression()
-	attribs := newDnDRollAttributes()
+	attribs := newRollAttributes()
 
 	for i := range rollArgs {
 		if rollAttrib := checkForRollAttribute(rollArgs[i]); rollAttrib != 0 {
@@ -57,11 +57,11 @@ func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, 
 			if len(rollExpr.diceRolls) > 0 {
 				rollingExpressions = append(rollingExpressions, *rollExpr)
 				rollExpr = newRollingExpression()
-				attribs = newDnDRollAttributes()
+				attribs = newRollAttributes()
 			}
 			attribs.setRollAttrib(rollAttrib)
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
-			diceRoll.Attribs = attribs
+			diceRoll.RollAttribs = attribs
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 		} else {
 			errors = append(errors, err)
@@ -95,12 +95,12 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	matches := rollArgregex.FindStringSubmatch(rollArg)
 
 	var diceAmmount, diceSize, modifier = 0, 0, 0
-	minus := false
+	var rollAttributes *rollAttributes = newRollAttributes()
 
 	// Parse minus sign
 	if len(matches[1]) > 0 {
 		if strings.EqualFold(matches[1], "-") {
-			minus = true
+			rollAttributes.setRollAttrib(minusAttrib)
 		}
 	}
 
@@ -132,7 +132,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 		}
 	}
 
-	return NewDiceRoll(diceAmmount, diceSize, modifier, minus)
+	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, rollAttributes)
 }
 
 // Parses a rollArg slice. Returns its value if valid, zero and an error if invalid.

@@ -4,11 +4,13 @@ import (
 	"math/rand"
 	"strings"
 	"testing"
+
+	"golang.org/x/exp/maps"
 )
 
 func TestRollingExpressionWithValidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
-	rollAttribs := newDnDRollAttributes()
+	rollAttribs := newRollAttributes()
 
 	for i := range validRollArgsAttribs {
 		if rollAttrib := checkForRollAttribute(validRollArgsAttribs[i]); rollAttrib > 0 {
@@ -19,7 +21,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 
 		for i := range validDiceRollsValues {
 			diceRoll := validDiceRollsValues[i].diceRoll
-			diceRoll.Attribs = rollAttribs
+			diceRoll.RollAttribs.setRollAttrib(maps.Keys(rollAttribs.attribs)...)
 			rollExpr.diceRolls = append(rollExpr.diceRolls, diceRoll)
 		}
 
@@ -76,10 +78,10 @@ func FuzzRollingExpression(f *testing.F) {
 	f.Add(10, 10)
 	f.Fuzz(func(t *testing.T, diceRollAmmount int, attribAmmount int) {
 		rollExpr := newRollingExpression()
-		rollAttribs := newDnDRollAttributes()
+		rollAttribs := newRollAttributes()
 
 		for i := 0; i < diceRollAmmount; i++ {
-			rollExpr.diceRolls = append(rollExpr.diceRolls, *newDiceRoll(rand.Intn(99999)+1, rand.Intn(99999)+1, rand.Intn(99999)+1, rand.Intn(2) == 1))
+			rollExpr.diceRolls = append(rollExpr.diceRolls, *newDiceRoll(rand.Intn(99999)+1, rand.Intn(99999)+1, rand.Intn(99999)+1))
 		}
 
 		for i := 0; i < attribAmmount; i++ {

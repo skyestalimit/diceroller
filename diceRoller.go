@@ -53,7 +53,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []rollin
 		for i := range rollExprs[e].diceRolls {
 			diceRoll := rollExprs[e].diceRolls[i]
 			if wasCritHit {
-				diceRoll.Attribs.setRollAttrib(critAttrib)
+				diceRoll.RollAttribs.setRollAttrib(critAttrib)
 			}
 			if result, diceErr := validateAndperformRoll(diceRoll); diceErr == nil {
 				rollExprResult.Results = append(rollExprResult.Results, *result)
@@ -84,18 +84,17 @@ func validateAndperformRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 // Generates DiceRollResult and applies attribs.
 func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll)
-	dndRollAttributes, _ := diceRoll.Attribs.(*dndRollAttributes)
 
 	// Generate rolls
-	generateRolls(diceRoll, diceRollResult, dndRollAttributes)
+	generateRolls(diceRoll, diceRollResult, diceRoll.RollAttribs)
 
 	// Drop High attrib
-	if dndRollAttributes.isDropHigh() && len(diceRollResult.Dice) > 1 {
+	if diceRoll.RollAttribs.isDropHigh() && len(diceRollResult.Dice) > 1 {
 		dropHigh(diceRollResult)
 	}
 
 	// Drop Low attrib
-	if dndRollAttributes.isDropLow() && len(diceRollResult.Dice) > 1 {
+	if diceRoll.RollAttribs.isDropLow() && len(diceRollResult.Dice) > 1 {
 		dropLow(diceRollResult)
 	}
 
@@ -103,7 +102,7 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult.Sum += diceRoll.Modifier
 
 	// Half attrib
-	if dndRollAttributes.isHalf() {
+	if diceRoll.RollAttribs.isHalf() {
 		diceRollResult.Sum = halve(diceRollResult.Sum)
 	}
 
@@ -113,14 +112,14 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	}
 
 	// Negative Sum if minus DiceRoll
-	if diceRoll.Minus {
+	if diceRoll.RollAttribs.isMinus() {
 		diceRollResult.Sum = -diceRollResult.Sum
 	}
 
 	return diceRollResult
 }
 
-func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *dndRollAttributes) {
+func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *rollAttributes) {
 	// Determine actual dice ammount to roll
 	actualDiceAmmount := diceRoll.DiceAmmount
 

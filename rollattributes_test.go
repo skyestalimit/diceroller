@@ -6,7 +6,7 @@ import (
 )
 
 func TestRollAttributes(t *testing.T) {
-	rollAttribs := newDnDRollAttributes()
+	rollAttribs := newRollAttributes()
 	for i := range rollAttributeMap {
 		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
 		if rollAttribs.hasAttrib(rollAttrib) == true {
@@ -24,14 +24,14 @@ func TestRollAttributes(t *testing.T) {
 }
 
 func TestPerformRollWithRollAttributes(t *testing.T) {
-	rollAttribs := newDnDRollAttributes()
+	rollAttribs := newRollAttributes()
 	for i := range rollAttributeMap {
 		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
 
 		rollAttribs.setRollAttrib(rollAttrib)
 
 		diceRoll := validDiceRollsValues[rand.Intn(len(validDiceRollsValues))].diceRoll
-		diceRoll.Attribs = rollAttribs
+		diceRoll.RollAttribs = rollAttribs
 
 		if result, diceErr := validateAndperformRoll(diceRoll); diceErr != nil {
 			t.Fatalf("DiceRoll %s returned error: %s", diceRoll.String(), diceErr.Error())
@@ -41,7 +41,7 @@ func TestPerformRollWithRollAttributes(t *testing.T) {
 	}
 }
 
-func checkForAttribCompatibility(rollAttribs dndRollAttributes, t *testing.T) {
+func checkForAttribCompatibility(rollAttribs rollAttributes, t *testing.T) {
 	for rollAttrib := range rollAttribs.attribs {
 		switch rollAttrib {
 		case advantageAttrib:
@@ -59,7 +59,7 @@ func checkForAttribCompatibility(rollAttribs dndRollAttributes, t *testing.T) {
 func FuzzSetRollAttrib(f *testing.F) {
 	f.Add(0)
 	f.Fuzz(func(t *testing.T, fuzzedRollAttrib int) {
-		rollAttribs := newDnDRollAttributes()
+		rollAttribs := newRollAttributes()
 		rollAttrib := rollAttribute(fuzzedRollAttrib)
 		rollAttribs.setRollAttrib(rollAttrib)
 

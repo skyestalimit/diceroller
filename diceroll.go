@@ -7,11 +7,10 @@ import (
 
 // A DiceRoll represents a dice rolling expression, such as 1d6 or 2d8+1.
 type DiceRoll struct {
-	DiceAmmount int        // Ammount of dice to be rolled
-	DiceSize    int        // Size, or number of faces, of the dice to be rolled
-	Modifier    int        // Value to be applied to the sum of rolled dices
-	Minus       bool       // Determines if the result of the roll is to be added or substracted
-	Attribs     attributes // Contains rollAttributes affecting the rolls
+	DiceAmmount int             // Ammount of dice to be rolled
+	DiceSize    int             // Size, or number of faces, of the dice to be rolled
+	Modifier    int             // Value to be applied to the sum of rolled dices
+	RollAttribs *rollAttributes // Contains rollAttributes affecting the rolls
 }
 
 // Max allowed DiceRoll values to avoid long run times and overflow.
@@ -21,13 +20,13 @@ const maxDiceRollValue int = 99999
 const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
-func NewDiceRoll(diceAmmount int, diceSize int, modifier int, minus bool) (*DiceRoll, error) {
-	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, minus, nil)
+func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error) {
+	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, nil)
 }
 
 // DiceRoll constructor with rollAttributes, validates values.
-func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, minus bool, attribs attributes) (*DiceRoll, error) {
-	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, minus, attribs}
+func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, attribs *rollAttributes) (*DiceRoll, error) {
+	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, attribs}
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
 	}
@@ -35,8 +34,8 @@ func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, minus b
 }
 
 // DiceRoll constructor without errors.
-func newDiceRoll(diceAmmount int, diceSize int, modifier int, minus bool) *DiceRoll {
-	diceRoll, _ := NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, minus, nil)
+func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
+	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier)
 	return diceRoll
 }
 
@@ -51,7 +50,7 @@ func (diceRoll DiceRoll) String() string {
 	strDiceRoll := ""
 
 	// Add minus symbol if needed
-	if diceRoll.Minus {
+	if diceRoll.RollAttribs.isMinus() {
 		strDiceRoll += "-"
 	}
 

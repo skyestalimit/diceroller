@@ -17,6 +17,7 @@ const (
 	disadvantageAttrib rollAttribute = iota + 1
 	dropHighAttrib     rollAttribute = iota + 1
 	dropLowAttrib      rollAttribute = iota + 1
+	minusAttrib        rollAttribute = iota + 1
 )
 
 // Allowed rollAttribute string as RollArg.
@@ -32,6 +33,7 @@ const (
 	disadvantageStr string = "dis"
 	dropHighStr     string = "drophigh"
 	dropLowStr      string = "droplow"
+	minusAttribStr  string = "minus"
 )
 
 var rollAttributeMap = map[rollAttribute]string{
@@ -46,6 +48,7 @@ var rollAttributeMap = map[rollAttribute]string{
 	disadvantageAttrib: disadvantageStr,
 	dropHighAttrib:     dropHighStr,
 	dropLowAttrib:      dropLowStr,
+	minusAttrib:        minusAttribStr,
 }
 
 type attributes interface {
@@ -53,15 +56,16 @@ type attributes interface {
 	hasAttrib(rollAttribute) bool
 }
 
-type dndRollAttributes struct {
+type rollAttributes struct {
 	attribs map[rollAttribute]bool
 }
 
 // Constructor for rollAttributes.
-func newDnDRollAttributes() *dndRollAttributes {
-	newDnDRollAttributes := new(dndRollAttributes)
-	newDnDRollAttributes.attribs = make(map[rollAttribute]bool)
-	return newDnDRollAttributes
+func newRollAttributes(rollAttribs ...rollAttribute) *rollAttributes {
+	newRollAttributes := new(rollAttributes)
+	newRollAttributes.attribs = make(map[rollAttribute]bool)
+	newRollAttributes.setRollAttrib(rollAttribs...)
+	return newRollAttributes
 }
 
 // To retrieve the roleAttribute matching wanted roleAttribute string.
@@ -75,59 +79,68 @@ func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) roll
 }
 
 // Sets attrib to true and prevents rollAttribute incompatibilities.
-func (dndAttribs *dndRollAttributes) setRollAttrib(attrib rollAttribute) {
-	switch attrib {
-	case advantageAttrib:
-		delete(dndAttribs.attribs, disadvantageAttrib)
-	case disadvantageAttrib:
-		delete(dndAttribs.attribs, advantageAttrib)
+func (dndAttribs *rollAttributes) setRollAttrib(rollAttribs ...rollAttribute) {
+	for i := range rollAttribs {
+		switch rollAttribs[i] {
+		case advantageAttrib:
+			delete(dndAttribs.attribs, disadvantageAttrib)
+		case disadvantageAttrib:
+			delete(dndAttribs.attribs, advantageAttrib)
+		}
+		dndAttribs.attribs[rollAttribs[i]] = true
 	}
-	dndAttribs.attribs[attrib] = true
 }
 
 // Returns true if wanted is set.
-func (dndAttrib *dndRollAttributes) hasAttrib(wanted rollAttribute) bool {
+func (dndAttrib *rollAttributes) hasAttrib(wanted rollAttribute) bool {
 	return dndAttrib.attribs[wanted]
 }
 
-func (dndAttrib *dndRollAttributes) isCrit() bool {
+func (dndAttrib *rollAttributes) isCrit() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(critAttrib)
 	}
 	return false
 }
 
-func (dndAttrib *dndRollAttributes) isAdvantage() bool {
+func (dndAttrib *rollAttributes) isAdvantage() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(advantageAttrib)
 	}
 	return false
 }
 
-func (dndAttrib *dndRollAttributes) isDisadvantage() bool {
+func (dndAttrib *rollAttributes) isDisadvantage() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(disadvantageAttrib)
 	}
 	return false
 }
 
-func (dndAttrib *dndRollAttributes) isDropHigh() bool {
+func (dndAttrib *rollAttributes) isDropHigh() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(dropHighAttrib)
 	}
 	return false
 }
 
-func (dndAttrib *dndRollAttributes) isDropLow() bool {
+func (dndAttrib *rollAttributes) isDropLow() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(dropLowAttrib)
 	}
 	return false
 }
 
-func (dndAttrib *dndRollAttributes) isHalf() bool {
+func (dndAttrib *rollAttributes) isHalf() bool {
 	if dndAttrib != nil {
 		return dndAttrib.hasAttrib(halfAttrib)
+	}
+	return false
+}
+
+func (dndAttrib *rollAttributes) isMinus() bool {
+	if dndAttrib != nil {
+		return dndAttrib.hasAttrib(minusAttrib)
 	}
 	return false
 }

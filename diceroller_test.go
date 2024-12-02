@@ -123,7 +123,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 	if sum <= 0 {
 		sum = 1
 	}
-	if diceValues.diceRoll.Minus {
+	if diceValues.diceRoll.RollAttribs.isMinus() {
 		sum = -sum
 	}
 
@@ -168,15 +168,15 @@ func FuzzTestPerformRollArgs(f *testing.F) {
 }
 
 func FuzzTestPerformRollsAndSum(f *testing.F) {
-	f.Add(6, 2, 4, true)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
-		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier, plus))
+	f.Add(6, 2, 4)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }
 
 func FuzzPerformRolls(f *testing.F) {
-	f.Add(12, 18, 11, true)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, plus bool) {
-		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier, plus))
+	f.Add(12, 18, 11)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }

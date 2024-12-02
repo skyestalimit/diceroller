@@ -17,32 +17,32 @@ var validDiceRollsValues = []diceRollTestValues{
 	{
 		`4d4+1`,
 		regexp.MustCompile(`\[[1-4] [1-4] [1-4] [1-4]\]`),
-		*newDiceRoll(4, 4, 1, false),
+		DiceRoll{4, 4, 1, newRollAttributes()},
 	},
 	{
 		`10d10`,
 		regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-		*newDiceRoll(10, 10, 0, false),
+		DiceRoll{10, 10, 0, newRollAttributes()},
 	},
 	{
 		`1d6-1`,
 		regexp.MustCompile(`\[[1-6]\]`),
-		*newDiceRoll(1, 6, -1, false),
+		DiceRoll{1, 6, -1, newRollAttributes()},
 	},
 	{
 		`4d12-12345`,
 		regexp.MustCompile(`\[([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9]) ([1]?[0-9])\]`),
-		*newDiceRoll(4, 12, -12345, false),
+		DiceRoll{4, 12, -12345, newRollAttributes()},
 	},
 	{
 		`-5d6-1`,
 		regexp.MustCompile(`\[[1-6] [1-6] [1-6] [1-6] [1-6]\]`),
-		*newDiceRoll(5, 6, -1, true),
+		DiceRoll{5, 6, -1, newRollAttributes(minusAttrib)},
 	},
 	{
 		`1d2-4`,
 		regexp.MustCompile(`\[[1-2]\]`),
-		*newDiceRoll(1, 2, -4, false),
+		DiceRoll{1, 2, -4, newRollAttributes()},
 	},
 }
 
@@ -51,27 +51,27 @@ var invalidDiceRollsValues = []diceRollTestValues{
 	{
 		`123456d10`,
 		nil,
-		DiceRoll{123456, 10, 0, false, newDnDRollAttributes()},
+		DiceRoll{123456, 10, 0, newRollAttributes()},
 	},
 	{
 		`10d123456+10`,
 		nil,
-		DiceRoll{10, 123456, 10, false, newDnDRollAttributes()},
+		DiceRoll{10, 123456, 10, newRollAttributes()},
 	},
 	{
 		`10d10-123456`,
 		nil,
-		DiceRoll{10, 10, -123456, false, newDnDRollAttributes()},
+		DiceRoll{10, 10, -123456, newRollAttributes()},
 	},
 	{
 		`0d8`,
 		nil,
-		DiceRoll{0, 8, 0, false, newDnDRollAttributes()},
+		DiceRoll{0, 8, 0, newRollAttributes()},
 	},
 	{
 		`-1d0`,
 		nil,
-		DiceRoll{1, 0, 0, true, newDnDRollAttributes()},
+		DiceRoll{1, 0, 0, newRollAttributes(minusAttrib)},
 	},
 }
 
@@ -108,8 +108,8 @@ func validateDiceRollString(diceValues diceRollTestValues, t *testing.T) {
 }
 
 func FuzzNewDiceRoll(f *testing.F) {
-	f.Add(2, 8, 1, true)
-	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int, minus bool) {
-		NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, minus, nil)
+	f.Add(2, 8, 1)
+	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
+		NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, nil)
 	})
 }

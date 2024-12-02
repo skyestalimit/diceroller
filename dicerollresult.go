@@ -50,10 +50,9 @@ func (result DiceRollResult) String() string {
 	spell := false
 
 	// Start with roll attributes
-	if result.diceRoll.Attribs != nil {
+	if result.diceRoll.RollAttribs != nil {
 		// Sort the attributes
-		rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
-		attribs := maps.Keys(rollAttribsMap.attribs)
+		attribs := maps.Keys(result.diceRoll.RollAttribs.attribs)
 
 		sort.SliceStable(attribs, func(i int, j int) bool {
 			return attribs[i] < attribs[j]
