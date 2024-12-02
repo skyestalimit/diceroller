@@ -57,7 +57,6 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []Rollin
 			}
 			if result, diceErr := validateAndperformRoll(diceRoll); diceErr == nil {
 				rollExprResult.Results = append(rollExprResult.Results, *result)
-				rollExprResult.Sum += result.Sum
 			} else {
 				diceErrs = append(diceErrs, diceErr)
 			}
@@ -108,7 +107,7 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 		diceRollResult.Sum = halve(diceRollResult.Sum)
 	}
 
-	// Minimum roll result is always 1, even after applying negative modifiers
+	// Minimum roll result is always 1, even after applying negative modifiers and half
 	if diceRollResult.Sum <= 0 {
 		diceRollResult.Sum = 1
 	}

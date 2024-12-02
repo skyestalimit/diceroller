@@ -26,6 +26,11 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 		sum += results[i].Sum
 	}
 
+	// Minimum DiceRoll result is 1, if at least a die was rolled
+	if len(results) > 0 && sum < 1 {
+		sum = 1
+	}
+
 	return
 }
 

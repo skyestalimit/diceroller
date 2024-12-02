@@ -10,7 +10,6 @@ type rollingExpression struct {
 // Results of performing a rollingExpression.
 type RollingExpressionResult struct {
 	Results []DiceRollResult
-	Sum     int
 }
 
 // Constructor of rollingExpression.
@@ -23,15 +22,16 @@ func newRollingExpression() *rollingExpression {
 // Constructor of RollingExpressionResult.
 func newRollingExpressionResult() *RollingExpressionResult {
 	rollExpr := new(RollingExpressionResult)
-	rollExpr.Sum = 0
 	rollExpr.Results = make([]DiceRollResult, 0)
 	return rollExpr
 }
 
 // Sums multiple RollingExpressionResult.
-func RollingExpressionResultSum(results ...RollingExpressionResult) (sum int) {
-	for i := range results {
-		sum += results[i].Sum
+func RollingExpressionResultSum(rollExprResults ...RollingExpressionResult) (sum int) {
+	for e := range rollExprResults {
+		for d := range rollExprResults[e].Results {
+			sum += rollExprResults[e].Results[d].Sum
+		}
 	}
 	return
 }
