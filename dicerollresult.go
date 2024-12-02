@@ -3,6 +3,8 @@ package diceroller
 import (
 	"fmt"
 	"sort"
+
+	"golang.org/x/exp/maps"
 )
 
 // A DiceRollResult contains the results of performing a DiceRoll
@@ -26,12 +28,19 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 		sum += results[i].Sum
 	}
 
-	// Minimum DiceRoll result is 1, if at least a die was rolled
-	if len(results) > 0 && sum < 1 {
-		sum = 1
+	return
+}
+
+// Detects a critical hit.
+func (rollResult DiceRollResult) hasScoredCritHit() bool {
+	critHit := false
+
+	if len(rollResult.Dice) == 1 && rollResult.Dice[0] == 20 &&
+		rollResult.diceRoll.DiceAmmount == 1 && rollResult.diceRoll.DiceSize == 20 {
+		critHit = true
 	}
 
-	return
+	return critHit
 }
 
 // Human readable DiceRollResult string.
@@ -42,12 +51,10 @@ func (result DiceRollResult) String() string {
 
 	// Start with roll attributes
 	if result.diceRoll.Attribs != nil {
-		rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
 		// Sort the attributes
-		attribs := make([]rollAttribute, 0, len(rollAttribsMap.attribs))
-		for rollAttrib := range rollAttribsMap.attribs {
-			attribs = append(attribs, rollAttrib)
-		}
+		rollAttribsMap := result.diceRoll.Attribs.(*dndRollAttributes)
+		attribs := maps.Keys(rollAttribsMap.attribs)
+
 		sort.SliceStable(attribs, func(i int, j int) bool {
 			return attribs[i] < attribs[j]
 		})
@@ -104,16 +111,4 @@ func (result DiceRollResult) String() string {
 	resultStr += "\n"
 
 	return resultStr
-}
-
-// Detects a critical hit.
-func (rollResult DiceRollResult) hasScoredCritHit() bool {
-	critHit := false
-
-	if len(rollResult.Dice) == 1 && rollResult.Dice[0] == 20 &&
-		rollResult.diceRoll.DiceAmmount == 1 && rollResult.diceRoll.DiceSize == 20 {
-		critHit = true
-	}
-
-	return critHit
 }

@@ -15,7 +15,7 @@ func PerformRollArgsAndSum(rollArgs ...string) int {
 }
 
 // Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
-func PerformRollArgs(rollArgs ...string) ([]RollingExpressionResult, []error) {
+func PerformRollArgs(rollArgs ...string) ([]rollingExpressionResult, []error) {
 	rollExprs, argErrs := ParseRollArgs(rollArgs...)
 	results, diceErrs := performRollingExpressions(rollExprs...)
 	return results, append(argErrs, diceErrs...)
@@ -46,10 +46,10 @@ func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 }
 
 // Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func performRollingExpressions(rollExprs ...rollingExpression) (results []RollingExpressionResult, diceErrs []error) {
+func performRollingExpressions(rollExprs ...rollingExpression) (results []rollingExpressionResult, diceErrs []error) {
 	wasCritHit := false
 	for e := range rollExprs {
-		rollExprResult := newRollingExpressionResult()
+		rollExprResult := newRollingExpressionResult(rollExprs[e])
 		for i := range rollExprs[e].diceRolls {
 			diceRoll := rollExprs[e].diceRolls[i]
 			if wasCritHit {
