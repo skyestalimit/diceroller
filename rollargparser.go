@@ -95,12 +95,12 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 	matches := rollArgregex.FindStringSubmatch(rollArg)
 
 	var diceAmmount, diceSize, modifier = 0, 0, 0
-	plus := true
+	minus := false
 
 	// Parse minus sign
 	if len(matches[1]) > 0 {
 		if strings.EqualFold(matches[1], "-") {
-			plus = false
+			minus = true
 		}
 	}
 
@@ -132,7 +132,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 		}
 	}
 
-	return NewDiceRoll(diceAmmount, diceSize, modifier, plus)
+	return NewDiceRoll(diceAmmount, diceSize, modifier, minus)
 }
 
 // Parses a rollArg slice. Returns its value if valid, zero and an error if invalid.

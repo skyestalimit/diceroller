@@ -113,7 +113,7 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	}
 
 	// Negative Sum if minus DiceRoll
-	if !diceRoll.Plus {
+	if diceRoll.Minus {
 		diceRollResult.Sum = -diceRollResult.Sum
 	}
 
@@ -123,6 +123,8 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *dndRollAttributes) {
 	// Determine actual dice ammount to roll
 	actualDiceAmmount := diceRoll.DiceAmmount
+
+	// Crit attrib
 	if dndRollAttributes.isCrit() {
 		actualDiceAmmount = actualDiceAmmount * 2
 	}

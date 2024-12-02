@@ -99,7 +99,7 @@ func TestTrickyRolls(t *testing.T) {
 	rollExpr, _ := ParseRollArgs("half", "1d2-2", "roll", "-d20-1")
 
 	if sum := rollExpr[0].diceRolls[0].Roll(); sum < 1 {
-		t.Fatalf("half 1d2-2 rolled %d, wanted > 1", sum)
+		t.Fatalf("half 1d2-2 rolled %d, wanted > 0", sum)
 	}
 
 	if _, diceErrs := performRollingExpressions(rollExpr...); diceErrs != nil {
@@ -123,7 +123,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 	if sum <= 0 {
 		sum = 1
 	}
-	if !diceValues.diceRoll.Plus {
+	if diceValues.diceRoll.Minus {
 		sum = -sum
 	}
 
