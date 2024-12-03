@@ -8,11 +8,7 @@ import (
 func TestRollAttributes(t *testing.T) {
 	rollAttribs := newRollAttributes()
 	for i := range rollAttributeMap {
-		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
-		if rollAttribs.hasAttrib(rollAttrib) == true {
-			t.Fatalf("hasAttrib %d returned true, wanted false", i)
-		}
-
+		rollAttrib := rollAttributeMap[i]
 		rollAttribs.setRollAttrib(rollAttrib)
 
 		if rollAttribs.hasAttrib(rollAttrib) == false {
@@ -26,7 +22,7 @@ func TestRollAttributes(t *testing.T) {
 func TestPerformRollWithRollAttributes(t *testing.T) {
 	rollAttribs := newRollAttributes()
 	for i := range rollAttributeMap {
-		rollAttrib := rollAttributeMapKey(rollAttributeMap, rollAttributeMap[i])
+		rollAttrib := rollAttributeMap[i]
 
 		rollAttribs.setRollAttrib(rollAttrib)
 
@@ -46,11 +42,11 @@ func checkForAttribCompatibility(rollAttribs rollAttributes, t *testing.T) {
 		switch rollAttrib {
 		case advantageAttrib:
 			if rollAttribs.hasAttrib(disadvantageAttrib) {
-				t.Fatalf("Advantage attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
+				t.Fatalf("Advantage attrib compatibility check failed, %s is set", rollAttributeMapKey(rollAttributeMap, rollAttrib))
 			}
 		case disadvantageAttrib:
 			if rollAttribs.hasAttrib(advantageAttrib) {
-				t.Fatalf("Disadvantage attrib compatibility check failed, %s is set", rollAttributeMap[rollAttrib])
+				t.Fatalf("Disadvantage attrib compatibility check failed, %s is set", rollAttributeMapKey(rollAttributeMap, rollAttrib))
 			}
 		}
 	}

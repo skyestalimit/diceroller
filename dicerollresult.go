@@ -70,7 +70,7 @@ func (result DiceRollResult) String() string {
 			case spellAttrib:
 				spell = true
 			}
-			resultStr += fmt.Sprintf("%s ", rollAttributeMap[rollAttrib])
+			resultStr += fmt.Sprintf("%s ", rollAttributeMapKey(rollAttributeMap, rollAttrib))
 		}
 	}
 

@@ -1,7 +1,5 @@
 package diceroller
 
-import "strings"
-
 type rollAttribute int
 
 // rollAttribute values. 0 is invalid.
@@ -38,19 +36,21 @@ const (
 	minusAttribStr      string = "minus"
 )
 
-var rollAttributeMap = map[rollAttribute]string{
-	rollAttrib: rollStr,
+var rollAttributeMap = map[string]rollAttribute{
+	rollStr: rollAttrib,
 	// DnD rollAttribute map
-	hitAttrib:          hitStr,
-	dmgAttrib:          dmgStr,
-	critAttrib:         critStr,
-	spellAttrib:        spellStr,
-	halfAttrib:         halfStr,
-	advantageAttrib:    advantageStr,
-	disadvantageAttrib: disadvantageStr,
-	dropHighAttrib:     dropHighStr,
-	dropLowAttrib:      dropLowStr,
-	minusAttrib:        minusAttribStr,
+	hitStr:              hitAttrib,
+	dmgStr:              dmgAttrib,
+	critStr:             critAttrib,
+	spellStr:            spellAttrib,
+	halfStr:             halfAttrib,
+	advantageStr:        advantageAttrib,
+	advantageLongStr:    advantageAttrib,
+	disadvantageStr:     disadvantageAttrib,
+	disadvantageLongStr: disadvantageAttrib,
+	dropHighStr:         dropHighAttrib,
+	dropLowStr:          dropLowAttrib,
+	minusAttribStr:      minusAttrib,
 }
 
 type rollAttributes struct {
@@ -66,13 +66,15 @@ func newRollAttributes(rollAttribs ...rollAttribute) *rollAttributes {
 }
 
 // To retrieve the roleAttribute matching wanted roleAttribute string.
-func rollAttributeMapKey(attribMap map[rollAttribute]string, wanted string) rollAttribute {
-	for attrib, attribStr := range attribMap {
-		if strings.EqualFold(attribStr, wanted) {
-			return attrib
+func rollAttributeMapKey(attribMap map[string]rollAttribute, wanted rollAttribute) string {
+	foundAttribStr := ""
+	for attribStr, attrib := range attribMap {
+		if attrib == wanted {
+			foundAttribStr = attribStr
+			break
 		}
 	}
-	return 0
+	return foundAttribStr
 }
 
 // Sets attrib to true and prevents rollAttribute incompatibilities.

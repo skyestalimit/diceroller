@@ -79,7 +79,7 @@ func checkForRollAttribute(rollArg string) rollAttribute {
 	var rollAttrib rollAttribute = 0
 	attribRegEx := regexp.MustCompile(rollAttribsFormat)
 	if attribRegEx.MatchString(strings.ToLower(rollArg)) {
-		rollAttrib = rollAttributeMapKey(rollAttributeMap, rollArg)
+		rollAttrib = rollAttributeMap[rollArg]
 	}
 	return rollAttrib
 }
