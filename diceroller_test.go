@@ -116,20 +116,20 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 
 	// Reproduce sum calculations
 	sum := 0
-	for i := range result.Dice {
-		sum += result.Dice[i]
+	for i := range result.dice {
+		sum += result.dice[i]
 	}
-	sum += diceValues.diceRoll.Modifier
+	sum += diceValues.diceRoll.modifier
 	if sum <= 0 {
 		sum = 1
 	}
-	if diceValues.diceRoll.RollAttribs.isMinus() {
+	if diceValues.diceRoll.rollAttribs.isMinus() {
 		sum = -sum
 	}
 
 	// Validate sum
-	if result.Sum != sum {
-		t.Fatalf("DiceRoll %s result = %d, wanted be %d", diceValues.diceRoll.String(), result.Sum, sum)
+	if result.sum != sum {
+		t.Fatalf("DiceRoll %s result = %d, wanted be %d", diceValues.diceRoll.String(), result.sum, sum)
 	}
 }
 

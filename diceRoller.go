@@ -53,7 +53,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []rollin
 		for i := range rollExprs[e].diceRolls {
 			diceRoll := rollExprs[e].diceRolls[i]
 			if wasCritHit {
-				diceRoll.RollAttribs.setRollAttrib(critAttrib)
+				diceRoll.rollAttribs.setRollAttrib(critAttrib)
 			}
 			if result, diceErr := validateAndperformRoll(diceRoll); diceErr == nil {
 				rollExprResult.Results = append(rollExprResult.Results, *result)
@@ -86,34 +86,34 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll)
 
 	// Generate rolls
-	generateRolls(diceRoll, diceRollResult, diceRoll.RollAttribs)
+	generateRolls(diceRoll, diceRollResult, diceRoll.rollAttribs)
 
 	// Drop High attrib
-	if diceRoll.RollAttribs.isDropHigh() && len(diceRollResult.Dice) > 1 {
+	if diceRoll.rollAttribs.isDropHigh() && len(diceRollResult.dice) > 1 {
 		dropHigh(diceRollResult)
 	}
 
 	// Drop Low attrib
-	if diceRoll.RollAttribs.isDropLow() && len(diceRollResult.Dice) > 1 {
+	if diceRoll.rollAttribs.isDropLow() && len(diceRollResult.dice) > 1 {
 		dropLow(diceRollResult)
 	}
 
 	// Apply modifier
-	diceRollResult.Sum += diceRoll.Modifier
+	diceRollResult.sum += diceRoll.modifier
 
 	// Half attrib
-	if diceRoll.RollAttribs.isHalf() {
-		diceRollResult.Sum = halve(diceRollResult.Sum)
+	if diceRoll.rollAttribs.isHalf() {
+		diceRollResult.sum = halve(diceRollResult.sum)
 	}
 
 	// Minimum roll result is always 1, even after applying negative modifiers and half
-	if diceRollResult.Sum <= 0 {
-		diceRollResult.Sum = 1
+	if diceRollResult.sum <= 0 {
+		diceRollResult.sum = 1
 	}
 
 	// Negative Sum if minus DiceRoll
-	if diceRoll.RollAttribs.isMinus() {
-		diceRollResult.Sum = -diceRollResult.Sum
+	if diceRoll.rollAttribs.isMinus() {
+		diceRollResult.sum = -diceRollResult.sum
 	}
 
 	return diceRollResult
@@ -121,7 +121,7 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 
 func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *rollAttributes) {
 	// Determine actual dice ammount to roll
-	actualDiceAmmount := diceRoll.DiceAmmount
+	actualDiceAmmount := diceRoll.diceAmmount
 
 	// Crit attrib
 	if dndRollAttributes.isCrit() {
@@ -130,19 +130,19 @@ func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAtt
 
 	// Generate rolls
 	for i := 0; i < actualDiceAmmount; i++ {
-		roll := rollDice(diceRoll.DiceSize)
+		roll := rollDice(diceRoll.diceSize)
 
 		// Advantage attrib
 		if dndRollAttributes.isAdvantage() {
-			roll = advantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
+			roll = advantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 		// Disadvantage attrib
 		if dndRollAttributes.isDisadvantage() {
-			roll = disadvantage(roll, rollDice(diceRoll.DiceSize), diceRollResult)
+			roll = disadvantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 
-		diceRollResult.Dice = append(diceRollResult.Dice, roll)
-		diceRollResult.Sum += roll
+		diceRollResult.dice = append(diceRollResult.dice, roll)
+		diceRollResult.sum += roll
 	}
 }
 
@@ -159,7 +159,7 @@ func advantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep int)
 		toKeep, toDrop = roll2, roll
 	}
 
-	diceRollResult.AdvDisDropped = append(diceRollResult.AdvDisDropped, toDrop)
+	diceRollResult.advDisDropped = append(diceRollResult.advDisDropped, toDrop)
 
 	return toKeep
 }
@@ -172,7 +172,7 @@ func disadvantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep i
 		toKeep, toDrop = roll2, roll
 	}
 
-	diceRollResult.AdvDisDropped = append(diceRollResult.AdvDisDropped, toDrop)
+	diceRollResult.advDisDropped = append(diceRollResult.advDisDropped, toDrop)
 
 	return toKeep
 }
@@ -181,24 +181,24 @@ func disadvantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep i
 func dropHigh(diceRollResult *DiceRollResult) {
 	drop := 0
 
-	drop = slices.Max(diceRollResult.Dice)
-	dropIndex := slices.Index(diceRollResult.Dice, drop)
-	diceRollResult.HighDropped = append(diceRollResult.HighDropped, diceRollResult.Dice[dropIndex])
+	drop = slices.Max(diceRollResult.dice)
+	dropIndex := slices.Index(diceRollResult.dice, drop)
+	diceRollResult.highDropped = append(diceRollResult.highDropped, diceRollResult.dice[dropIndex])
 
-	diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
-	diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
+	diceRollResult.sum -= diceRollResult.dice[dropIndex]
+	diceRollResult.dice = slices.Delete(diceRollResult.dice, dropIndex, dropIndex+1)
 }
 
 // Applies drop low logic. Returns the index of the roll to drop.
 func dropLow(diceRollResult *DiceRollResult) {
 	drop := 0
 
-	drop = slices.Min(diceRollResult.Dice)
-	dropIndex := slices.Index(diceRollResult.Dice, drop)
-	diceRollResult.LowDropped = append(diceRollResult.LowDropped, diceRollResult.Dice[dropIndex])
+	drop = slices.Min(diceRollResult.dice)
+	dropIndex := slices.Index(diceRollResult.dice, drop)
+	diceRollResult.lowDropped = append(diceRollResult.lowDropped, diceRollResult.dice[dropIndex])
 
-	diceRollResult.Sum -= diceRollResult.Dice[dropIndex]
-	diceRollResult.Dice = slices.Delete(diceRollResult.Dice, dropIndex, dropIndex+1)
+	diceRollResult.sum -= diceRollResult.dice[dropIndex]
+	diceRollResult.dice = slices.Delete(diceRollResult.dice, dropIndex, dropIndex+1)
 }
 
 // Applies half logic. Rounds down.

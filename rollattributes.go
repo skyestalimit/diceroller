@@ -24,16 +24,18 @@ const (
 const (
 	rollStr string = "roll"
 	// DnD rollAttribute strings
-	hitStr          string = "hit"
-	dmgStr          string = "dmg"
-	critStr         string = "crit"
-	spellStr        string = "spell"
-	halfStr         string = "half"
-	advantageStr    string = "adv"
-	disadvantageStr string = "dis"
-	dropHighStr     string = "drophigh"
-	dropLowStr      string = "droplow"
-	minusAttribStr  string = "minus"
+	hitStr              string = "hit"
+	dmgStr              string = "dmg"
+	critStr             string = "crit"
+	spellStr            string = "spell"
+	halfStr             string = "half"
+	advantageStr        string = "adv"
+	advantageLongStr    string = "advantage"
+	disadvantageStr     string = "dis"
+	disadvantageLongStr string = "disadvantage"
+	dropHighStr         string = "drophigh"
+	dropLowStr          string = "droplow"
+	minusAttribStr      string = "minus"
 )
 
 var rollAttributeMap = map[rollAttribute]string{
@@ -49,11 +51,6 @@ var rollAttributeMap = map[rollAttribute]string{
 	dropHighAttrib:     dropHighStr,
 	dropLowAttrib:      dropLowStr,
 	minusAttrib:        minusAttribStr,
-}
-
-type attributes interface {
-	setRollAttrib(rollAttribute)
-	hasAttrib(rollAttribute) bool
 }
 
 type rollAttributes struct {

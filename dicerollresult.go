@@ -10,11 +10,11 @@ import (
 // A DiceRollResult contains the results of performing a DiceRoll
 type DiceRollResult struct {
 	diceRoll      DiceRoll // Performed DiceRoll
-	Dice          []int    // Individual dice roll result
-	Sum           int      // Sum of Dice
-	AdvDisDropped []int    // Dropped advantage/disadvantage dice
-	HighDropped   []int    // Dropped high dice
-	LowDropped    []int    // Dropped low dice
+	dice          []int    // Individual dice roll result
+	sum           int      // Sum of Dice
+	advDisDropped []int    // Dropped advantage/disadvantage dice
+	highDropped   []int    // Dropped high dice
+	lowDropped    []int    // Dropped low dice
 }
 
 // DiceRollResult constructor with DiceRoll readable string and rollAttributes.
@@ -25,7 +25,7 @@ func newDiceRollResult(diceRoll DiceRoll) *DiceRollResult {
 // Returns the total sum of a DiceRollResult array.
 func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 	for i := range results {
-		sum += results[i].Sum
+		sum += results[i].sum
 	}
 
 	return
@@ -35,8 +35,8 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 func (rollResult DiceRollResult) hasScoredCritHit() bool {
 	critHit := false
 
-	if len(rollResult.Dice) == 1 && rollResult.Dice[0] == 20 &&
-		rollResult.diceRoll.DiceAmmount == 1 && rollResult.diceRoll.DiceSize == 20 {
+	if len(rollResult.dice) == 1 && rollResult.dice[0] == 20 &&
+		rollResult.diceRoll.diceAmmount == 1 && rollResult.diceRoll.diceSize == 20 {
 		critHit = true
 	}
 
@@ -46,13 +46,13 @@ func (rollResult DiceRollResult) hasScoredCritHit() bool {
 // Human readable DiceRollResult string.
 func (result DiceRollResult) String() string {
 	resultStr := " Result of DiceRoll \""
-	var advDis rollAttribute = 0
+	advDisStr := ""
 	spell := false
 
-	// Start with roll attributes
-	if result.diceRoll.RollAttribs != nil {
+	// Start with roll attributes, add them as String
+	if result.diceRoll.rollAttribs != nil {
 		// Sort the attributes
-		attribs := maps.Keys(result.diceRoll.RollAttribs.attribs)
+		attribs := maps.Keys(result.diceRoll.rollAttribs.attribs)
 
 		sort.SliceStable(attribs, func(i int, j int) bool {
 			return attribs[i] < attribs[j]
@@ -61,11 +61,12 @@ func (result DiceRollResult) String() string {
 		// Add them to the result string
 		for i := range attribs {
 			rollAttrib := rollAttribute(attribs[i])
+			// Collect that affects the results printout later
 			switch rollAttrib {
 			case advantageAttrib:
-				advDis = advantageAttrib
+				advDisStr = "Adv drop:"
 			case disadvantageAttrib:
-				advDis = disadvantageAttrib
+				advDisStr = "Dis drop:"
 			case spellAttrib:
 				spell = true
 			}
@@ -74,37 +75,29 @@ func (result DiceRollResult) String() string {
 	}
 
 	// DiceRoll string and dice result array
-	resultStr += fmt.Sprintf("%s\": \n  Rolls:     %s\n", result.diceRoll, fmt.Sprint(result.Dice))
+	resultStr += fmt.Sprintf("%s\": \n  Rolls:     %s\n", result.diceRoll, fmt.Sprint(result.dice))
 
 	// Advantage / disadvantage dropped dice array
-	if len(result.AdvDisDropped) > 0 {
-		advDisStr := ""
-		switch advDis {
-		case advantageAttrib:
-			advDisStr = "Adv drop:"
-		case disadvantageAttrib:
-			advDisStr = "Dis drop:"
-		}
-
-		resultStr += fmt.Sprintf("  %s  %s\n", advDisStr, fmt.Sprint(result.AdvDisDropped))
+	if len(result.advDisDropped) > 0 {
+		resultStr += fmt.Sprintf("  %s  %s\n", advDisStr, fmt.Sprint(result.advDisDropped))
 	}
 
 	// Dropped High dice array
-	if len(result.HighDropped) > 0 {
-		resultStr += fmt.Sprintf("  Drop High: %s\n", fmt.Sprint(result.HighDropped))
+	if len(result.highDropped) > 0 {
+		resultStr += fmt.Sprintf("  Drop High: %s\n", fmt.Sprint(result.highDropped))
 	}
 
 	// Dropped Low dice array
-	if len(result.LowDropped) > 0 {
-		resultStr += fmt.Sprintf("  Drop Low:  %s\n", fmt.Sprint(result.LowDropped))
+	if len(result.lowDropped) > 0 {
+		resultStr += fmt.Sprintf("  Drop Low:  %s\n", fmt.Sprint(result.lowDropped))
 	}
 
 	// The DiceRoll sum
-	resultStr += fmt.Sprintf("  Sum:       %d", result.Sum)
+	resultStr += fmt.Sprintf("  Sum:       %d", result.sum)
 
 	// Half ammount for passing a spell saving throw
 	if spell {
-		resultStr += fmt.Sprintf(" Saved: %d", halve(result.Sum))
+		resultStr += fmt.Sprintf(" Saved: %d", halve(result.sum))
 	}
 
 	resultStr += "\n"

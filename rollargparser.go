@@ -59,9 +59,10 @@ func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, 
 				rollExpr = newRollingExpression()
 				attribs = newRollAttributes()
 			}
+			// Apply the rollAttribute to diceRolls
 			attribs.setRollAttrib(rollAttrib)
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
-			diceRoll.RollAttribs = attribs
+			diceRoll.rollAttribs = attribs
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 		} else {
 			errors = append(errors, err)

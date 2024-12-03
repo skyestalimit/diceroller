@@ -7,10 +7,10 @@ import (
 
 // A DiceRoll represents a dice rolling expression, such as 1d6 or 2d8+1.
 type DiceRoll struct {
-	DiceAmmount int             // Ammount of dice to be rolled
-	DiceSize    int             // Size, or number of faces, of the dice to be rolled
-	Modifier    int             // Value to be applied to the sum of rolled dices
-	RollAttribs *rollAttributes // Contains rollAttributes affecting the rolls
+	diceAmmount int             // Ammount of dice to be rolled
+	diceSize    int             // Size, or number of faces, of the dice to be rolled
+	modifier    int             // Value to be applied to the sum of rolled dices
+	rollAttribs *rollAttributes // Contains rollAttributes affecting the rolls
 }
 
 // Max allowed DiceRoll values to avoid long run times and overflow.
@@ -24,6 +24,12 @@ func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error)
 	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, nil)
 }
 
+// DiceRoll constructor, validates values but doesn't return errors. Can be useful for testing.
+func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
+	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier)
+	return diceRoll
+}
+
 // DiceRoll constructor with rollAttributes, validates values.
 func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, attribs *rollAttributes) (*DiceRoll, error) {
 	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, attribs}
@@ -33,16 +39,10 @@ func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, attribs
 	return &diceRoll, nil
 }
 
-// DiceRoll constructor without errors.
-func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
-	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier)
-	return diceRoll
-}
-
 // Performs the DiceRoll. Returns the sum if valid, zero if invalid.
 func (diceRoll DiceRoll) Roll() int {
 	result, _ := validateAndperformRoll(diceRoll)
-	return result.Sum
+	return result.sum
 }
 
 // Human readable DiceRoll string, such as "2d8+1".
@@ -50,19 +50,19 @@ func (diceRoll DiceRoll) String() string {
 	strDiceRoll := ""
 
 	// Add minus symbol if needed
-	if diceRoll.RollAttribs.isMinus() {
+	if diceRoll.rollAttribs.isMinus() {
 		strDiceRoll += "-"
 	}
 
 	// XdY format
-	strDiceRoll += fmt.Sprintf("%dd%d", diceRoll.DiceAmmount, diceRoll.DiceSize)
+	strDiceRoll += fmt.Sprintf("%dd%d", diceRoll.diceAmmount, diceRoll.diceSize)
 
 	// Add modifier when necessary
-	if diceRoll.Modifier != 0 {
-		if diceRoll.Modifier > 0 {
+	if diceRoll.modifier != 0 {
+		if diceRoll.modifier > 0 {
 			strDiceRoll += "+"
 		}
-		strDiceRoll += fmt.Sprint(diceRoll.Modifier)
+		strDiceRoll += fmt.Sprint(diceRoll.modifier)
 	}
 
 	return strDiceRoll
@@ -70,13 +70,13 @@ func (diceRoll DiceRoll) String() string {
 
 // Validates diceRoll values. Returns nil if valid, error if invalid.
 func validateDiceRoll(diceRoll DiceRoll) error {
-	if diceErr := validateDiceAmmout(diceRoll.DiceAmmount); diceErr != nil {
+	if diceErr := validateDiceAmmout(diceRoll.diceAmmount); diceErr != nil {
 		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
-	if diceErr := validateDiceSize(diceRoll.DiceSize); diceErr != nil {
+	if diceErr := validateDiceSize(diceRoll.diceSize); diceErr != nil {
 		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
-	if diceErr := validateDiceModifier(diceRoll.Modifier); diceErr != nil {
+	if diceErr := validateDiceModifier(diceRoll.modifier); diceErr != nil {
 		return fmt.Errorf("%s: %s", diceRoll.String(), diceErr.Error())
 	}
 	return nil

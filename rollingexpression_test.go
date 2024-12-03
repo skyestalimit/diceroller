@@ -21,7 +21,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 
 		for i := range validDiceRollsValues {
 			diceRoll := validDiceRollsValues[i].diceRoll
-			diceRoll.RollAttribs.setRollAttrib(maps.Keys(rollAttribs.attribs)...)
+			diceRoll.rollAttribs.setRollAttrib(maps.Keys(rollAttribs.attribs)...)
 			rollExpr.diceRolls = append(rollExpr.diceRolls, diceRoll)
 		}
 
