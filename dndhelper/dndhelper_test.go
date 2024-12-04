@@ -4,12 +4,57 @@ import (
 	"math/rand"
 	"os"
 	"testing"
-
-	"github.com/skyestalimit/diceroller"
 )
 
+// Valid Roll Args
+var validRollArgs = []string{
+	"4d4+1",
+	"10d10",
+	"1d6-1",
+	"10000d10000-10000",
+	"1D8-00",
+	"1d100+0",
+	"20d12-9901"}
+
+// Valid Roll Args attribs
+var validRollArgsAttribs = []string{
+	"roll",
+	"hit",
+	"dmg",
+	"crit",
+	"spell",
+	"half",
+	"adv",
+	"dis",
+	"droplow",
+	"drophigh"}
+
+// Invalid Roll Args
+var invalidRollArgs = []string{
+	"9dd9-+1",
+	"2d6+123456",
+	"123456d12+12",
+	"12d123456-100",
+	"patate1",
+	"sudo reboot",
+	"1d4 1d4",
+	"0d2",
+	"1d0",
+	"1b8",
+	"1+8d8+1"}
+
+// Invalid Roll Args attribs
+var invalidRollArgsAttribs = []string{
+	"bonus",
+	"damidge",
+	"!@#$%^&*()",
+	"sudo reboot",
+	"check",
+	"11",
+	"\"hai\""}
+
 func TestPerformValidRollArgs(t *testing.T) {
-	os.Args = diceroller.ValidRollArgs
+	os.Args = validRollArgs
 	main()
 }
 
