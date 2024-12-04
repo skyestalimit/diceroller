@@ -12,11 +12,11 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 	rollAttribs := newRollAttributes()
 
-	for i := range validRollArgsAttribs {
-		if rollAttrib := checkForRollAttribute(validRollArgsAttribs[i]); rollAttrib > 0 {
+	for i := range ValidRollArgsAttribs {
+		if rollAttrib := checkForRollAttribute(ValidRollArgsAttribs[i]); rollAttrib > 0 {
 			rollAttribs.setRollAttrib(rollAttrib)
 		} else {
-			t.Fatalf("Valid roll attrib %s has no matching rollAttributes value", validRollArgsAttribs[i])
+			t.Fatalf("Valid roll attrib %s has no matching rollAttributes value", ValidRollArgsAttribs[i])
 		}
 
 		for i := range validDiceRollsValues {
@@ -52,9 +52,9 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 func TestRollingExpressionWithInvalidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 
-	for i := range invalidRollArgsAttribs {
-		if checkForRollAttribute(invalidRollArgsAttribs[i]) > 0 {
-			t.Fatalf("Invalid roll attrib %s has matching rollAttributes value", invalidRollArgsAttribs[i])
+	for i := range InvalidRollArgsAttribs {
+		if checkForRollAttribute(InvalidRollArgsAttribs[i]) > 0 {
+			t.Fatalf("Invalid roll attrib %s has matching rollAttributes value", InvalidRollArgsAttribs[i])
 		}
 	}
 

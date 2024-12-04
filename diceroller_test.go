@@ -67,14 +67,14 @@ func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 // Test rolling with valid RollArgs
 func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
-	for i := range validRollArgs {
-		if sum := PerformRollArgsAndSum(validRollArgs[i]); sum <= 0 {
-			t.Fatalf("Valid RollArg %s result = %d, wanted > 0", validRollArgs[i], sum)
+	for i := range ValidRollArgs {
+		if sum := PerformRollArgsAndSum(ValidRollArgs[i]); sum <= 0 {
+			t.Fatalf("Valid RollArg %s result = %d, wanted > 0", ValidRollArgs[i], sum)
 		}
 	}
 
 	// Test sending the whole array
-	if sum := PerformRollArgsAndSum(validRollArgs...); sum <= 0 {
+	if sum := PerformRollArgsAndSum(ValidRollArgs...); sum <= 0 {
 		t.Fatalf("Valid RollArgs result = %d, wanted > 0", sum)
 	}
 }
@@ -82,14 +82,14 @@ func TestPerformRollArgsWithValidRollArgs(t *testing.T) {
 // Test rolling with invalid RollArgs
 func TestPerformRollArgsWithInvalidRollArgs(t *testing.T) {
 	// Test valid RollArgs individually
-	for i := range invalidRollArgs {
-		if sum := PerformRollArgsAndSum(invalidRollArgs[i]); sum > 0 {
-			t.Fatalf("Invalid RollArg %s result = %d, wanted 0", invalidRollArgs[i], sum)
+	for i := range InvalidRollArgs {
+		if sum := PerformRollArgsAndSum(InvalidRollArgs[i]); sum > 0 {
+			t.Fatalf("Invalid RollArg %s result = %d, wanted 0", InvalidRollArgs[i], sum)
 		}
 	}
 
 	// Test the full array
-	if sum := PerformRollArgsAndSum(invalidRollArgs...); sum > 0 {
+	if sum := PerformRollArgsAndSum(InvalidRollArgs...); sum > 0 {
 		t.Fatalf("Invalid RollArgs result = %d, wanted 0", sum)
 	}
 }
