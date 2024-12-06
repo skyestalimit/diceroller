@@ -6,7 +6,7 @@ import (
 )
 
 // Valid Roll Args
-var ValidRollArgs = []string{
+var validRollArgs = []string{
 	"4d4+1",
 	"10d10",
 	"1d6-1",
@@ -16,7 +16,7 @@ var ValidRollArgs = []string{
 	"20d12-9901"}
 
 // Valid Roll Args attribs
-var ValidRollArgsAttribs = []string{
+var validRollArgsAttribs = []string{
 	"roll",
 	"hit",
 	"dmg",
@@ -29,7 +29,7 @@ var ValidRollArgsAttribs = []string{
 	"drophigh"}
 
 // Invalid Roll Args
-var InvalidRollArgs = []string{
+var invalidRollArgs = []string{
 	"9dd9-+1",
 	"2d6+123456",
 	"123456d12+12",
@@ -43,7 +43,7 @@ var InvalidRollArgs = []string{
 	"1+8d8+1"}
 
 // Invalid Roll Args attribs
-var InvalidRollArgsAttribs = []string{
+var invalidRollArgsAttribs = []string{
 	"bonus",
 	"damidge",
 	"!@#$%^&*()",
@@ -53,7 +53,7 @@ var InvalidRollArgsAttribs = []string{
 	"\"hai\""}
 
 func TestParseValidRollArgs(t *testing.T) {
-	rollArgsArray := append(ValidRollArgs, ValidRollArgsAttribs...)
+	rollArgsArray := append(validRollArgs, validRollArgsAttribs...)
 	_, errors := ParseRollArgs(rollArgsArray...)
 	for i := range errors {
 		validArgParsingError(errors[i], t)
@@ -61,7 +61,7 @@ func TestParseValidRollArgs(t *testing.T) {
 }
 
 func TestParseInvalidRollArgs(t *testing.T) {
-	rollArgsArray := append(InvalidRollArgs, InvalidRollArgsAttribs...)
+	rollArgsArray := append(invalidRollArgs, invalidRollArgsAttribs...)
 	rollExprs, _ := ParseRollArgs(rollArgsArray...)
 	for e := range rollExprs {
 		for i := range rollExprs[e].diceRolls {
@@ -71,17 +71,17 @@ func TestParseInvalidRollArgs(t *testing.T) {
 }
 
 func TestParseSingleValidRollArg(t *testing.T) {
-	for i := range ValidRollArgs {
-		if _, argErr := parseRollArg(ValidRollArgs[i]); argErr != nil {
+	for i := range validRollArgs {
+		if _, argErr := parseRollArg(validRollArgs[i]); argErr != nil {
 			validArgParsingError(argErr, t)
 		}
 	}
 }
 
 func TestParseSingleInvalidRollArg(t *testing.T) {
-	for i := range InvalidRollArgs {
-		if _, argErr := parseRollArg(InvalidRollArgs[i]); argErr == nil {
-			invalidArgParsingError(InvalidRollArgs[i], t)
+	for i := range invalidRollArgs {
+		if _, argErr := parseRollArg(invalidRollArgs[i]); argErr == nil {
+			invalidArgParsingError(invalidRollArgs[i], t)
 		}
 	}
 }
@@ -111,13 +111,13 @@ func FuzzParseManyRollArgs(f *testing.F) {
 
 			switch argType {
 			case 1:
-				rollArg = ValidRollArgs[rand.Intn(len(ValidRollArgs))]
+				rollArg = validRollArgs[rand.Intn(len(validRollArgs))]
 			case 2:
-				rollArg = InvalidRollArgs[rand.Intn(len(InvalidRollArgs))]
+				rollArg = invalidRollArgs[rand.Intn(len(invalidRollArgs))]
 			case 3:
-				rollArg = ValidRollArgsAttribs[rand.Intn(len(ValidRollArgsAttribs))]
+				rollArg = validRollArgsAttribs[rand.Intn(len(validRollArgsAttribs))]
 			case 4:
-				rollArg = InvalidRollArgsAttribs[rand.Intn(len(InvalidRollArgsAttribs))]
+				rollArg = invalidRollArgsAttribs[rand.Intn(len(invalidRollArgsAttribs))]
 			}
 
 			rollArgsArray = append(rollArgsArray, rollArg)

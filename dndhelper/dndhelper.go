@@ -73,6 +73,5 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println("Usage:	dndhelper [rollArg] ... [rollArg]")
-	fmt.Println("	Valid rollArg examples: 1d6, 4d4, 1d10+1, 1D8-1")
+	fmt.Println("Usage:	dndhelper [rollArg...]")
 }

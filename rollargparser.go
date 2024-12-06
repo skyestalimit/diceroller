@@ -18,34 +18,6 @@ const maxAllowedRollArgLength int = 5
 
 // Parses a RollArg array. Returns a DiceRoll array for valid RollArgs, an
 // error array for invalid ones.
-//
-// A valid RollArg matches either the DiceRoll format or a rollAttribute string.
-//
-// DiceRoll format: [X]dY[+|-]Z. In other words XdY or dY followed by + or - Z.
-// Valid DiceRoll examples: "5d6", "d20", "4d4+1", "10d10", "1d6-1", "1D8".
-//
-// RollArgs will be converted into DiceRolls and grouped together in rolling
-// expressions. A new rolling expression starts when a rollAttribute is
-// parsed after a sequence of DiceRolls.
-//
-// For example:
-//   - 5d6 1d6 10d10 would return one rolling expression containing all three
-//     RollArgs as DiceRolls.
-//   - adv d20+5 half spell 8d8 would return two rolling expressions: "adv 1d20+5"
-//     and "half spell 8d8".
-//   - 5d6 roll 4d6 roll 3d6 would return three rolling expressions: "5d6", "4d6" and "3d6".
-//
-// rollAttribute string list:
-//   - roll, hit, dmg : separators, starts a new rolling expressions
-//
-// DnD rollAttribute string list:
-//   - crit: Critical, doubles all dice ammount
-//   - spell: Spell, DiceRollResults.String() prints the sum and the sum halved for saves
-//   - half: Halves the sums, for resistances and such
-//   - adv: Advantage, rolls each dice twice and drops the lowest
-//   - dis: Disadvantage, rolls each dice twice and drops the highest
-//   - drophigh: Drop High, drops the highest result of a DiceRoll
-//   - droplow: Drop Low, drops the lowest result of a DiceRoll
 func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, errors []error) {
 	// We're building rollingExpressions along with their rollAttributes
 	rollExpr := newRollingExpression()
