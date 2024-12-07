@@ -7,8 +7,8 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-// A DiceRollResult contains the results of performing a DiceRoll
-type DiceRollResult struct {
+// A diceRollResult contains the results of performing a DiceRoll
+type diceRollResult struct {
 	diceRoll      DiceRoll // Performed DiceRoll
 	dice          []int    // Individual dice roll result
 	sum           int      // Sum of Dice
@@ -18,12 +18,12 @@ type DiceRollResult struct {
 }
 
 // DiceRollResult constructor with DiceRoll readable string and rollAttributes.
-func newDiceRollResult(diceRoll DiceRoll) *DiceRollResult {
-	return &DiceRollResult{diceRoll, []int{}, 0, []int{}, []int{}, []int{}}
+func newDiceRollResult(diceRoll DiceRoll) *diceRollResult {
+	return &diceRollResult{diceRoll, []int{}, 0, []int{}, []int{}, []int{}}
 }
 
 // Returns the total sum of a DiceRollResult array.
-func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
+func DiceRollResultsSum(results ...diceRollResult) (sum int) {
 	for i := range results {
 		sum += results[i].sum
 	}
@@ -32,7 +32,7 @@ func DiceRollResultsSum(results ...DiceRollResult) (sum int) {
 }
 
 // Detects a critical hit.
-func (rollResult DiceRollResult) hasScoredCritHit() bool {
+func (rollResult diceRollResult) hasScoredCritHit() bool {
 	critHit := false
 
 	if len(rollResult.dice) == 1 && rollResult.dice[0] == 20 &&
@@ -44,7 +44,7 @@ func (rollResult DiceRollResult) hasScoredCritHit() bool {
 }
 
 // Human readable DiceRollResult string.
-func (result DiceRollResult) String() string {
+func (result diceRollResult) String() string {
 	resultStr := " Result of DiceRoll \""
 	advDisStr := ""
 	spell := false

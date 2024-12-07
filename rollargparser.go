@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/maps"
 )
 
 // RollArg regex
@@ -34,7 +36,7 @@ func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, 
 			// Apply the rollAttribute to diceRolls
 			attribs.setRollAttrib(rollAttrib)
 		} else if diceRoll, err := parseRollArg(rollArgs[i]); err == nil {
-			diceRoll.rollAttribs = attribs
+			diceRoll.rollAttribs.setRollAttrib(maps.Keys(attribs.attribs)...)
 			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 		} else {
 			errors = append(errors, err)

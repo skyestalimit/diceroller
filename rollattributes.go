@@ -88,34 +88,11 @@ func (dndAttribs *rollAttributes) setRollAttrib(rollAttribs ...rollAttribute) {
 }
 
 // Returns true if wanted is set.
-func (dndAttrib rollAttributes) hasAttrib(wanted rollAttribute) bool {
-	return dndAttrib.attribs[wanted]
-}
+func hasAttrib(dndAttrib *rollAttributes, wanted rollAttribute) bool {
+	found := false
+	if dndAttrib != nil {
+		found = dndAttrib.attribs[wanted]
+	}
 
-func (dndAttrib rollAttributes) isCrit() bool {
-	return dndAttrib.hasAttrib(critAttrib)
-}
-
-func (dndAttrib rollAttributes) isAdvantage() bool {
-	return dndAttrib.hasAttrib(advantageAttrib)
-}
-
-func (dndAttrib rollAttributes) isDisadvantage() bool {
-	return dndAttrib.hasAttrib(disadvantageAttrib)
-}
-
-func (dndAttrib rollAttributes) isDropHigh() bool {
-	return dndAttrib.hasAttrib(dropHighAttrib)
-}
-
-func (dndAttrib rollAttributes) isDropLow() bool {
-	return dndAttrib.hasAttrib(dropLowAttrib)
-}
-
-func (dndAttrib rollAttributes) isHalf() bool {
-	return dndAttrib.hasAttrib(halfAttrib)
-}
-
-func (dndAttrib rollAttributes) isMinus() bool {
-	return dndAttrib.hasAttrib(minusAttrib)
+	return found
 }

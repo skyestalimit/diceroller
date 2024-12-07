@@ -15,7 +15,7 @@ func PerformRollArgsAndSum(rollArgs ...string) int {
 }
 
 // Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
-func PerformRollArgs(rollArgs ...string) ([]rollingExpressionResult, []error) {
+func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
 	rollExprs, argErrs := ParseRollArgs(rollArgs...)
 	results, diceErrs := performRollingExpressions(rollExprs...)
 	return results, append(argErrs, diceErrs...)
@@ -28,7 +28,7 @@ func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 }
 
 // Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []error) {
+func PerformRolls(diceRolls ...DiceRoll) (results []diceRollResult, diceErrs []error) {
 	for i := range diceRolls {
 		if result, diceErr := validateAndperformRoll(diceRolls[i]); diceErr == nil {
 			results = append(results, *result)
@@ -42,14 +42,14 @@ func PerformRolls(diceRolls ...DiceRoll) (results []DiceRollResult, diceErrs []e
 // Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
 func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 	results, _ := performRollingExpressions(rollExprs...)
-	return RollingExpressionResultSum(results...)
+	return RollResultSum(results...)
 }
 
 // Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func performRollingExpressions(rollExprs ...rollingExpression) (results []rollingExpressionResult, diceErrs []error) {
+func performRollingExpressions(rollExprs ...rollingExpression) (results []rollResult, diceErrs []error) {
 	wasCritHit := false
 	for e := range rollExprs {
-		rollExprResult := newRollingExpressionResult(rollExprs[e])
+		rollExprResult := newRollResult(rollExprs[e])
 		for i := range rollExprs[e].diceRolls {
 			diceRoll := rollExprs[e].diceRolls[i]
 			if wasCritHit {
@@ -70,7 +70,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []rollin
 }
 
 // Validates and performs diceRoll. Returns a DiceRollResult if valid, an error if invalid.
-func validateAndperformRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
+func validateAndperformRoll(diceRoll DiceRoll) (*diceRollResult, error) {
 	// Validate DiceRoll
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		// Invalid DiceRoll, return error
@@ -82,19 +82,19 @@ func validateAndperformRoll(diceRoll DiceRoll) (*DiceRollResult, error) {
 }
 
 // Generates DiceRollResult and applies attribs.
-func performRoll(diceRoll DiceRoll) *DiceRollResult {
+func performRoll(diceRoll DiceRoll) *diceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll)
 
 	// Generate rolls
 	generateRolls(diceRoll, diceRollResult, diceRoll.rollAttribs)
 
 	// Drop High attrib
-	if diceRoll.rollAttribs.isDropHigh() && len(diceRollResult.dice) > 1 {
+	if hasAttrib(diceRoll.rollAttribs, dropHighAttrib) && len(diceRollResult.dice) > 1 {
 		dropHigh(diceRollResult)
 	}
 
 	// Drop Low attrib
-	if diceRoll.rollAttribs.isDropLow() && len(diceRollResult.dice) > 1 {
+	if hasAttrib(diceRoll.rollAttribs, dropLowAttrib) && len(diceRollResult.dice) > 1 {
 		dropLow(diceRollResult)
 	}
 
@@ -102,7 +102,7 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	diceRollResult.sum += diceRoll.modifier
 
 	// Half attrib
-	if diceRoll.rollAttribs.isHalf() {
+	if hasAttrib(diceRoll.rollAttribs, halfAttrib) {
 		diceRollResult.sum = halve(diceRollResult.sum)
 	}
 
@@ -112,19 +112,19 @@ func performRoll(diceRoll DiceRoll) *DiceRollResult {
 	}
 
 	// Negative Sum if minus DiceRoll
-	if diceRoll.rollAttribs.isMinus() {
+	if hasAttrib(diceRoll.rollAttribs, minusAttrib) {
 		diceRollResult.sum = -diceRollResult.sum
 	}
 
 	return diceRollResult
 }
 
-func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAttributes *rollAttributes) {
+func generateRolls(diceRoll DiceRoll, diceRollResult *diceRollResult, dndRollAttributes *rollAttributes) {
 	// Determine actual dice ammount to roll
 	actualDiceAmmount := diceRoll.diceAmmount
 
 	// Crit attrib
-	if dndRollAttributes.isCrit() {
+	if hasAttrib(dndRollAttributes, critAttrib) {
 		actualDiceAmmount = actualDiceAmmount * 2
 	}
 
@@ -133,11 +133,11 @@ func generateRolls(diceRoll DiceRoll, diceRollResult *DiceRollResult, dndRollAtt
 		roll := rollDice(diceRoll.diceSize)
 
 		// Advantage attrib
-		if dndRollAttributes.isAdvantage() {
+		if hasAttrib(dndRollAttributes, advantageAttrib) {
 			roll = advantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 		// Disadvantage attrib
-		if dndRollAttributes.isDisadvantage() {
+		if hasAttrib(dndRollAttributes, disadvantageAttrib) {
 			roll = disadvantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 
@@ -152,7 +152,7 @@ func rollDice(diceSize int) int {
 }
 
 // Applies advantage logic. Returns the roll to keep and the roll to drop.
-func advantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep int) {
+func advantage(roll int, roll2 int, diceRollResult *diceRollResult) (toKeep int) {
 	toKeep, toDrop := roll, roll2 // Default return order, change if needed
 
 	if roll != max(roll, roll2) {
@@ -165,7 +165,7 @@ func advantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep int)
 }
 
 // Applies disavantage logic. Returns the roll to keep and the roll to drop.
-func disadvantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep int) {
+func disadvantage(roll int, roll2 int, diceRollResult *diceRollResult) (toKeep int) {
 	toKeep, toDrop := roll, roll2 // Default return order, change if needed
 
 	if roll != min(roll, roll2) {
@@ -178,7 +178,7 @@ func disadvantage(roll int, roll2 int, diceRollResult *DiceRollResult) (toKeep i
 }
 
 // Applies drop high logic. Returns the index of the roll to drop.
-func dropHigh(diceRollResult *DiceRollResult) {
+func dropHigh(diceRollResult *diceRollResult) {
 	drop := 0
 
 	drop = slices.Max(diceRollResult.dice)
@@ -190,7 +190,7 @@ func dropHigh(diceRollResult *DiceRollResult) {
 }
 
 // Applies drop low logic. Returns the index of the roll to drop.
-func dropLow(diceRollResult *DiceRollResult) {
+func dropLow(diceRollResult *diceRollResult) {
 	drop := 0
 
 	drop = slices.Min(diceRollResult.dice)

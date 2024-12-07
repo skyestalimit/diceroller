@@ -21,7 +21,7 @@ const bigNumberErrorMsg = "This is a dice roller, not a Pi calculator"
 
 // DiceRoll constructor, validates values.
 func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error) {
-	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, nil)
+	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, newRollAttributes())
 }
 
 // DiceRoll constructor, validates values but doesn't return errors. Can be useful for testing.
@@ -50,7 +50,7 @@ func (diceRoll DiceRoll) String() string {
 	strDiceRoll := ""
 
 	// Add minus symbol if needed
-	if diceRoll.rollAttribs.isMinus() {
+	if hasAttrib(diceRoll.rollAttribs, minusAttrib) {
 		strDiceRoll += "-"
 	}
 

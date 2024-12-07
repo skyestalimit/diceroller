@@ -108,7 +108,7 @@ func TestTrickyRolls(t *testing.T) {
 }
 
 // Validates roll result matches expected format
-func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues, t *testing.T) {
+func validateDiceRollResult(result diceRollResult, diceValues diceRollTestValues, t *testing.T) {
 	// validate result format
 	if resultStr := result.String(); !diceValues.resultFormat.MatchString(result.String()) {
 		t.Fatalf("Roll result = %s, wanted %#q", resultStr, diceValues.resultFormat)
@@ -123,7 +123,7 @@ func validateDiceRollResult(result DiceRollResult, diceValues diceRollTestValues
 	if sum <= 0 {
 		sum = 1
 	}
-	if diceValues.diceRoll.rollAttribs.isMinus() {
+	if hasAttrib(diceValues.diceRoll.rollAttribs, minusAttrib) {
 		sum = -sum
 	}
 
