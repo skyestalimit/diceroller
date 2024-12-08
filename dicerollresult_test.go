@@ -15,6 +15,6 @@ func FuzzDiceRollResultSum(f *testing.F) {
 			results = append(results, *result)
 		}
 
-		DiceRollResultsSum(results...)
+		diceRollResultsSum(results...)
 	})
 }

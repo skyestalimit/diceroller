@@ -23,7 +23,7 @@ func newDiceRollResult(diceRoll DiceRoll) *diceRollResult {
 }
 
 // Returns the total sum of a DiceRollResult array.
-func DiceRollResultsSum(results ...diceRollResult) (sum int) {
+func diceRollResultsSum(results ...diceRollResult) (sum int) {
 	for i := range results {
 		sum += results[i].sum
 	}

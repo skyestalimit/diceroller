@@ -41,15 +41,15 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 
 	}
 
-	// One result per valid DiceRoll should be received
-	if lenResults, lenValues := len(results), len(validDiceRollsValues); lenResults != lenValues {
+	// One rollResult with one diceRollResult per valid DiceRoll should be received
+	if lenResults, lenValues := len(results[0].Results), len(validDiceRollsValues); lenResults != lenValues {
 		// Missing results, fail the test
 		t.Fatalf("Result list length = %d, wanted %d", lenResults, lenValues)
 	}
 
 	// Validate result array
 	for i := range results {
-		validateDiceRollResult(results[i], validDiceRollsValues[i], t)
+		validateDiceRollResult(results[0].Results[i], validDiceRollsValues[i], t)
 	}
 }
 

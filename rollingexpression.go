@@ -6,8 +6,8 @@ type rollingExpression struct {
 }
 
 // Constructor of rollingExpression.
-func newRollingExpression() *rollingExpression {
-	return &rollingExpression{make([]DiceRoll, 0)}
+func newRollingExpression(diceRolls ...DiceRoll) *rollingExpression {
+	return &rollingExpression{append(make([]DiceRoll, 0), diceRolls...)}
 }
 
 // Rolling Expression as String.

@@ -14,7 +14,7 @@ func PerformRollArgsAndSum(rollArgs ...string) int {
 	return performRollingExpressionsAndSum(rollExprs...)
 }
 
-// Performs an array of RollArgs. Returns a DiceRollResult array for valid RollArgs and an error array for invalid ones.
+// Performs an array of RollArgs. Returns a rollResult array for valid RollArgs and an error array for invalid ones.
 func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
 	rollExprs, argErrs := ParseRollArgs(rollArgs...)
 	results, diceErrs := performRollingExpressions(rollExprs...)
@@ -24,19 +24,12 @@ func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
 func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 	results, _ := PerformRolls(diceRolls...)
-	return DiceRollResultsSum(results...)
+	return RollResultSum(results...)
 }
 
-// Performs an array of DiceRoll. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(diceRolls ...DiceRoll) (results []diceRollResult, diceErrs []error) {
-	for i := range diceRolls {
-		if result, diceErr := validateAndperformRoll(diceRolls[i]); diceErr == nil {
-			results = append(results, *result)
-		} else {
-			diceErrs = append(diceErrs, diceErr)
-		}
-	}
-	return results, diceErrs
+// Performs an array of DiceRoll. Returns a rollResult array for valid DiceRolls and an error array for invalid ones.
+func PerformRolls(diceRolls ...DiceRoll) (results []rollResult, diceErrs []error) {
+	return performRollingExpressions(*newRollingExpression(diceRolls...))
 }
 
 // Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
@@ -45,7 +38,7 @@ func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 	return RollResultSum(results...)
 }
 
-// Performs a rolling expression. Returns a DiceRollResult array for valid DiceRolls and an error array for invalid ones.
+// Performs a rolling expression. Returns a rollResult array for valid DiceRolls and an error array for invalid ones.
 func performRollingExpressions(rollExprs ...rollingExpression) (results []rollResult, diceErrs []error) {
 	wasCritHit := false
 	for e := range rollExprs {
