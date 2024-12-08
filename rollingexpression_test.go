@@ -12,6 +12,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 	rollExpr := newRollingExpression()
 	rollAttribs := newRollAttributes()
 
+	// Loop all attribs to test more combinations
 	for i := range validRollArgsAttribs {
 		if rollAttrib := checkForRollAttribute(validRollArgsAttribs[i]); rollAttrib > 0 {
 			rollAttribs.setRollAttrib(rollAttrib)
@@ -44,7 +45,6 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 
 		if sum := RollResultsSum(results...); sum < 1 {
 			t.Fatalf("Rolling Expression results sum %d, wanted > 0", sum)
-
 		}
 	}
 }
@@ -81,7 +81,7 @@ func FuzzRollingExpression(f *testing.F) {
 		rollAttribs := newRollAttributes()
 
 		for i := 0; i < attribAmmount; i++ {
-			rollAttribs.setRollAttrib(rollAttribute(i))
+			rollAttribs.setRollAttrib(rollAttributeMap[maps.Keys(rollAttributeMap)[i]])
 		}
 
 		for i := 0; i < diceRollAmmount; i++ {

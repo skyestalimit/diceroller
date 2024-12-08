@@ -22,13 +22,13 @@ func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
 }
 
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
-func PerformRollsAndSum(diceRolls ...DiceRoll) int {
-	results, _ := PerformRolls(diceRolls...)
+func PerformDiceRollsAndSum(diceRolls ...DiceRoll) int {
+	results, _ := PerformDiceRolls(diceRolls...)
 	return RollResultsSum(results...)
 }
 
 // Performs an array of DiceRoll. Returns a rollResult array for valid DiceRolls and an error array for invalid ones.
-func PerformRolls(diceRolls ...DiceRoll) (results []rollResult, diceErrs []error) {
+func PerformDiceRolls(diceRolls ...DiceRoll) (results []rollResult, diceErrs []error) {
 	return performRollingExpressions(*newRollingExpression(diceRolls...))
 }
 

@@ -54,7 +54,7 @@ In the end, all the rolls made with this package are made using DiceRolls intern
 You can also build your own DiceRolls and pass them to the following function to roll them:
 
 ```go
-PerformRollsAndSum(*diceRoll2d6plus1, *diceRoll1d8)
+PerformDiceRollsAndSum(*diceRoll2d6plus1, *diceRoll1d8)
 ```
 
 ### Viewing Results

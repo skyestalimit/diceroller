@@ -28,7 +28,7 @@ func TestPerformRollWithInvalidDiceRolls(t *testing.T) {
 // Test rolling an array of valid DiceRoll
 func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	results, diceErrs := PerformRolls(diceRollsFromTestValues(validDiceRollsValues)...)
+	results, diceErrs := PerformDiceRolls(diceRollsFromTestValues(validDiceRollsValues)...)
 
 	// No errors should be received for a valid DiceRoll array
 	if diceErrs != nil {
@@ -56,7 +56,7 @@ func TestPerformRollsWithValidDiceRolls(t *testing.T) {
 // Test rolling an array of invalid DiceRoll
 func TestPerformRollsWithInvalidDiceRolls(t *testing.T) {
 	// Perform rolls on DiceRoll array
-	_, diceErrs := PerformRolls(diceRollsFromTestValues(invalidDiceRollsValues)...)
+	_, diceErrs := PerformDiceRolls(diceRollsFromTestValues(invalidDiceRollsValues)...)
 
 	// One error per invalid DiceRoll should be received
 	if lenDiceErrs, lenValues := len(diceErrs), len(invalidDiceRollsValues); lenDiceErrs != lenValues {
@@ -167,16 +167,16 @@ func FuzzTestPerformRollArgs(f *testing.F) {
 	})
 }
 
-func FuzzTestPerformRollsAndSum(f *testing.F) {
+func FuzzTestPerformDiceRollsAndSum(f *testing.F) {
 	f.Add(6, 2, 4)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier))
+		PerformDiceRollsAndSum(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }
 
 func FuzzPerformRolls(f *testing.F) {
 	f.Add(12, 18, 11)
 	f.Fuzz(func(t *testing.T, diceAmmount int, diceSize int, modifier int) {
-		PerformRolls(*newDiceRoll(diceAmmount, diceSize, modifier))
+		PerformDiceRolls(*newDiceRoll(diceAmmount, diceSize, modifier))
 	})
 }
