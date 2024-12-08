@@ -10,13 +10,13 @@ import (
 
 // Straightforward rolling using RollArgs. Returns the sum, invalid RollArgs are worth 0.
 func PerformRollArgsAndSum(rollArgs ...string) int {
-	rollExprs, _ := ParseRollArgs(rollArgs...)
+	rollExprs, _ := parseRollArgs(rollArgs...)
 	return performRollingExpressionsAndSum(rollExprs...)
 }
 
 // Performs an array of RollArgs. Returns a rollResult array for valid RollArgs and an error array for invalid ones.
 func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
-	rollExprs, argErrs := ParseRollArgs(rollArgs...)
+	rollExprs, argErrs := parseRollArgs(rollArgs...)
 	results, diceErrs := performRollingExpressions(rollExprs...)
 	return results, append(argErrs, diceErrs...)
 }
@@ -24,7 +24,7 @@ func PerformRollArgs(rollArgs ...string) ([]rollResult, []error) {
 // Performs an array of DiceRoll. Returns the sum, invalid DiceRolls are worth 0.
 func PerformRollsAndSum(diceRolls ...DiceRoll) int {
 	results, _ := PerformRolls(diceRolls...)
-	return RollResultSum(results...)
+	return RollResultsSum(results...)
 }
 
 // Performs an array of DiceRoll. Returns a rollResult array for valid DiceRolls and an error array for invalid ones.
@@ -35,7 +35,7 @@ func PerformRolls(diceRolls ...DiceRoll) (results []rollResult, diceErrs []error
 // Performs a rolling expression. Returns the sum, invalid DiceRolls are worth 0.
 func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 	results, _ := performRollingExpressions(rollExprs...)
-	return RollResultSum(results...)
+	return RollResultsSum(results...)
 }
 
 // Performs a rolling expression. Returns a rollResult array for valid DiceRolls and an error array for invalid ones.

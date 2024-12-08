@@ -42,7 +42,7 @@ func TestRollingExpressionWithValidValues(t *testing.T) {
 			t.Fatalf("Rolling Expression returned errors: %s", strErr)
 		}
 
-		if sum := RollResultSum(results...); sum < 1 {
+		if sum := RollResultsSum(results...); sum < 1 {
 			t.Fatalf("Rolling Expression results sum %d, wanted > 0", sum)
 
 		}
@@ -68,7 +68,7 @@ func TestRollingExpressionWithInvalidValues(t *testing.T) {
 		t.Fatalf("Invalid Rolling Expression did not return errors")
 	}
 
-	if sum := RollResultSum(results...); sum > 0 {
+	if sum := RollResultsSum(results...); sum > 0 {
 		t.Fatalf("Invalid Rolling Expression results %d, wanted <= 0", sum)
 
 	}

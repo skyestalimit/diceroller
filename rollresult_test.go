@@ -18,6 +18,6 @@ func FuzzRollResultSum(f *testing.F) {
 			rollExprs = append(rollExprs, *rollExpr)
 		}
 		rollResults, _ := performRollingExpressions()
-		RollResultSum(rollResults...)
+		RollResultsSum(rollResults...)
 	})
 }

@@ -54,7 +54,6 @@ func (diceRoll DiceRoll) hasAttrib(wanted rollAttribute) bool {
 	if diceRoll.rollAttribs != nil {
 		found = diceRoll.rollAttribs.hasAttrib(wanted)
 	}
-
 	return found
 }
 

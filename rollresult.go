@@ -14,20 +14,24 @@ func newRollResult(rollExpr rollingExpression) *rollResult {
 }
 
 // Sums multiple RollingExpressionResult.
-func RollResultSum(rollExprResults ...rollResult) (sum int) {
+func RollResultsSum(rollExprResults ...rollResult) (sum int) {
 	for e := range rollExprResults {
-		sum += diceRollResultsSum(rollExprResults[e].results...)
+		sum += rollExprResults[e].Sum()
 	}
 	return
 }
 
+func (rollResult rollResult) Sum() int {
+	return diceRollResultsSum(rollResult.results...)
+}
+
 // Formatted result output.
-func (rollExprResult rollResult) String() string {
-	resultStr := "Rolling expression: " + rollExprResult.rollExpr.String() + "\n" // add attribs to string
-	for i := range rollExprResult.results {
-		resultStr += rollExprResult.results[i].String()
+func (rollResult rollResult) String() string {
+	resultStr := "Roll result : " + rollResult.rollExpr.String() + "\n" // add attribs to string
+	for i := range rollResult.results {
+		resultStr += rollResult.results[i].String()
 	}
-	resultStr += fmt.Sprintf("Rolling expression sum: %d \n", diceRollResultsSum(rollExprResult.results...))
+	resultStr += fmt.Sprintf("Roll results sum: %d \n", diceRollResultsSum(rollResult.results...))
 	return resultStr
 }
 

@@ -20,7 +20,7 @@ const maxAllowedRollArgLength int = 5
 
 // Parses a RollArg array. Returns a DiceRoll array for valid RollArgs, an
 // error array for invalid ones.
-func ParseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, errors []error) {
+func parseRollArgs(rollArgs ...string) (rollingExpressions []rollingExpression, errors []error) {
 	// We're building rollingExpressions along with their rollAttributes
 	rollExpr := newRollingExpression()
 	attribs := newRollAttributes()
@@ -112,7 +112,7 @@ func parseRollArg(rollArg string) (*DiceRoll, error) {
 
 // Parses a rollArg slice. Returns its value if valid, zero and an error if invalid.
 func parseRollArgSlice(rollArgSlice string) (int, error) {
-	// Validate rollArgSlice size, max allowed is 5 not including minus symbol
+	// Validate rollArgSlice size, max allowed length is not including minus symbol
 	maxAllowedLength := maxAllowedRollArgLength
 	if strings.ContainsAny(rollArgSlice, "-") {
 		maxAllowedLength++

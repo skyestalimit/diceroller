@@ -54,7 +54,7 @@ var invalidRollArgsAttribs = []string{
 
 func TestParseValidRollArgs(t *testing.T) {
 	rollArgsArray := append(validRollArgs, validRollArgsAttribs...)
-	_, errors := ParseRollArgs(rollArgsArray...)
+	_, errors := parseRollArgs(rollArgsArray...)
 	for i := range errors {
 		validArgParsingError(errors[i], t)
 	}
@@ -62,7 +62,7 @@ func TestParseValidRollArgs(t *testing.T) {
 
 func TestParseInvalidRollArgs(t *testing.T) {
 	rollArgsArray := append(invalidRollArgs, invalidRollArgsAttribs...)
-	rollExprs, _ := ParseRollArgs(rollArgsArray...)
+	rollExprs, _ := parseRollArgs(rollArgsArray...)
 	for e := range rollExprs {
 		for i := range rollExprs[e].diceRolls {
 			invalidArgParsingError(rollExprs[e].diceRolls[i].String(), t)
@@ -97,7 +97,7 @@ func invalidArgParsingError(diceRollStr string, t *testing.T) {
 func FuzzParseRollArgs(f *testing.F) {
 	f.Add("8d4-1")
 	f.Fuzz(func(t *testing.T, fuzzedRollArg string) {
-		ParseRollArgs(fuzzedRollArg)
+		parseRollArgs(fuzzedRollArg)
 	})
 }
 
@@ -122,6 +122,6 @@ func FuzzParseManyRollArgs(f *testing.F) {
 
 			rollArgsArray = append(rollArgsArray, rollArg)
 		}
-		ParseRollArgs(rollArgsArray...)
+		parseRollArgs(rollArgsArray...)
 	})
 }
