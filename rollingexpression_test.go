@@ -80,18 +80,13 @@ func FuzzRollingExpression(f *testing.F) {
 		rollExpr := newRollingExpression()
 		rollAttribs := newRollAttributes()
 
-		for i := 0; i < diceRollAmmount; i++ {
-			rollExpr.diceRolls = append(rollExpr.diceRolls, *newDiceRoll(rand.Intn(99999)+1, rand.Intn(99999)+1, rand.Intn(99999)+1))
-		}
-
 		for i := 0; i < attribAmmount; i++ {
 			rollAttribs.setRollAttrib(rollAttribute(i))
+		}
 
-			if !hasAttrib(rollAttribs, rollAttribute(i)) {
-				t.Fatalf("Random attrib %d is false, wanted true", i)
-			}
-
-			checkForAttribCompatibility(rollAttribs, t)
+		for i := 0; i < diceRollAmmount; i++ {
+			diceRoll, _ := NewDiceRollWithAttribs(rand.Intn(99999)+1, rand.Intn(99999)+1, rand.Intn(99999)+1, rollAttribs)
+			rollExpr.diceRolls = append(rollExpr.diceRolls, *diceRoll)
 		}
 
 		_, diceErrs := performRollingExpressions(*rollExpr)

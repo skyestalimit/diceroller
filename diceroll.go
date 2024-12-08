@@ -24,19 +24,22 @@ func NewDiceRoll(diceAmmount int, diceSize int, modifier int) (*DiceRoll, error)
 	return NewDiceRollWithAttribs(diceAmmount, diceSize, modifier, newRollAttributes())
 }
 
-// DiceRoll constructor, validates values but doesn't return errors. Can be useful for testing.
-func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
-	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier)
-	return diceRoll
-}
-
 // DiceRoll constructor with rollAttributes, validates values.
 func NewDiceRollWithAttribs(diceAmmount int, diceSize int, modifier int, attribs *rollAttributes) (*DiceRoll, error) {
+	if attribs == nil {
+		attribs = newRollAttributes()
+	}
 	diceRoll := DiceRoll{diceAmmount, diceSize, modifier, attribs}
 	if diceErr := validateDiceRoll(diceRoll); diceErr != nil {
 		return nil, fmt.Errorf("invalid DiceRoll %s", diceErr.Error())
 	}
 	return &diceRoll, nil
+}
+
+// DiceRoll constructor, validates values but doesn't return errors. Can be useful for testing.
+func newDiceRoll(diceAmmount int, diceSize int, modifier int) *DiceRoll {
+	diceRoll, _ := NewDiceRoll(diceAmmount, diceSize, modifier)
+	return diceRoll
 }
 
 // Performs the DiceRoll. Returns the sum if valid, zero if invalid.
@@ -45,12 +48,22 @@ func (diceRoll DiceRoll) Roll() int {
 	return result.sum
 }
 
+// Returns true if wanted is set. Provides nil protection that rollAttribute can't provide itself.
+func (diceRoll DiceRoll) hasAttrib(wanted rollAttribute) bool {
+	found := false
+	if diceRoll.rollAttribs != nil {
+		found = diceRoll.rollAttribs.hasAttrib(wanted)
+	}
+
+	return found
+}
+
 // Human readable DiceRoll string, such as "2d8+1".
 func (diceRoll DiceRoll) String() string {
 	strDiceRoll := ""
 
 	// Add minus symbol if needed
-	if hasAttrib(diceRoll.rollAttribs, minusAttrib) {
+	if diceRoll.hasAttrib(minusAttrib) {
 		strDiceRoll += "-"
 	}
 

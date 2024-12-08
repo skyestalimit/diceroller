@@ -11,7 +11,7 @@ func TestRollAttributes(t *testing.T) {
 		rollAttrib := rollAttributeMap[i]
 		rollAttribs.setRollAttrib(rollAttrib)
 
-		if hasAttrib(rollAttribs, rollAttrib) == false {
+		if rollAttribs.hasAttrib(rollAttrib) == false {
 			t.Fatalf("hasAttrib %d returned false, wanted true", rollAttrib)
 		}
 
@@ -41,11 +41,11 @@ func checkForAttribCompatibility(rollAttribs *rollAttributes, t *testing.T) {
 	for rollAttrib := range rollAttribs.attribs {
 		switch rollAttrib {
 		case advantageAttrib:
-			if hasAttrib(rollAttribs, disadvantageAttrib) {
+			if rollAttribs.hasAttrib(disadvantageAttrib) {
 				t.Fatalf("Advantage attrib compatibility check failed, %s is set", rollAttributeMapKey(rollAttributeMap, rollAttrib))
 			}
 		case disadvantageAttrib:
-			if hasAttrib(rollAttribs, advantageAttrib) {
+			if rollAttribs.hasAttrib(advantageAttrib) {
 				t.Fatalf("Disadvantage attrib compatibility check failed, %s is set", rollAttributeMapKey(rollAttributeMap, rollAttrib))
 			}
 		}
@@ -59,7 +59,7 @@ func FuzzSetRollAttrib(f *testing.F) {
 		rollAttrib := rollAttribute(fuzzedRollAttrib)
 		rollAttribs.setRollAttrib(rollAttrib)
 
-		if !hasAttrib(rollAttribs, rollAttrib) {
+		if !rollAttribs.hasAttrib(rollAttrib) {
 			t.Fatalf("Fuzzed attrib %d not set", fuzzedRollAttrib)
 		}
 

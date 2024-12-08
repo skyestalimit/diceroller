@@ -49,7 +49,7 @@ func performRollingExpressions(rollExprs ...rollingExpression) (results []rollRe
 				diceRoll.rollAttribs.setRollAttrib(critAttrib)
 			}
 			if result, diceErr := validateAndperformRoll(diceRoll); diceErr == nil {
-				rollExprResult.Results = append(rollExprResult.Results, *result)
+				rollExprResult.results = append(rollExprResult.results, *result)
 			} else {
 				diceErrs = append(diceErrs, diceErr)
 			}
@@ -79,15 +79,15 @@ func performRoll(diceRoll DiceRoll) *diceRollResult {
 	diceRollResult := newDiceRollResult(diceRoll)
 
 	// Generate rolls
-	generateRolls(diceRoll, diceRollResult, diceRoll.rollAttribs)
+	generateRolls(diceRoll, diceRollResult)
 
 	// Drop High attrib
-	if hasAttrib(diceRoll.rollAttribs, dropHighAttrib) && len(diceRollResult.dice) > 1 {
+	if diceRoll.hasAttrib(dropHighAttrib) && len(diceRollResult.dice) > 1 {
 		dropHigh(diceRollResult)
 	}
 
 	// Drop Low attrib
-	if hasAttrib(diceRoll.rollAttribs, dropLowAttrib) && len(diceRollResult.dice) > 1 {
+	if diceRoll.hasAttrib(dropLowAttrib) && len(diceRollResult.dice) > 1 {
 		dropLow(diceRollResult)
 	}
 
@@ -95,7 +95,7 @@ func performRoll(diceRoll DiceRoll) *diceRollResult {
 	diceRollResult.sum += diceRoll.modifier
 
 	// Half attrib
-	if hasAttrib(diceRoll.rollAttribs, halfAttrib) {
+	if diceRoll.hasAttrib(halfAttrib) {
 		diceRollResult.sum = halve(diceRollResult.sum)
 	}
 
@@ -105,19 +105,19 @@ func performRoll(diceRoll DiceRoll) *diceRollResult {
 	}
 
 	// Negative Sum if minus DiceRoll
-	if hasAttrib(diceRoll.rollAttribs, minusAttrib) {
+	if diceRoll.hasAttrib(minusAttrib) {
 		diceRollResult.sum = -diceRollResult.sum
 	}
 
 	return diceRollResult
 }
 
-func generateRolls(diceRoll DiceRoll, diceRollResult *diceRollResult, dndRollAttributes *rollAttributes) {
+func generateRolls(diceRoll DiceRoll, diceRollResult *diceRollResult) {
 	// Determine actual dice ammount to roll
 	actualDiceAmmount := diceRoll.diceAmmount
 
 	// Crit attrib
-	if hasAttrib(dndRollAttributes, critAttrib) {
+	if diceRoll.hasAttrib(critAttrib) {
 		actualDiceAmmount = actualDiceAmmount * 2
 	}
 
@@ -126,11 +126,11 @@ func generateRolls(diceRoll DiceRoll, diceRollResult *diceRollResult, dndRollAtt
 		roll := rollDice(diceRoll.diceSize)
 
 		// Advantage attrib
-		if hasAttrib(dndRollAttributes, advantageAttrib) {
+		if diceRoll.hasAttrib(advantageAttrib) {
 			roll = advantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 		// Disadvantage attrib
-		if hasAttrib(dndRollAttributes, disadvantageAttrib) {
+		if diceRoll.hasAttrib(disadvantageAttrib) {
 			roll = disadvantage(roll, rollDice(diceRoll.diceSize), diceRollResult)
 		}
 

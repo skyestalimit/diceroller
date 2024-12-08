@@ -88,7 +88,7 @@ func (dndAttribs *rollAttributes) setRollAttrib(rollAttribs ...rollAttribute) {
 }
 
 // Returns true if wanted is set.
-func hasAttrib(dndAttrib *rollAttributes, wanted rollAttribute) bool {
+func (dndAttrib *rollAttributes) hasAttrib(wanted rollAttribute) bool {
 	found := false
 	if dndAttrib != nil {
 		found = dndAttrib.attribs[wanted]
