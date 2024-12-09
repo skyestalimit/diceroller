@@ -4,19 +4,18 @@ import "fmt"
 
 // Results of performing a rollingExpression.
 type rollResult struct {
-	rollExpr rollingExpression
-	results  []diceRollResult
+	results []diceRollResult
 }
 
-// Constructor of RollingExpressionResult.
-func newRollResult(rollExpr rollingExpression) *rollResult {
-	return &rollResult{rollExpr, make([]diceRollResult, 0)}
+// Constructor of rollResult.
+func newRollResult() *rollResult {
+	return &rollResult{make([]diceRollResult, 0)}
 }
 
-// Sums multiple RollingExpressionResult.
-func RollResultsSum(rollExprResults ...rollResult) (sum int) {
-	for e := range rollExprResults {
-		sum += rollExprResults[e].Sum()
+// Sums multiple rollResult.
+func RollResultsSum(rollResults ...rollResult) (sum int) {
+	for e := range rollResults {
+		sum += rollResults[e].Sum()
 	}
 	return
 }
@@ -27,7 +26,7 @@ func (rollResult rollResult) Sum() int {
 
 // Formatted result output.
 func (rollResult rollResult) String() string {
-	resultStr := "Roll result : " + rollResult.rollExpr.String() + "\n" // add attribs to string
+	resultStr := "Roll result : \n" // add attribs to string
 	for i := range rollResult.results {
 		resultStr += rollResult.results[i].String()
 	}

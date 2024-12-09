@@ -42,7 +42,7 @@ func performRollingExpressionsAndSum(rollExprs ...rollingExpression) int {
 func performRollingExpressions(rollExprs ...rollingExpression) (results []rollResult, diceErrs []error) {
 	wasCritHit := false
 	for e := range rollExprs {
-		rollExprResult := newRollResult(rollExprs[e])
+		rollExprResult := newRollResult()
 		for i := range rollExprs[e].diceRolls {
 			diceRoll := rollExprs[e].diceRolls[i]
 			if wasCritHit {
